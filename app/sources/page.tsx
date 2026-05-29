@@ -101,9 +101,8 @@ export default function SourcesPage() {
 
           <SimpleGrid columns={[1, 1, 2]} gap={6}>
             {SOURCES.map((source, idx) => (
-              <Box
+              <Link
                 key={idx}
-                as="a"
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -114,9 +113,10 @@ export default function SourcesPage() {
                 p={6}
                 transition="all 0.2s ease-in-out"
                 boxShadow="0 2px 10px rgba(0,0,0,0.02)"
-                _hover={{ borderColor: 'brand.400', transform: 'translateY(-2px)', boxShadow: '0 10px 25px -5px rgba(57,73,171,0.15)' }}
+                _hover={{ borderColor: 'brand.400', transform: 'translateY(-2px)', boxShadow: '0 10px 25px -5px rgba(57,73,171,0.15)', textDecoration: 'none' }}
                 display="flex"
                 flexDirection="column"
+                style={{ textDecoration: 'none' }}
               >
                 <HStack justify="space-between" mb={3}>
                   <Box
@@ -144,7 +144,7 @@ export default function SourcesPage() {
                 <Text fontSize="sm" color="gray.600" lineHeight={1.6} flex={1}>
                   {source.description}
                 </Text>
-              </Box>
+              </Link>
             ))}
           </SimpleGrid>
         </VStack>
