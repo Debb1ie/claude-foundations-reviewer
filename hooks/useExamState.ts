@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Question, ExamMode, Domain, ExamResults } from '@/types/exam';
 import { DOMAINS } from '@/types/exam';
 import questionsData from '@/data/questions.json';
@@ -64,10 +65,12 @@ function pickQuestionsForExam(): Question[] {
   return shuffleArray(result);
 }
 
-export const useExamStore = create<ExamStore>((set, get) => ({
-  questions: typedQuestions,
-  currentQuestion: 0,
-  answers: [],
+export const useExamStore = create<ExamStore>()(
+  persist(
+    (set, get) => ({
+      questions: typedQuestions,
+      currentQuestion: 0,
+      answers: [],
   mode: null,
   selectedDomain: null,
   timeRemaining: EXAM_DURATION,
@@ -241,4 +244,9 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       incorrectQuestions,
     };
   },
-}));
+}),
+  {
+    name: 'exam-storage',
+    storage: createJSONStorage(() => sessionStorage),
+  }
+));

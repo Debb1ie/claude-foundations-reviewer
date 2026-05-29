@@ -58,9 +58,10 @@ export function useTimer() {
     }
   }, [secondsLeft, completeExam, stop]);
 
-  const minutes = Math.floor(secondsLeft / 60);
+  const hours = Math.floor(secondsLeft / 3600);
+  const minutes = Math.floor((secondsLeft % 3600) / 60);
   const seconds = secondsLeft % 60;
-  const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   const isLow = secondsLeft < 300 && secondsLeft > 0;
   const isExpired = secondsLeft <= 0;
 
