@@ -101,7 +101,7 @@ export function ReviewOverview() {
               const isUnanswered = userAnswer === null;
 
               let cardBorderColor = isUnanswered ? 'orange.300' : 'border';
-              let cardBg = isUnanswered ? 'orange.50/20' : 'bg.panel';
+              const cardBg = isUnanswered ? 'orange.50/20' : 'bg.panel';
 
               if (isFlagged) {
                 cardBorderColor = 'orange.400';

@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import NextLink from 'next/link';
+import { Header } from '@/components/Header';
 import {
   Box,
   Container,
@@ -84,25 +85,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
 
   return (
     <Box bg="transparent" minH="100vh">
-      {/* Top Header/Navigation Bar */}
-      <Box borderBottom="1px solid" borderColor="border" bg="bg.panel" position="sticky" top={0} zIndex={10}>
-        <Container maxW="container.lg" py={4}>
-          <HStack justify="space-between">
-            <HStack gap={3}>
-              <Heading as="h1" size="md" fontWeight={600} color="brand.700">
-                Claude Certified Architect Exam Simulator
-              </Heading>
-            </HStack>
-            <HStack gap={4}>
-              <NextLink href="/sources" passHref legacyBehavior>
-                <Link fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }}>
-                  Study Resources
-                </Link>
-              </NextLink>
-            </HStack>
-          </HStack>
-        </Container>
-      </Box>
+      <Header />
 
       <Container maxW="container.lg" py={[8, 12]}>
         <VStack gap={[8, 10]} align="stretch">

@@ -136,8 +136,10 @@ export function ExamView() {
   const exitingRef = useRef(false);
   const startTimerRef = useRef(timer.start);
   const stopTimerRef = useRef(timer.stop);
-  startTimerRef.current = timer.start;
-  stopTimerRef.current = timer.stop;
+  useEffect(() => {
+    startTimerRef.current = timer.start;
+    stopTimerRef.current = timer.stop;
+  }, [timer.start, timer.stop]);
 
   useEffect(() => {
     if (mode && MODE_LABELS[mode]?.timer && timeRemaining > 0) {

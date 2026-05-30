@@ -1,9 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ModeSelector } from '@/components/ModeSelector';
 import { Footer } from '@/components/Footer';
 import { useExamStore } from '@/hooks/useExamState';
-import { Box } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { useEffect } from 'react';
 
 export default function Home() {
