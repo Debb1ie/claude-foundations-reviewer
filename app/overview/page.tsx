@@ -2,9 +2,9 @@
 import React from 'react';
 import { DOMAINS, DOMAIN_TEXT_COLORS } from '@/types/exam';
 import { Box, Container, Heading, Text, VStack, HStack, SimpleGrid, Badge, Flex } from '@chakra-ui/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -15,7 +15,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 16 } }
 };

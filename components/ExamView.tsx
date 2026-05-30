@@ -789,24 +789,24 @@ export function ExamView() {
       {/* Pause/Exit Dialog Modal */}
       <AnimatePresence>
         {dialogOpen && (
-          <Box
-            as={motion.div}
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            position="fixed"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            bg="rgba(0,0,0,0.6)"
-            zIndex="9999"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            backdropFilter="blur(8px)"
-            p={4}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(8px)',
+              padding: '16px'
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -848,31 +848,31 @@ export function ExamView() {
                 </HStack>
               </Box>
             </motion.div>
-          </Box>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Finish confirmation dialog */}
       <AnimatePresence>
         {finishDialogOpen && (
-          <Box
-            as={motion.div}
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            position="fixed"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            bg="rgba(0,0,0,0.6)"
-            zIndex="9999"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            backdropFilter="blur(8px)"
-            p={4}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(8px)',
+              padding: '16px'
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -912,7 +912,7 @@ export function ExamView() {
                 </HStack>
               </Box>
             </motion.div>
-          </Box>
+          </motion.div>
         )}
       </AnimatePresence>
     </Box>

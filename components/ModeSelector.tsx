@@ -15,9 +15,9 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -28,7 +28,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 16 } }
 };

@@ -20,9 +20,9 @@ import {
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -33,7 +33,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 16 } }
 };
@@ -323,24 +323,24 @@ export function ReviewOverview() {
       {/* Confirmation Dialog */}
       <AnimatePresence>
         {submitOpen && (
-          <Box
-            as={motion.div}
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            position="fixed"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            bg="rgba(0,0,0,0.6)"
-            zIndex="9999"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            backdropFilter="blur(8px)"
-            p={4}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(8px)',
+              padding: '16px'
+            }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -385,7 +385,7 @@ export function ReviewOverview() {
                 </HStack>
               </Box>
             </motion.div>
-          </Box>
+          </motion.div>
         )}
       </AnimatePresence>
     </Box>
