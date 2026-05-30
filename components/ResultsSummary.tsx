@@ -442,5 +442,3 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
     </Box>
   );
 }
-  );
-}
