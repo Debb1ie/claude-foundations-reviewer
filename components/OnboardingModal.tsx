@@ -141,11 +141,18 @@ export function OnboardingModal() {
       p={4}
     >
       <Box
-        bg="bg.panel"
+        bg="rgba(255, 255, 255, 0.88)"
+        backdropFilter="blur(20px)"
+        _dark={{
+          bg: "rgba(15, 23, 42, 0.88)",
+          borderColor: "rgba(255, 255, 255, 0.12)"
+        }}
         w="100%"
         maxW="500px"
         borderRadius="2xl"
-        boxShadow="2xl"
+        border="1px solid"
+        borderColor="rgba(255, 255, 255, 0.45)"
+        boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
         overflow="hidden"
         p={[6, 8]}
         position="relative"
@@ -160,7 +167,8 @@ export function OnboardingModal() {
             px={0}
             minW={8}
             onClick={handleClose}
-            color="gray.500"
+            color="gray.700"
+            _dark={{ color: "gray.300" }}
             aria-label="Skip"
           >
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -179,19 +187,19 @@ export function OnboardingModal() {
             transition={{ duration: 0.3 }}
           >
             <VStack gap={6} align="center" textAlign="center" minH="240px" justify="center">
-              <Box color="brand.600" p={4} bg="brand.50" borderRadius="full">
+              <Box color="brand.600" p={4} bg="brand.50" _dark={{ bg: "rgba(57, 73, 171, 0.2)", color: "brand.300" }} borderRadius="full">
                 {slides[currentSlide].icon}
               </Box>
-              <Heading size="lg" color="brand.800" fontWeight="bold">
+              <Heading size="lg" color="brand.800" _dark={{ color: "brand.200" }} fontWeight="bold">
                 {slides[currentSlide].title}
               </Heading>
-              <Text color="gray.600" fontSize="md" lineHeight="tall">
+              <Text color="gray.800" _dark={{ color: "gray.100" }} fontSize="md" lineHeight="tall" fontWeight={500}>
                 {slides[currentSlide].content}
               </Text>
             </VStack>
           </motion.div>
         </AnimatePresence>
-
+ 
         <Flex justify="space-between" align="center" mt={8}>
           <HStack gap={2}>
             {slides.map((_, idx) => (
@@ -200,15 +208,16 @@ export function OnboardingModal() {
                 w={idx === currentSlide ? '20px' : '8px'}
                 h="8px"
                 borderRadius="full"
-                bg={idx === currentSlide ? 'brand.500' : 'gray.200'}
+                bg={idx === currentSlide ? 'brand.600' : 'gray.400'}
+                _dark={{ bg: idx === currentSlide ? 'brand.300' : 'gray.600' }}
                 transition="all 0.3s"
               />
             ))}
           </HStack>
-
+ 
           <HStack gap={3}>
             {currentSlide > 0 && (
-              <Button variant="ghost" onClick={prevSlide} color="gray.500">
+              <Button variant="ghost" onClick={prevSlide} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
                 Back
               </Button>
             )}
@@ -217,15 +226,15 @@ export function OnboardingModal() {
                 Next
               </Button>
             ) : (
-              <Button bg="accent.500" color="white" _hover={{ bg: 'accent.600' }} onClick={handleClose}>
+              <Button bg="accent.600" _dark={{ bg: "accent.500" }} color="white" _hover={{ bg: 'accent.700' }} onClick={handleClose}>
                 Get Started
               </Button>
             )}
           </HStack>
         </Flex>
-
+ 
         <Box mt={6} pt={4} borderTop="1px solid" borderColor="border">
-          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '14px', color: '#4A5568' }}>
+          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '14px', color: 'var(--chakra-colors-fg)', fontWeight: 600 }}>
             <input
               type="checkbox"
               checked={doNotShow}

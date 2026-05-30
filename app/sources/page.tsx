@@ -68,26 +68,6 @@ const SOURCES = [
 export default function SourcesPage() {
   return (
     <Box bg="transparent" minH="100vh">
-      {/* Top Header/Navigation Bar */}
-      <Box borderBottom="1px solid" borderColor="border" bg="bg.panel" position="sticky" top={0} zIndex={10}>
-        <Container maxW="container.lg" py={4}>
-          <HStack justify="space-between">
-            <HStack gap={3}>
-              <Heading as="h1" size="md" fontWeight={600} color="brand.700">
-                Claude Certified Architect Exam Simulator
-              </Heading>
-            </HStack>
-            <HStack gap={4}>
-              <NextLink href="/home" passHref>
-                <Link fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }}>
-                  Back to Simulator
-                </Link>
-              </NextLink>
-            </HStack>
-          </HStack>
-        </Container>
-      </Box>
-
       <Container maxW="container.lg" py={[8, 12]}>
         <VStack gap={[8, 10]} align="stretch">
           <Box textAlign="center" maxW="2xl" mx="auto">
@@ -107,13 +87,24 @@ export default function SourcesPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 border="2px solid"
-                borderColor="border"
-                bg="bg.panel"
+                borderColor="rgba(255, 255, 255, 0.35)"
+                bg="rgba(255, 255, 255, 0.45)"
+                backdropFilter="blur(12px)"
+                _dark={{
+                  bg: "rgba(30, 41, 59, 0.45)",
+                  borderColor: "rgba(255, 255, 255, 0.08)"
+                }}
                 borderRadius="xl"
                 p={6}
-                transition="all 0.2s ease-in-out"
-                boxShadow="0 2px 10px rgba(0,0,0,0.02)"
-                _hover={{ borderColor: 'brand.400', transform: 'translateY(-2px)', boxShadow: '0 10px 25px -5px rgba(57,73,171,0.15)', textDecoration: 'none' }}
+                transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                _hover={{
+                  borderColor: 'brand.400',
+                  bg: 'rgba(255, 255, 255, 0.65)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.1)',
+                  textDecoration: 'none'
+                }}
                 display="flex"
                 flexDirection="column"
                 style={{ textDecoration: 'none' }}

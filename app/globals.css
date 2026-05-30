@@ -10,16 +10,22 @@ body, h1, h2, h3, h4, p, ul, ol, li, figure, blockquote, dl, dd {
 }
 
 html, body {
-  height: 100%;
+  min-height: 100vh !important;
   font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 
-/* Sleek, flat, non-gradient modern professional certification portal background */
+/* Premium vibrant DevCon 16 sky-blue/cyan/indigo canvas background with authentic brand isometric grid overlay */
 body {
-  background-color: #f8fafc;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='69.282' viewBox='0 0 120 69.282'%3E%3Cpath d='M 0 34.641 L 60 0 L 120 34.641 L 60 69.282 Z' stroke='rgba(0, 188, 212, 0.09)' stroke-width='0.75' fill='none'/%3E%3Ccircle cx='60' cy='0' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='0' cy='34.641' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='120' cy='34.641' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='60' cy='69.282' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #f0f4ff 0%, #e0f2fe 30%, #e0f7fc 65%, #f5f3ff 100%) !important;
+  background-size: 120px 69.282px, cover !important;
+  background-attachment: fixed !important;
+  background-repeat: repeat, no-repeat !important;
   color: #0f172a; /* Slate 900 for premium typography */
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* Consistent scrollbar styling */

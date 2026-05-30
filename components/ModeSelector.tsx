@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import NextLink from 'next/link';
-import { Header } from '@/components/Header';
 import {
   Box,
   Container,
@@ -15,7 +14,24 @@ import {
   Badge,
   Link,
 } from '@chakra-ui/react';
-import { DOMAINS, type Domain } from '@/types/exam';
+import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 16 } }
+};
 
 const SVG_ICONS = {
   CLOCK: (
@@ -85,172 +101,237 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
 
   return (
     <Box bg="transparent" minH="100vh">
-      <Header />
-
       <Container maxW="container.lg" py={[8, 12]}>
-        <VStack gap={[8, 10]} align="stretch">
-          <Box textAlign="center" maxW="2xl" mx="auto">
-            <Heading as="h2" size="3xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-              Claude you prove it?
-            </Heading>
-            <Text color="gray.600" fontSize="lg" lineHeight="tall">
-              Select your practice mode below to begin studying for the Claude Certified Architect Foundations exam.
-            </Text>
-          </Box>
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={containerVariants}
+        >
+          <VStack gap={[8, 10]} align="stretch">
+            <motion.div variants={itemVariants}>
+              <Box textAlign="center" maxW="2xl" mx="auto">
+                <Heading as="h2" size="3xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
+                  Claude you prove it?
+                </Heading>
+                <Text color="gray.600" fontSize="lg" lineHeight="tall">
+                  Select your practice mode below to begin studying for the Claude Certified Architect Foundations exam.
+                </Text>
+              </Box>
+            </motion.div>
 
-          {/* Grid of modes */}
-          <SimpleGrid columns={[1, 1, 2, 4]} gap={5}>
-            {MODES.map((mode) => {
-              const isSelected = selectedMode === mode.id;
-              return (
-                <Box
-                  key={mode.id}
-                  as="button"
-                  onClick={() => {
-                    setSelectedMode(mode.id);
-                    if (mode.id !== 'focus') {
-                      setSelectedDomain(null);
-                    }
-                  }}
-                  cursor="pointer"
-                  border="2px solid"
-                  borderColor={isSelected ? 'brand.500' : 'border'}
-                  bg="bg.panel"
-                  borderRadius="xl"
-                  p={5}
-                  textAlign="left"
-                  transition="all 0.2s ease-in-out"
-                  boxShadow={isSelected ? '0 10px 25px -5px rgba(57,73,171,0.15)' : '0 2px 10px rgba(0,0,0,0.02)'}
-                  _hover={{ borderColor: isSelected ? 'brand.500' : 'brand.300', transform: 'translateY(-2px)' }}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="stretch"
-                  w="100%"
-                >
-                  <VStack gap={4} align="stretch" h="100%">
-                    <HStack justify="space-between" align="center">
-                      <Box
-                        p={2.5}
-                        borderRadius="lg"
-                        bg={isSelected ? 'brand.600' : 'bg.muted'}
-                        color={isSelected ? 'white' : 'brand.600'}
-                        transition="all 0.2s"
-                      >
-                        {SVG_ICONS[mode.icon]}
-                      </Box>
-                      {isSelected && (
-                        <Badge bg="brand.100" color="brand.700" size="sm" borderRadius="full" px={2.5}>
-                          Selected
-                        </Badge>
-                      )}
-                    </HStack>
-
-                    <Box>
-                      <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
-                        {mode.title}
-                      </Heading>
-                      <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
-                        {mode.description}
-                      </Text>
-                    </Box>
-
-                    <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
-                      {mode.features.map((f) => (
-                        <HStack key={f} gap={2} align="center">
-                          <Box w={1.5} h={1.5} borderRadius="full" bg={isSelected ? 'accent.500' : 'brand.300'} />
-                          <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
-                        </HStack>
-                      ))}
-                    </VStack>
-                  </VStack>
-                </Box>
-              );
-            })}
-          </SimpleGrid>
-
-          {/* Domain selector for Focus Mode */}
-          {selectedMode === 'focus' && (
-            <Box
-              mt={4}
-              p={[4, 6]}
-              bg="bg.panel"
-              borderRadius="xl"
-              border="1px solid"
-              borderColor="border"
-              boxShadow="0 4px 12px rgba(0,0,0,0.01)"
-            >
-              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4}>
-                Select Practice Domain
-              </Text>
-              <SimpleGrid columns={[1, 1, 2, 3]} gap={4}>
-                {DOMAINS.map((d) => {
-                  const isDomainSelected = selectedDomain === d.id;
-                  return (
+            {/* Grid of modes */}
+            <SimpleGrid columns={[1, 1, 2, 4]} gap={5}>
+              {MODES.map((mode) => {
+                const isSelected = selectedMode === mode.id;
+                return (
+                  <motion.div
+                    key={mode.id}
+                    variants={itemVariants}
+                    style={{ display: 'flex', width: '100%' }}
+                  >
                     <Box
-                      key={d.id}
                       as="button"
+                      onClick={() => {
+                        setSelectedMode(mode.id);
+                        if (mode.id !== 'focus') {
+                          setSelectedDomain(null);
+                        }
+                      }}
+                      cursor="pointer"
+                      border="2px solid"
+                      borderColor={isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.35)'}
+                      bg={isSelected ? 'rgba(57, 73, 171, 0.06)' : 'rgba(255, 255, 255, 0.45)'}
+                      backdropFilter="blur(12px)"
+                      _dark={{
+                        bg: isSelected ? 'rgba(124, 110, 250, 0.1)' : 'rgba(30, 41, 59, 0.45)',
+                        borderColor: isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.08)'
+                      }}
+                      borderRadius="xl"
+                      p={5}
+                      textAlign="left"
+                      transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                      boxShadow={isSelected ? '0 10px 25px -5px rgba(57,73,171,0.15)' : '0 8px 32px 0 rgba(31, 38, 135, 0.03)'}
+                      _hover={{
+                        borderColor: isSelected ? 'brand.500' : 'brand.300',
+                        bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.65)',
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)'
+                      }}
                       display="flex"
                       flexDirection="column"
                       alignItems="stretch"
-                      p={4}
-                      borderRadius="lg"
-                      border="2px solid"
-                      borderColor={isDomainSelected ? d.color : 'border'}
-                      bg={isDomainSelected ? `${d.color}08` : 'transparent'}
-                      _hover={{ borderColor: isDomainSelected ? d.color : 'brand.400' }}
-                      onClick={() => setSelectedDomain(d.id === selectedDomain ? null : d.id)}
-                      transition="all 0.2s"
-                      textAlign="left"
-                      cursor="pointer"
                       w="100%"
                     >
-                      <HStack justify="space-between" w="100%" mb={3}>
-                        <Badge bg={`${d.color}15`} color={d.color} border={`1px solid ${d.color}35`} px={2} py={0.5} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
-                          {d.id}
-                        </Badge>
-                        <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="gray.500">
-                          {d.weight}% Weight
-                        </Text>
-                      </HStack>
-                      <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>
-                        {d.name}
-                      </Text>
-                      <Text fontSize="xs" color="gray.500">
-                        {d.shortName} deep dive
-                      </Text>
-                    </Box>
-                  );
-                })}
-              </SimpleGrid>
-            </Box>
-          )}
+                      <VStack gap={4} align="stretch" h="100%">
+                        <HStack justify="space-between" align="center">
+                          <Box
+                            p={2.5}
+                            borderRadius="lg"
+                            bg={isSelected ? 'brand.600' : 'rgba(57, 73, 171, 0.08)'}
+                            border={isSelected ? 'none' : '1px solid'}
+                            borderColor={isSelected ? 'transparent' : 'rgba(57, 73, 171, 0.16)'}
+                            color={isSelected ? 'white' : 'brand.600'}
+                            transition="all 0.2s"
+                            _dark={isSelected ? {} : {
+                              bg: 'rgba(124, 110, 250, 0.15)',
+                              borderColor: 'rgba(255, 255, 255, 0.12)',
+                              color: 'brand.300'
+                            }}
+                          >
+                            {SVG_ICONS[mode.icon]}
+                          </Box>
+                          {isSelected && (
+                            <Badge bg="brand.100" color="brand.700" size="sm" borderRadius="full" px={2.5}>
+                              Selected
+                            </Badge>
+                          )}
+                        </HStack>
 
-          {/* Start CTA Button */}
-          <HStack gap={4} justify="center" mt={4}>
-            <Button
-              size="lg"
-              disabled={!selectedMode || (selectedMode === 'focus' && !selectedDomain)}
-              onClick={() => {
-                if (selectedMode) {
-                  onStart(selectedMode, selectedMode === 'focus' ? selectedDomain! : undefined);
-                }
-              }}
-              bg="brand.600"
-              color="white"
-              fontWeight={700}
-              fontSize="sm"
-              px={12}
-              py={6}
-              borderRadius="lg"
-              _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
-              _active={{ transform: 'translateY(0)' }}
-              transition="all 0.2s"
-              cursor={(!selectedMode || (selectedMode === 'focus' && !selectedDomain)) ? 'not-allowed' : 'pointer'}
-            >
-              Start {selectedMode === 'focus' ? 'Focus practice' : selectedMode === 'zen' ? 'Zen practice' : selectedMode === 'review' ? 'Review practice' : 'Standard exam'}
-            </Button>
-          </HStack>
-        </VStack>
+                        <Box>
+                          <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
+                            {mode.title}
+                          </Heading>
+                          <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
+                            {mode.description}
+                          </Text>
+                        </Box>
+
+                        <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                          {mode.features.map((f) => (
+                            <HStack key={f} gap={2} align="center">
+                              <Box w={1.5} h={1.5} borderRadius="full" bg={isSelected ? 'accent.500' : 'brand.300'} />
+                              <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
+                            </HStack>
+                          ))}
+                        </VStack>
+                      </VStack>
+                    </Box>
+                  </motion.div>
+                );
+              })}
+            </SimpleGrid>
+
+            {/* Domain selector for Focus Mode */}
+            <AnimatePresence mode="wait">
+              {selectedMode === 'focus' && (
+                <motion.div
+                  key="focus-domain-selector"
+                  initial={{ opacity: 0, height: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.98 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden', width: '100%' }}
+                >
+                  <Box
+                    mt={4}
+                    p={[4, 6]}
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(16px)"
+                    _dark={{
+                      bg: "rgba(15, 23, 42, 0.45)",
+                      borderColor: "rgba(255, 255, 255, 0.08)"
+                    }}
+                    borderRadius="xl"
+                    border="1px solid"
+                    borderColor="rgba(255, 255, 255, 0.3)"
+                    boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                  >
+                    <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4}>
+                      Select Practice Domain
+                    </Text>
+                    <SimpleGrid columns={[1, 1, 2, 3]} gap={4}>
+                      {DOMAINS.map((d) => {
+                        const isDomainSelected = selectedDomain === d.id;
+                        return (
+                          <Box
+                            key={d.id}
+                            as="button"
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="stretch"
+                            p={4}
+                            borderRadius="lg"
+                            border="2px solid"
+                            borderColor={isDomainSelected ? d.color : 'rgba(255, 255, 255, 0.35)'}
+                            bg={isDomainSelected ? `${d.color}15` : 'rgba(255, 255, 255, 0.35)'}
+                            backdropFilter="blur(8px)"
+                            _dark={{
+                              bg: isDomainSelected ? `${d.color}20` : 'rgba(30, 41, 59, 0.3)',
+                              borderColor: isDomainSelected ? d.color : 'rgba(255, 255, 255, 0.06)'
+                            }}
+                            _hover={{
+                              borderColor: isDomainSelected ? d.color : 'brand.400',
+                              bg: isDomainSelected ? `${d.color}20` : 'rgba(255, 255, 255, 0.55)',
+                              transform: 'translateY(-2px)'
+                            }}
+                            onClick={() => setSelectedDomain(d.id === selectedDomain ? null : d.id)}
+                            transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                            textAlign="left"
+                            cursor="pointer"
+                            w="100%"
+                          >
+                            <HStack justify="space-between" w="100%" mb={3}>
+                              <Badge
+                                bg={DOMAIN_SOLID_BGS[d.id]}
+                                color={DOMAIN_SOLID_TEXT[d.id]}
+                                border="none"
+                                px={2.5}
+                                py={0.5}
+                                borderRadius="md"
+                                fontSize="2xs"
+                                fontFamily="mono"
+                                fontWeight={700}
+                              >
+                                {d.id}
+                              </Badge>
+                              <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="gray.500" _dark={{ color: 'gray.400' }}>
+                                {d.weight}% Weight
+                              </Text>
+                            </HStack>
+                            <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>
+                              {d.name}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                              {d.shortName} deep dive
+                            </Text>
+                          </Box>
+                        );
+                      })}
+                    </SimpleGrid>
+                  </Box>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Start CTA Button */}
+            <motion.div variants={itemVariants}>
+              <HStack gap={4} justify="center" mt={4}>
+                <Button
+                  size="lg"
+                  disabled={!selectedMode || (selectedMode === 'focus' && !selectedDomain)}
+                  onClick={() => {
+                    if (selectedMode) {
+                      onStart(selectedMode, selectedMode === 'focus' ? selectedDomain! : undefined);
+                    }
+                  }}
+                  bg="brand.600"
+                  color="white"
+                  fontWeight={700}
+                  fontSize="sm"
+                  px={12}
+                  py={6}
+                  borderRadius="lg"
+                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
+                  _active={{ transform: 'translateY(0)' }}
+                  transition="all 0.2s"
+                  cursor={(!selectedMode || (selectedMode === 'focus' && !selectedDomain)) ? 'not-allowed' : 'pointer'}
+                >
+                  Start {selectedMode === 'focus' ? 'Focus practice' : selectedMode === 'zen' ? 'Zen practice' : selectedMode === 'review' ? 'Review practice' : 'Standard exam'}
+                </Button>
+              </HStack>
+            </motion.div>
+          </VStack>
+        </motion.div>
       </Container>
     </Box>
   );

@@ -28,6 +28,46 @@ export const DOMAINS: DomainInfo[] = [
   { id: 'D5', name: 'Context Management & Reliability', shortName: 'Context Mgmt.', weight: 15, color: '#A06EFA' },
 ];
 
+export const DOMAIN_TEXT_COLORS: Record<Domain, { _light: string; _dark: string }> = {
+  D1: { _light: '#3f51b5', _dark: '#9f92ec' }, // Deep Indigo / Soft Purple
+  D2: { _light: '#c83b14', _dark: '#fa9a80' }, // Vivid Coral / Soft Coral
+  D3: { _light: '#006c8c', _dark: '#85d7fa' }, // Deep Cyan / Soft Blue
+  D4: { _light: '#805b00', _dark: '#f3db8b' }, // Dark Gold / Soft Gold
+  D5: { _light: '#6f2bc8', _dark: '#b996fb' }, // Deep Purple / Soft Violet
+};
+
+export const DOMAIN_BADGE_BGS: Record<Domain, { _light: string; _dark: string }> = {
+  D1: { _light: 'rgba(124, 110, 250, 0.08)', _dark: 'rgba(124, 110, 250, 0.15)' },
+  D2: { _light: 'rgba(250, 140, 110, 0.08)', _dark: 'rgba(250, 140, 110, 0.15)' },
+  D3: { _light: 'rgba(110, 207, 250, 0.09)', _dark: 'rgba(110, 207, 250, 0.15)' },
+  D4: { _light: 'rgba(240, 208, 110, 0.09)', _dark: 'rgba(240, 208, 110, 0.15)' },
+  D5: { _light: 'rgba(160, 110, 250, 0.08)', _dark: 'rgba(160, 110, 250, 0.15)' },
+};
+
+export const DOMAIN_BADGE_BORDERS: Record<Domain, { _light: string; _dark: string }> = {
+  D1: { _light: 'rgba(124, 110, 250, 0.22)', _dark: 'rgba(124, 110, 250, 0.3)' },
+  D2: { _light: 'rgba(250, 140, 110, 0.22)', _dark: 'rgba(250, 140, 110, 0.3)' },
+  D3: { _light: 'rgba(110, 207, 250, 0.26)', _dark: 'rgba(110, 207, 250, 0.35)' },
+  D4: { _light: 'rgba(240, 208, 110, 0.26)', _dark: 'rgba(240, 208, 110, 0.35)' },
+  D5: { _light: 'rgba(160, 110, 250, 0.22)', _dark: 'rgba(160, 110, 250, 0.3)' },
+};
+
+export const DOMAIN_SOLID_BGS: Record<Domain, string> = {
+  D1: '#5C4EFA', // Vibrant Indigo
+  D2: '#F25C37', // Vibrant Coral/Orange
+  D3: '#00B4D8', // Vibrant Cyan/Blue
+  D4: '#E5A900', // Vibrant Gold/Yellow
+  D5: '#904EFA', // Vibrant Purple
+};
+
+export const DOMAIN_SOLID_TEXT: Record<Domain, string> = {
+  D1: '#ffffff',
+  D2: '#ffffff',
+  D3: '#ffffff',
+  D4: '#0f172a', // Slate-900 for dark gold contrast
+  D5: '#ffffff',
+};
+
 export type ExamMode = 'exam' | 'review' | 'zen' | 'focus';
 
 export interface ExamState {

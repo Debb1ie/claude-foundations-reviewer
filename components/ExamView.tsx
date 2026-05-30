@@ -21,7 +21,8 @@ import {
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
-import { DOMAINS, type Domain } from '@/types/exam';
+import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DOMAIN_COLORS: Record<Domain, string> = {
   D1: '#7C6EFA',  // Agentic Arch.
@@ -279,8 +280,13 @@ export function ExamView() {
       {/* Sticky Header */}
       <Box
         borderBottom="1px solid"
-        borderColor="border"
-        bg="bg.panel"
+        borderColor="rgba(255, 255, 255, 0.3)"
+        bg="rgba(255, 255, 255, 0.45)"
+        backdropFilter="blur(16px)"
+        _dark={{
+          bg: "rgba(15, 23, 42, 0.45)",
+          borderColor: "rgba(255, 255, 255, 0.08)"
+        }}
         position="sticky"
         top={0}
         zIndex={10}
@@ -293,7 +299,19 @@ export function ExamView() {
               </Text>
 
               {showTimer && (
-                <HStack gap={1.5} px={3} py={1} bg="bg.muted" borderRadius="md" border="1px solid" borderColor="border">
+                <HStack
+                  gap={1.5}
+                  px={3}
+                  py={1}
+                  bg="rgba(57, 73, 171, 0.08)"
+                  borderRadius="md"
+                  border="1px solid"
+                  borderColor="rgba(57, 73, 171, 0.18)"
+                  _dark={{
+                    bg: "rgba(124, 110, 250, 0.12)",
+                    borderColor: "rgba(255, 255, 255, 0.12)"
+                  }}
+                >
                   <ClockIcon />
                   {timer.isPaused ? (
                     <Text
@@ -387,49 +405,74 @@ export function ExamView() {
       {/* Main Content Area */}
       <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column">
         {/* Mobile-only Collapsible Question Map Panel */}
-        {mobileNavOpen && (
-          <Box
-            display={['block', 'block', 'none']}
-            mb={4}
-            p={4}
-            bg="bg.panel"
-            borderRadius="lg"
-            border="1px solid"
-            borderColor="border"
-            boxShadow="sm"
-          >
-            <Text fontSize="xs" fontWeight={700} color="brand.700" mb={3} fontFamily="mono">
-              QUESTION MAP ({answeredCount}/{questions.length})
-            </Text>
-            {renderQuestionGrid()}
-          </Box>
-        )}
+        <AnimatePresence>
+          {mobileNavOpen && (
+            <motion.div
+              key="mobile-question-map"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden', width: '100%' }}
+            >
+              <Box
+                display={['block', 'block', 'none']}
+                mb={4}
+                p={4}
+                bg="bg.panel"
+                borderRadius="lg"
+                border="1px solid"
+                borderColor="border"
+                boxShadow="sm"
+              >
+                <Text fontSize="xs" fontWeight={700} color="brand.700" mb={3} fontFamily="mono">
+                  QUESTION MAP ({answeredCount}/{questions.length})
+                </Text>
+                {renderQuestionGrid()}
+              </Box>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <HStack align="stretch" gap={6} flex={1} wrap="wrap">
           {/* LEFT PANEL: The Question details (70% width on desktop) */}
           <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }}>
             <Box
-              bg="bg.panel"
+              bg="rgba(255, 255, 255, 0.45)"
+              backdropFilter="blur(16px)"
+              _dark={{
+                bg: "rgba(15, 23, 42, 0.45)",
+                borderColor: "rgba(255, 255, 255, 0.08)"
+              }}
               border="1px solid"
-              borderColor="border"
+              borderColor="rgba(255, 255, 255, 0.35)"
               borderRadius="xl"
               p={[4, 6]}
-              boxShadow="0 2px 8px rgba(0,0,0,0.01)"
+              boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+              overflow="hidden"
             >
-              <VStack gap={5} align="stretch">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion}
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                >
+                  <VStack gap={5} align="stretch">
                 {/* Meta details */}
                 <HStack justify="space-between">
                   <HStack gap={2}>
                     <Badge
                       px={2.5}
-                      py={1}
+                      py={0.5}
                       borderRadius="md"
-                      bg={`${domainColor}12`}
-                      color={domainColor}
+                      bg={DOMAIN_SOLID_BGS[q.domain]}
+                      color={DOMAIN_SOLID_TEXT[q.domain]}
                       fontFamily="mono"
                       fontSize="xs"
                       fontWeight={700}
-                      border={`1.5px solid ${domainColor}35`}
+                      border="none"
                     >
                       {q.domain}
                     </Badge>
@@ -466,18 +509,24 @@ export function ExamView() {
                 {q.scenario && (
                   <Box
                     p={4}
-                    bg="bg.muted"
+                    bg="rgba(57, 73, 171, 0.08)"
+                    border="1px solid"
+                    borderColor="rgba(57, 73, 171, 0.18)"
                     borderLeft="4px solid"
                     borderLeftColor="brand.500"
-                    borderRadius="0 lg lg 0"
+                    borderRadius="lg"
+                    _dark={{
+                      bg: "rgba(124, 110, 250, 0.12)",
+                      borderColor: "rgba(255, 255, 255, 0.12)"
+                    }}
                   >
-                    <HStack gap={1.5} mb={1.5} color="brand.600">
+                    <HStack gap={1.5} mb={1.5} color="brand.700" _dark={{ color: "brand.300" }}>
                       <InfoIcon />
                       <Text fontFamily="mono" fontSize="xs" fontWeight={700} textTransform="uppercase" letterSpacing="0.05em">
                         Scenario Context
                       </Text>
                     </HStack>
-                    <Text fontSize="sm" color="gray.700" lineHeight={1.6}>
+                    <Text fontSize="sm" color="gray.900" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight={1.6}>
                       {q.scenario}
                     </Text>
                   </Box>
@@ -496,8 +545,8 @@ export function ExamView() {
                     let borderColor = 'border';
                     let bgColor = 'transparent';
                     let keyBg = 'transparent';
-                    let keyBorderColor = 'border';
-                    let keyTextColor = 'gray.400';
+                    let keyBorderColor: any = { _light: 'gray.300', _dark: 'rgba(255, 255, 255, 0.16)' };
+                    let keyTextColor: any = { _light: 'gray.500', _dark: 'gray.400' };
 
                     if (showAnswerFeedback && isReviewChecked) {
                       if (isCorrectOption) {
@@ -533,9 +582,20 @@ export function ExamView() {
                         border="2px solid"
                         borderColor={borderColor}
                         bg={bgColor}
+                        backdropFilter="blur(8px)"
+                        _dark={{
+                          bg: isSelected ? 'rgba(124, 110, 250, 0.1)' : (showAnswerFeedback && isReviewChecked ? (isCorrectOption ? 'rgba(34, 200, 138, 0.15)' : 'rgba(240, 90, 90, 0.15)') : 'rgba(30, 41, 59, 0.3)'),
+                          borderColor: isSelected ? 'brand.500' : (showAnswerFeedback && isReviewChecked ? (isCorrectOption ? '#22c88a' : '#f05a5a') : 'rgba(255, 255, 255, 0.06)')
+                        }}
                         cursor="pointer"
-                        transition="all 0.15s ease"
-                        _hover={{ borderColor: isSelected ? 'brand.500' : 'brand.400', bg: isSelected ? 'rgba(57,73,171,0.06)' : 'rgba(57,73,171,0.02)' }}
+                        transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                          borderColor: isSelected ? 'brand.500' : 'brand.400',
+                          bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.45)',
+                          _dark: {
+                            bg: isSelected ? 'rgba(124, 110, 250, 0.15)' : 'rgba(30, 41, 59, 0.5)'
+                          }
+                        }}
                         onClick={() => handleAnswerClick(i)}
                         textAlign="left"
                         w="100%"
@@ -584,37 +644,55 @@ export function ExamView() {
                   </Box>
                 )}
 
-                {/* Explanations Section */}
-                {showAnswerFeedback && (
-                  <Box
-                    p={5}
-                    bg="bg.muted"
-                    border="1px solid"
-                    borderColor="border"
-                    borderRadius="xl"
-                    boxShadow="inset 0 2px 4px rgba(0,0,0,0.01)"
-                  >
-                    <HStack color="brand.700" gap={2} mb={2.5}>
-                      <InfoIcon />
-                      <Text fontSize="sm" fontWeight={700} fontFamily="mono" textTransform="uppercase">
-                        Explanation & Reference
-                      </Text>
-                    </HStack>
-                    <Text
-                      fontSize="sm"
-                      color="gray.700"
-                      lineHeight={1.7}
-                      dangerouslySetInnerHTML={{ __html: q.explanation }}
-                    />
-                    {q.source && (
-                      <Text mt={3} pt={2.5} borderTop="1px solid" borderColor="border" fontSize="2xs" fontFamily="mono" color="gray.400" fontWeight={600}>
-                        SOURCE: {q.source}
-                      </Text>
+                  {/* Explanations Section */}
+                  <AnimatePresence>
+                    {showAnswerFeedback && (
+                      <motion.div
+                        key="explanation-panel"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <Box
+                          p={5}
+                          bg="rgba(57, 73, 171, 0.05)"
+                          border="1px solid"
+                          borderColor="rgba(57, 73, 171, 0.15)"
+                          borderRadius="xl"
+                          boxShadow="inset 0 2px 4px rgba(0,0,0,0.01)"
+                          mt={2}
+                          _dark={{
+                            bg: "rgba(124, 110, 250, 0.08)",
+                            borderColor: "rgba(255, 255, 255, 0.08)"
+                          }}
+                        >
+                          <HStack color="brand.700" gap={2} mb={2.5}>
+                            <InfoIcon />
+                            <Text fontSize="sm" fontWeight={700} fontFamily="mono" textTransform="uppercase">
+                              Explanation & Reference
+                            </Text>
+                          </HStack>
+                          <Text
+                            fontSize="sm"
+                            color="gray.700"
+                            lineHeight={1.7}
+                            dangerouslySetInnerHTML={{ __html: q.explanation }}
+                          />
+                          {q.source && (
+                            <Text mt={3} pt={2.5} borderTop="1px solid" borderColor="border" fontSize="2xs" fontFamily="mono" color="gray.400" fontWeight={600}>
+                              SOURCE: {q.source}
+                            </Text>
+                          )}
+                        </Box>
+                      </motion.div>
                     )}
-                  </Box>
-                )}
-              </VStack>
-            </Box>
+                  </AnimatePresence>
+                </VStack>
+              </motion.div>
+            </AnimatePresence>
+          </Box>
 
             {/* Bottom Nav Strip */}
             <HStack justify="space-between" mt={2} mb={20}>
@@ -665,12 +743,17 @@ export function ExamView() {
             <Box
               position="sticky"
               top="74px"
-              bg="bg.panel"
+              bg="rgba(255, 255, 255, 0.45)"
+              backdropFilter="blur(16px)"
+              _dark={{
+                bg: "rgba(15, 23, 42, 0.45)",
+                borderColor: "rgba(255, 255, 255, 0.08)"
+              }}
               border="1px solid"
-              borderColor="border"
+              borderColor="rgba(255, 255, 255, 0.35)"
               borderRadius="xl"
               p={5}
-              boxShadow="0 2px 8px rgba(0,0,0,0.01)"
+              boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
             >
               <VStack gap={4} align="stretch">
                 <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono" letterSpacing="0.05em">
@@ -704,64 +787,134 @@ export function ExamView() {
       </Container>
 
       {/* Pause/Exit Dialog Modal */}
-      <DialogRoot open={dialogOpen} onOpenChange={(e) => {
-        setDialogOpen(e.open);
-        if (!e.open && timer.isPaused && !exitingRef.current) {
-          timer.resume();
-        }
-        exitingRef.current = false;
-      }}>
-        <DialogBackdrop />
-        <DialogPositioner>
-          <DialogContent borderRadius="xl" border="1px solid" borderColor="border">
-            <DialogHeader borderBottom="1px solid" borderColor="border" px={6} pt={5} pb={4}>
-              <DialogTitle fontSize="md" fontWeight={700} color="brand.700">
-                {isTimed ? 'Pause practice exam?' : 'Exit simulator?'}
-              </DialogTitle>
-            </DialogHeader>
-            <DialogBody px={6} py={5}>
-              <Text fontSize="sm" color="gray.600">
-                {isTimed
-                  ? 'Your practice exam timer is paused. Click Resume to continue, or Exit to reset all your progress.'
-                  : 'Are you sure you want to exit? All current progress will be lost.'}
-              </Text>
-            </DialogBody>
-            <DialogFooter borderTop="1px solid" borderColor="border" px={6} pt={4} pb={5} gap={3}>
-              <Button variant="outline" size="sm" onClick={handleResume} fontWeight={600}>
-                {isTimed ? 'Resume' : 'Cancel'}
-              </Button>
-              <Button bg="red.600" color="white" _hover={{ bg: 'red.700' }} size="sm" onClick={handleExit} fontWeight={700}>
-                {isTimed ? 'Exit Practice' : 'Exit Simulator'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </DialogPositioner>
-      </DialogRoot>
+      <AnimatePresence>
+        {dialogOpen && (
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            position="fixed"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            bg="rgba(0,0,0,0.6)"
+            zIndex="9999"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            backdropFilter="blur(8px)"
+            p={4}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            >
+              <Box
+                bg="rgba(255, 255, 255, 0.88)"
+                backdropFilter="blur(20px)"
+                _dark={{
+                  bg: "rgba(15, 23, 42, 0.88)",
+                  borderColor: "rgba(255, 255, 255, 0.12)"
+                }}
+                w="100%"
+                maxW="500px"
+                borderRadius="2xl"
+                border="1px solid"
+                borderColor="rgba(255, 255, 255, 0.45)"
+                boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
+                p={[6, 8]}
+                position="relative"
+              >
+                <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: "brand.200" }} mb={4}>
+                  {isTimed ? 'Pause practice exam?' : 'Exit simulator?'}
+                </Heading>
+                <Text fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight="tall" mb={6}>
+                  {isTimed
+                    ? 'Your practice exam timer is paused. Click Resume to continue, or Exit to reset all your progress.'
+                    : 'Are you sure you want to exit? All current progress will be lost.'}
+                </Text>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                  <Button variant="outline" size="sm" onClick={handleResume} fontWeight={600} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
+                    {isTimed ? 'Resume' : 'Cancel'}
+                  </Button>
+                  <Button bg="red.600" color="white" _hover={{ bg: 'red.700' }} size="sm" onClick={handleExit} fontWeight={700}>
+                    {isTimed ? 'Exit Practice' : 'Exit Simulator'}
+                  </Button>
+                </HStack>
+              </Box>
+            </motion.div>
+          </Box>
+        )}
+      </AnimatePresence>
 
       {/* Finish confirmation dialog */}
-      <DialogRoot open={finishDialogOpen} onOpenChange={(e) => setFinishDialogOpen(e.open)}>
-        <DialogBackdrop />
-        <DialogPositioner>
-          <DialogContent borderRadius="xl" border="1px solid" borderColor="border">
-            <DialogHeader borderBottom="1px solid" borderColor="border" px={6} pt={5} pb={4}>
-              <DialogTitle fontSize="md" fontWeight={700} color="brand.700">Finish Practice Session?</DialogTitle>
-            </DialogHeader>
-            <DialogBody px={6} py={5}>
-              <Text fontSize="sm" color="gray.600">
-                You will be redirected to the bulk review dashboard where you can check all your chosen options before final score evaluation.
-              </Text>
-            </DialogBody>
-            <DialogFooter borderTop="1px solid" borderColor="border" px={6} pt={4} pb={5} gap={3}>
-              <Button variant="outline" size="sm" onClick={() => setFinishDialogOpen(false)} fontWeight={600}>
-                Cancel
-              </Button>
-              <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={handleConfirmFinish} fontWeight={700}>
-                Review Selected Answers
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </DialogPositioner>
-      </DialogRoot>
+      <AnimatePresence>
+        {finishDialogOpen && (
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            position="fixed"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            bg="rgba(0,0,0,0.6)"
+            zIndex="9999"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            backdropFilter="blur(8px)"
+            p={4}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            >
+              <Box
+                bg="rgba(255, 255, 255, 0.88)"
+                backdropFilter="blur(20px)"
+                _dark={{
+                  bg: "rgba(15, 23, 42, 0.88)",
+                  borderColor: "rgba(255, 255, 255, 0.12)"
+                }}
+                w="100%"
+                maxW="500px"
+                borderRadius="2xl"
+                border="1px solid"
+                borderColor="rgba(255, 255, 255, 0.45)"
+                boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
+                p={[6, 8]}
+                position="relative"
+              >
+                <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: "brand.200" }} mb={4}>
+                  Finish Practice Session?
+                </Heading>
+                <Text fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight="tall" mb={6}>
+                  You will be redirected to the bulk review dashboard where you can check all your chosen options before final score evaluation.
+                </Text>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                  <Button variant="outline" size="sm" onClick={() => setFinishDialogOpen(false)} fontWeight={600} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
+                    Cancel
+                  </Button>
+                  <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={handleConfirmFinish} fontWeight={700}>
+                    Review Selected Answers
+                  </Button>
+                </HStack>
+              </Box>
+            </motion.div>
+          </Box>
+        )}
+      </AnimatePresence>
     </Box>
   );
 }
