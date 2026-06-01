@@ -3,11 +3,29 @@ export interface Question {
   text: string;
   scenario?: string;
   options: string[];
-  correctAnswer: number;
+  correctAnswer: number;           // Single-select answer (used when correctAnswers is absent)
+  correctAnswers?: number[];       // Multi-select answer array (present = this is a select-all-that-apply question)
   explanation: string;
   domain: Domain;
   task: string;
   source: string;
+}
+
+export function isMultiSelect(q: Question): boolean {
+  return Array.isArray(q.correctAnswers) && q.correctAnswers.length > 1;
+}
+
+export function isAnswerCorrect(q: Question, userAnswer: number | number[] | null): boolean {
+  if (userAnswer === null) return false;
+  if (isMultiSelect(q)) {
+    if (!Array.isArray(userAnswer)) return false;
+    const correct = q.correctAnswers!;
+    if (userAnswer.length !== correct.length) return false;
+    const sorted = [...userAnswer].sort();
+    const sortedCorrect = [...correct].sort();
+    return sorted.every((v, i) => v === sortedCorrect[i]);
+  }
+  return typeof userAnswer === 'number' && userAnswer === q.correctAnswer;
 }
 
 export type Domain = 'D1' | 'D2' | 'D3' | 'D4' | 'D5';
@@ -92,7 +110,13 @@ export interface ExamResults {
   passed: boolean;
   timeTaken: number;
   domainBreakdown: Record<Domain, { correct: number; total: number }>;
-  incorrectQuestions: { question: Question; userAnswer: number }[];
+  incorrectQuestions: { question: Question; userAnswer: number | number[] }[];
+}
+
+export function isAnswerSelected(userAnswer: number | number[] | null, optionIndex: number): boolean {
+  if (userAnswer === null) return false;
+  if (Array.isArray(userAnswer)) return userAnswer.includes(optionIndex);
+  return userAnswer === optionIndex;
 }
 
 export interface TimerState {

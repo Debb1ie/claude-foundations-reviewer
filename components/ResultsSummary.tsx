@@ -12,7 +12,7 @@ import {
   Progress,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
+import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const containerVariants: Variants = {
@@ -338,7 +338,11 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                               let keyTextColor = 'gray.400';
                               let textWeight = 500;
 
-                              if (i === q.correctAnswer) {
+                              const isCorrectOpt = isMultiSelect(q)
+                                ? (q.correctAnswers ?? []).includes(i)
+                                : i === q.correctAnswer;
+                              const isUserSel = isAnswerSelected(item.userAnswer, i);
+                              if (isCorrectOpt) {
                                 label = 'Correct Answer';
                                 borderColor = '#22c88a';
                                 bgColor = '#e6f9f1';
@@ -346,7 +350,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                                 keyBorderColor = '#22c88a';
                                 keyTextColor = 'white';
                                 textWeight = 600;
-                              } else if (i === item.userAnswer) {
+                              } else if (isUserSel) {
                                 label = 'Your Selection';
                                 borderColor = '#f05a5a';
                                 bgColor = '#fde8e8';
@@ -382,27 +386,33 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                                     fontSize="2xs"
                                     fontWeight={700}
                                   >
-                                    {['A', 'B', 'C', 'D'][i]}
+                                    {isMultiSelect(q) && isAnswerSelected(item.userAnswer, i) ? (
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                  ) : (
+                                    ['A', 'B', 'C', 'D'][i]
+                                  )}
                                   </Box>
                                   <Text fontSize="xs" color="gray.700" fontWeight={textWeight} flex={1} lineHeight={1.4}>
                                     {opt}
                                   </Text>
-                                  {label && (
-                                    <Badge
-                                      size="sm"
-                                      variant="solid"
-                                      bg={i === q.correctAnswer ? 'success.600' : 'error.600'}
-                                      color="white"
-                                      borderRadius="md"
-                                      px={2}
-                                      py={0.5}
-                                      fontSize="2xs"
-                                      fontWeight={700}
-                                      fontFamily="mono"
-                                    >
-                                      {label.toUpperCase()}
-                                    </Badge>
-                                  )}
+                                    {label && (
+                                      <Badge
+                                        size="sm"
+                                        variant="solid"
+                                        bg={label === 'Correct Answer' ? 'success.600' : 'error.600'}
+                                        color="white"
+                                        borderRadius="md"
+                                        px={2}
+                                        py={0.5}
+                                        fontSize="2xs"
+                                        fontWeight={700}
+                                        fontFamily="mono"
+                                      >
+                                        {label.toUpperCase()}
+                                      </Badge>
+                                    )}
                                 </HStack>
                               );
                             })}

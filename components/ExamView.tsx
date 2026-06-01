@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
+import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DOMAIN_COLORS: Record<Domain, string> = {
@@ -162,10 +162,26 @@ export function ExamView() {
   };
 
   const handleAnswerClick = (index: number) => {
-    if (showExplanations && reviewChecked[currentQuestion] && answers[currentQuestion] !== index) {
-      clearReviewChecked(currentQuestion);
+    const q = questions[currentQuestion];
+    if (isMultiSelect(q)) {
+      const current = answers[currentQuestion];
+      const selected = Array.isArray(current) ? [...current] : [];
+      const idx = selected.indexOf(index);
+      if (idx >= 0) {
+        selected.splice(idx, 1);
+      } else {
+        selected.push(index);
+      }
+      if (showExplanations && reviewChecked[currentQuestion]) {
+        clearReviewChecked(currentQuestion);
+      }
+      setAnswer(selected);
+    } else {
+      if (showExplanations && reviewChecked[currentQuestion] && answers[currentQuestion] !== index) {
+        clearReviewChecked(currentQuestion);
+      }
+      setAnswer(index);
     }
-    setAnswer(index);
   };
 
   const handleFinishClick = () => {
@@ -212,7 +228,7 @@ export function ExamView() {
         {questions.map((_, i) => {
           const isCurrent = i === currentQuestion;
           const isAns = answers[i] !== null;
-          const isCorrect = isAns && answers[i] === questions[i].correctAnswer;
+          const isCorrect = isAns && isAnswerCorrect(questions[i], answers[i]);
           const isFlagged = flagged[i];
           const isNavigable = canNavigateTo(i);
 
@@ -532,6 +548,26 @@ export function ExamView() {
                   </Box>
                 )}
 
+                {/* Multi-Select Badge */}
+                {isMultiSelect(q) && (
+                  <Badge
+                    alignSelf="flex-start"
+                    px={2.5}
+                    py={0.5}
+                    borderRadius="md"
+                    bg="purple.100"
+                    color="purple.800"
+                    border="1px solid"
+                    borderColor="purple.200"
+                    fontFamily="mono"
+                    fontSize="2xs"
+                    fontWeight={700}
+                    _dark={{ bg: 'rgba(168, 85, 247, 0.15)', color: 'purple.200', borderColor: 'rgba(168, 85, 247, 0.3)' }}
+                  >
+                    SELECT ALL THAT APPLY
+                  </Badge>
+                )}
+
                 {/* Question Text */}
                 <Heading as="p" size="md" fontWeight={600} lineHeight={1.6} color="brand.700">
                   {q.text}
@@ -540,8 +576,9 @@ export function ExamView() {
                 {/* Options List */}
                 <VStack gap={3} align="stretch">
                   {q.options.map((opt, i) => {
-                    const isSelected = answers[currentQuestion] === i;
-                    const isCorrectOption = i === q.correctAnswer;
+                    const isSingle = !isMultiSelect(q);
+                    const isSelected = isAnswerSelected(answers[currentQuestion], i);
+                    const isCorrectOption = isSingle ? (i === q.correctAnswer) : (q.correctAnswers ?? []).includes(i);
                     let borderColor = 'border';
                     let bgColor = 'transparent';
                     let keyBg = 'transparent';
@@ -617,7 +654,13 @@ export function ExamView() {
                           fontWeight={700}
                           mt="1px"
                         >
-                          {activeOptions[i]}
+                          {isSingle ? activeOptions[i] : (
+                            isSelected ? (
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            ) : null
+                          )}
                         </Box>
                         <Text fontSize="sm" color="gray.700" fontWeight={isSelected ? 600 : 500} lineHeight={1.5} mt="1px">
                           {opt}

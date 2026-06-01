@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Question, ExamMode, Domain, ExamResults } from '@/types/exam';
-import { DOMAINS } from '@/types/exam';
+import { DOMAINS, isAnswerCorrect } from '@/types/exam';
 import questionsData from '@/data/questions.json';
 
 interface ExamStore {
   questions: Question[];
   currentQuestion: number;
-  answers: (number | null)[];
+  answers: (number | number[] | null)[];
   mode: ExamMode | null;
   selectedDomain: Domain | null;
   timeRemaining: number;
@@ -20,7 +20,7 @@ interface ExamStore {
   isReviewing: boolean;
   reviewChecked: boolean[];
 
-  setAnswer: (answer: number) => void;
+  setAnswer: (answer: number | number[]) => void;
   goToQuestion: (index: number) => void;
   nextQuestion: () => void;
   prevQuestion: () => void;
@@ -200,15 +200,15 @@ export const useExamStore = create<ExamStore>()(
 
   getResults: () => {
     const { questions, answers, startTime, endTime } = get();
-    const correctAnswers = questions.filter(
-      (q, i) => answers[i] !== null && answers[i] === q.correctAnswer
+    const correctCount = questions.filter(
+      (q, i) => answers[i] !== null && isAnswerCorrect(q, answers[i])
     ).length;
     const totalQuestions = questions.length;
-    const incorrectAnswers = questions.filter(
-      (q, i) => answers[i] !== null && answers[i] !== q.correctAnswer
+    const incorrectCount = questions.filter(
+      (q, i) => answers[i] !== null && !isAnswerCorrect(q, answers[i])
     ).length;
     const unanswered = questions.filter((_, i) => answers[i] === null).length;
-    const pct = Math.round((correctAnswers / totalQuestions) * 100);
+    const pct = Math.round((correctCount / totalQuestions) * 100);
     const scaledScore = Math.round(100 + (pct / 100) * 900);
     const passed = scaledScore >= 720;
 
@@ -219,7 +219,7 @@ export const useExamStore = create<ExamStore>()(
     questions.forEach((q, i) => {
       if (domainBreakdown[q.domain]) {
         domainBreakdown[q.domain].total++;
-        if (answers[i] !== null && answers[i] === q.correctAnswer) {
+        if (answers[i] !== null && isAnswerCorrect(q, answers[i])) {
           domainBreakdown[q.domain].correct++;
         }
       }
@@ -227,14 +227,14 @@ export const useExamStore = create<ExamStore>()(
 
     const incorrectQuestions = questions
       .map((q, i) => ({ question: q, userAnswer: answers[i] }))
-      .filter((item): item is { question: Question; userAnswer: number } =>
-        item.userAnswer !== null && item.userAnswer !== item.question.correctAnswer
+      .filter((item): item is { question: Question; userAnswer: number | number[] } =>
+        item.userAnswer !== null && !isAnswerCorrect(item.question, item.userAnswer)
       );
 
     return {
       totalQuestions,
-      correctAnswers,
-      incorrectAnswers,
+      correctAnswers: correctCount,
+      incorrectAnswers: incorrectCount,
       unanswered,
       score: pct,
       scaledScore,

@@ -310,77 +310,379 @@ export default function OverviewPage() {
               </Box>
             </motion.div>
 
+
+
+            {/* Section 1.1: The Claude Partner Network */}
             <motion.div variants={itemVariants}>
-              <Box>
-                <Box textAlign="center" mb={6}>
-                  <Heading as="h2" size="xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-                    Exam Scenarios to Prepare
-                  </Heading>
-                  <Text color="gray.600" fontSize="md">
-                    The exam tests your practical judgment across these realistic production contexts.
-                  </Text>
+              <Box textAlign="center" mb={4}>
+                <Heading as="h2" size="xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
+                  Claude Partner Network
+                </Heading>
+                <Text color="gray.600" fontSize="md" maxW="2xl" mx="auto">
+                  Anthropic&apos;s official partner program for agencies and consultancies building solutions on Claude.
+                </Text>
+              </Box>
+
+              <VStack gap={6} align="stretch">
+                {/* Four Academy Module Cards */}
+                <SimpleGrid columns={[1, 2]} gap={4}>
+                  {[
+                    {
+                      title: 'Agent Skills',
+                      desc: 'Building AI agents with Claude, agent architecture patterns, tool use and function calling.',
+                      icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+                    },
+                    {
+                      title: 'Claude API',
+                      desc: 'API integration best practices, rate limits and optimization, error handling patterns.',
+                      icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+                    },
+                    {
+                      title: 'Model Context Protocol (MCP)',
+                      desc: 'Connecting Claude to external tools, building custom integrations, protocol specifications.',
+                      icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+                    },
+                    {
+                      title: 'Claude Code',
+                      desc: 'Using Claude for development workflows, code generation patterns, development best practices.',
+                      icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
+                    },
+                  ].map((mod, idx) => (
+                    <Box
+                      key={idx}
+                      bg="rgba(255, 255, 255, 0.45)"
+                      backdropFilter="blur(12px)"
+                      _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                      borderRadius="xl"
+                      border="2px solid"
+                      borderColor="rgba(255, 255, 255, 0.35)"
+                      p={5}
+                      boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                    >
+                      <HStack gap={3.5} align="flex-start">
+                        <Box
+                          p={2.5} borderRadius="lg"
+                          bg="rgba(57, 73, 171, 0.08)"
+                          border="1px solid" borderColor="rgba(57, 73, 171, 0.18)"
+                          color="brand.600" flexShrink={0}
+                          _dark={{ bg: 'rgba(124, 110, 250, 0.15)', borderColor: 'rgba(255, 255, 255, 0.12)', color: 'brand.300' }}
+                        >
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d={mod.icon} />
+                          </svg>
+                        </Box>
+                        <VStack align="stretch" gap={1}>
+                          <Text fontSize="sm" fontWeight={700} color="brand.700">{mod.title}</Text>
+                          <Text fontSize="xs" color="gray.600" lineHeight={1.5}>{mod.desc}</Text>
+                        </VStack>
+                      </HStack>
+                    </Box>
+                  ))}
+                </SimpleGrid>
+
+                {/* Registration Warning */}
+                <Box
+                  p={4}
+                  bg="rgba(251, 191, 36, 0.08)"
+                  border="1.5px solid"
+                  borderColor="orange.300"
+                  borderRadius="xl"
+                  _dark={{ bg: 'rgba(251, 191, 36, 0.06)', borderColor: 'orange.400' }}
+                >
+                  <HStack align="flex-start" gap={3}>
+                    <Box color="orange.500" flexShrink={0} mt={0.5}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                    </Box>
+                    <VStack align="stretch" gap={0.5}>
+                      <Text fontSize="sm" fontWeight={700} color="orange.800" _dark={{ color: 'orange.200' }}>
+                        Critical: Use Company Email for Registration
+                      </Text>
+                      <Text fontSize="xs" color="orange.700" _dark={{ color: 'orange.300' }} lineHeight={1.5}>
+                        Team members <strong>must</strong> register with their company email address. Personal accounts (Gmail, Outlook, etc.) will not count toward your organization&apos;s verification in Anthropic&apos;s system.
+                      </Text>
+                    </VStack>
+                  </HStack>
                 </Box>
 
-                <SimpleGrid columns={[1, 2, 3]} gap={5}>
-                  {SCENARIOS.map(scenario => (
-                    <motion.div
-                      key={scenario.id}
-                      variants={itemVariants}
-                      style={{ display: 'flex', width: '100%' }}
-                    >
+                {/* Team Size Comparison */}
+                <SimpleGrid columns={[1, 2]} gap={4}>
+                  <Box
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(12px)"
+                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    borderRadius="xl"
+                    border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
+                    p={5}
+                  >
+                    <Heading as="h3" size="xs" fontWeight={700} color="brand.700" mb={3}>
+                      Team Size Guidelines
+                    </Heading>
+                    <Text fontSize="xs" color="gray.600" lineHeight={1.6} mb={3}>
+                      The application portal mentions <strong>10 team members</strong> completing Academy courses, but the manual review process is flexible. Boutique agencies (as small as 3 people) have been accepted.
+                    </Text>
+                    <HStack gap={4} wrap="wrap">
+                      <Badge px={2.5} py={1} borderRadius="md" bg="rgba(57,73,171,0.08)" color="brand.700" border="1px solid" borderColor="rgba(57,73,171,0.18)" fontSize="2xs" fontWeight={700}>Portal: 10+ members</Badge>
+                      <Badge px={2.5} py={1} borderRadius="md" bg="rgba(34,200,138,0.1)" color="green.700" border="1px solid" borderColor="green.200" fontSize="2xs" fontWeight={700}>Confirmed: 3-person agency accepted</Badge>
+                    </HStack>
+                  </Box>
+                  <Box
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(12px)"
+                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    borderRadius="xl"
+                    border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
+                    p={5}
+                  >
+                    <Heading as="h3" size="xs" fontWeight={700} color="brand.700" mb={3}>
+                      CPN Benefits
+                    </Heading>
+                    <VStack align="stretch" gap={2}>
+                      {['Early access to new features & models', 'Co-marketing opportunities with Anthropic', 'Enhanced technical support & implementation guidance', 'Referral program access & partner community'].map((b, i) => (
+                        <HStack key={i} gap={2}>
+                          <Box w="5px" h="5px" borderRadius="full" bg="brand.500" flexShrink={0} />
+                          <Text fontSize="xs" color="gray.600" fontWeight={500}>{b}</Text>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  </Box>
+                </SimpleGrid>
+              </VStack>
+            </motion.div>
+
+            {/* Section 1.2: Exam Strategy & Preparation Tips */}
+            <motion.div variants={itemVariants}>
+              <Box textAlign="center" mb={4}>
+                <Heading as="h2" size="xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
+                  Exam Strategy &amp; Preparation Tips
+                </Heading>
+                <Text color="gray.600" fontSize="md" maxW="2xl" mx="auto">
+                  A structured approach to maximize your study efficiency and exam-day performance.
+                </Text>
+              </Box>
+
+              <VStack gap={5} align="stretch">
+                {/* Exam Scenarios to Prepare */}
+                <Box
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(16px)"
+                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  borderRadius="xl"
+                  border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
+                  p={5}
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                >
+                  <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={3}>
+                    Exam Scenarios to Prepare
+                  </Heading>
+                  <Text fontSize="xs" color="gray.600" mb={4}>
+                    The exam tests your practical judgment across these realistic production contexts.
+                  </Text>
+                  <SimpleGrid columns={[1, 2, 3]} gap={4}>
+                    {SCENARIOS.map(scenario => (
                       <Box
-                        bg="rgba(255, 255, 255, 0.45)"
-                        backdropFilter="blur(12px)"
-                        _dark={{
-                          bg: "rgba(30, 41, 59, 0.45)",
-                          borderColor: "rgba(255, 255, 255, 0.08)"
-                        }}
-                        p={5}
-                        borderRadius="xl"
-                        border="2px solid"
-                        borderColor="rgba(255, 255, 255, 0.35)"
-                        transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                        boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                        key={scenario.id}
+                        bg="rgba(255, 255, 255, 0.55)"
+                        backdropFilter="blur(8px)"
+                        _dark={{ bg: 'rgba(30, 41, 59, 0.5)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                        p={4}
+                        borderRadius="lg"
+                        border="1px solid"
+                        borderColor="rgba(255, 255, 255, 0.5)"
+                        transition="all 0.2s"
                         _hover={{
                           borderColor: 'brand.400',
                           bg: '#ffffff',
-                          _dark: { bg: 'rgba(30, 41, 59, 0.75)' },
-                          transform: 'translateY(-3px)',
-                          boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.15)'
+                          _dark: { bg: 'rgba(30, 41, 59, 0.7)' },
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 24px 0 rgba(57, 73, 171, 0.12)'
                         }}
-                        w="100%"
                       >
-                        <HStack align="center" gap={4}>
+                        <HStack align="center" gap={3}>
                           <Box
-                            p={2.5}
+                            p={2}
                             borderRadius="lg"
                             bg="rgba(57, 73, 171, 0.08)"
                             border="1px solid"
                             borderColor="rgba(57, 73, 171, 0.16)"
                             color="brand.600"
-                            transition="all 0.2s"
                             _dark={{
                               bg: "rgba(124, 110, 250, 0.15)",
                               borderColor: "rgba(255, 255, 255, 0.12)",
                               color: "brand.300"
                             }}
                           >
-                            <Box w="24px" h="24px" display="flex" alignItems="center" justifyContent="center">{scenario.icon}</Box>
+                            <Box w="20px" h="20px" display="flex" alignItems="center" justifyContent="center">{scenario.icon}</Box>
                           </Box>
                           <Box>
-                            <Badge bg="brand.100" color="brand.700" mb={1.5} size="sm" borderRadius="full" px={2.5}>
+                            <Badge bg="brand.100" color="brand.700" mb={1} size="sm" borderRadius="full" px={2}>
                               Scenario {scenario.id}
                             </Badge>
-                            <Heading as="h3" size="sm" fontWeight={700} color="brand.700" lineHeight="1.3">
+                            <Heading as="h4" size="xs" fontWeight={700} color="brand.700" lineHeight="1.3">
                               {scenario.title}
                             </Heading>
                           </Box>
                         </HStack>
                       </Box>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </SimpleGrid>
+                </Box>
+
+                {/* Study Allocation */}
+                <Box
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(16px)"
+                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  borderRadius="xl"
+                  border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
+                  p={6}
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                >
+                  <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={4}>
+                    High-Yield Domain Allocation
+                  </Heading>
+                  <Text fontSize="xs" color="gray.600" mb={4}>
+                    Focus your preparation proportionally to exam weight. Domains 1 &amp; 2 represent nearly half the exam.
+                  </Text>
+                  <VStack gap={3} align="stretch">
+                    {[
+                      { label: 'Agentic Architecture & Orchestration', weight: 27, color: '#7C6EFA' },
+                      { label: 'Prompt Engineering', weight: 20, color: '#F0D06E' },
+                      { label: 'Claude Code Config & Workflows', weight: 20, color: '#6ECFFA' },
+                      { label: 'Tool Design & MCP Integration', weight: 18, color: '#FA8C6E' },
+                      { label: 'Context Management & Reliability', weight: 15, color: '#A06EFA' },
+                    ].map((d, i) => (
+                      <Box key={i}>
+                        <HStack justify="space-between" mb={1}>
+                          <HStack gap={2}>
+                            <Box w="10px" h="10px" borderRadius="sm" bg={d.color} flexShrink={0} />
+                            <Text fontSize="xs" fontWeight={600} color="brand.700">{d.label}</Text>
+                          </HStack>
+                          <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.600">{d.weight}%</Text>
+                        </HStack>
+                        <Box w="100%" h="6px" bg="border" borderRadius="full" overflow="hidden">
+                          <Box h="100%" borderRadius="full" bg={d.color} w={`${d.weight}%`} transition="width 0.5s ease" />
+                        </Box>
+                      </Box>
+                    ))}
+                  </VStack>
+                </Box>
+
+                {/* Differentiating Pillars */}
+                <SimpleGrid columns={[1, 2]} gap={4}>
+                  <Box
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(12px)"
+                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    borderRadius="xl"
+                    border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
+                    p={5}
+                  >
+                    <HStack gap={2.5} mb={3}>
+                      <Box p={2} borderRadius="lg" bg="rgba(57,73,171,0.08)" border="1px solid" borderColor="rgba(57,73,171,0.18)" color="brand.600">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                      </Box>
+                      <Heading as="h3" size="xs" fontWeight={700} color="brand.700">Constitutional AI &amp; Safety</Heading>
+                    </HStack>
+                    <Text fontSize="xs" color="gray.600" lineHeight={1.6}>
+                      This is where Anthropic differentiates itself. Study the Critiques &amp; Revisions loop, RLHF principles, and the Helpfulness vs. Harmlessness trade-off. Community test-takers consistently report this domain being harder than expected.
+                    </Text>
+                  </Box>
+                  <Box
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(12px)"
+                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    borderRadius="xl"
+                    border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
+                    p={5}
+                  >
+                    <HStack gap={2.5} mb={3}>
+                      <Box p={2} borderRadius="lg" bg="rgba(57,73,171,0.08)" border="1px solid" borderColor="rgba(57,73,171,0.18)" color="brand.600">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                        </svg>
+                      </Box>
+                      <Heading as="h3" size="xs" fontWeight={700} color="brand.700">MCP &amp; Multi-Agent Systems</Heading>
+                    </HStack>
+                    <Text fontSize="xs" color="gray.600" lineHeight={1.6}>
+                      The exam covers stdio vs. SSE transport selection, capability negotiation, JSON-RPC message flow, and agent orchestration patterns. These are newer topics that appear more prominently than official domain weights suggest.
+                    </Text>
+                  </Box>
                 </SimpleGrid>
-              </Box>
+
+                {/* 7-Week Roadmap */}
+                <Box
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(16px)"
+                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  borderRadius="xl"
+                  border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
+                  p={6}
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                >
+                  <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={4}>
+                    7-Week Preparation Roadmap
+                  </Heading>
+                  <VStack gap={3} align="stretch">
+                    {[
+                      { phase: 'Weeks 1-2', title: 'Foundations', items: 'Complete Academy Modules 1 & 2 (Agent Skills, Claude API), read official API docs, set up dev environment and build simple API integrations' },
+                      { phase: 'Weeks 3-4', title: 'Deep Dive', items: 'Complete Modules 3 & 4 (MCP, Claude Code), study Constitutional AI framework, build a small project using MCP and tool use, take the free 5-question sample' },
+                      { phase: 'Weeks 5-6', title: 'Practice & Refine', items: 'Work through the 105-question practice set, identify weak domains and revisit docs, join community study groups, take timed mock exams' },
+                      { phase: 'Week 7', title: 'Final Review', items: 'Review all domain summaries, focus on API Architecture and Prompt Engineering, rest before exam day' },
+                    ].map((phase, i) => (
+                      <HStack key={i} gap={4} p={3.5} borderRadius="lg" bg="rgba(57,73,171,0.04)" border="1px solid" borderColor="rgba(57,73,171,0.1)">
+                        <Badge
+                          px={3} py={1.5} borderRadius="md"
+                          bg={['rgba(124,110,250,0.12)', 'rgba(250,140,110,0.12)', 'rgba(110,207,250,0.12)', 'rgba(240,208,110,0.12)'][i]}
+                          color={['#7C6EFA', '#FA8C6E', '#6ECFFA', '#F0D06E'][i]}
+                          border="1px solid" borderColor={['rgba(124,110,250,0.25)', 'rgba(250,140,110,0.25)', 'rgba(110,207,250,0.25)', 'rgba(240,208,110,0.25)'][i]}
+                          fontFamily="mono" fontSize="2xs" fontWeight={700} flexShrink={0}
+                        >
+                          {phase.phase}
+                        </Badge>
+                        <VStack align="stretch" gap={0.5}>
+                          <Text fontSize="xs" fontWeight={700} color="brand.700">{phase.title}</Text>
+                          <Text fontSize="2xs" color="gray.600" lineHeight={1.5}>{phase.items}</Text>
+                        </VStack>
+                      </HStack>
+                    ))}
+                  </VStack>
+                </Box>
+
+                {/* Tactical Test-Taking Tips */}
+                <Box
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(12px)"
+                  _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  borderRadius="xl"
+                  border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
+                  p={5}
+                >
+                  <Heading as="h3" size="xs" fontWeight={700} color="brand.700" mb={3}>
+                    Tactical Test-Taking Tips
+                  </Heading>
+                  <SimpleGrid columns={[1, 2]} gap={3}>
+                    {[
+                      'Target 1.5 minutes per scenario question — flag complex items for later review',
+                      'Focus on architectural decision-making, not memorizing benchmark numbers',
+                      'Read all four options before selecting — eliminate obviously wrong answers first',
+                      'No penalty for guessing — always provide an answer, even if uncertain',
+                      'Use the flag feature to mark uncertain questions for final review',
+                      'Practice with the mock exam timer to build pacing discipline',
+                    ].map((tip, i) => (
+                      <HStack key={i} gap={2.5} align="flex-start">
+                        <Box w="5px" h="5px" borderRadius="full" bg="brand.500" mt={1.5} flexShrink={0} />
+                        <Text fontSize="xs" color="gray.600" lineHeight={1.5} fontWeight={500}>{tip}</Text>
+                      </HStack>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+              </VStack>
             </motion.div>
 
           </VStack>

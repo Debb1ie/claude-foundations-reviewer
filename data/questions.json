@@ -167,7 +167,7 @@
                         "Ask the user for clarification before proceeding with any investigation action",
                         "Run a broad analysis of all available performance metrics simultaneously",
                         "Use dynamic decomposition to break the investigation into concrete sub-tasks",
-                        "Provide a template response explaining what the agent cannot perform"
+                        "Request a structured investigation plan from the user including specific metrics and systems to examine"
                     ],
         "correctAnswer":  2,
         "explanation":  "Dynamic decomposition is the correct pattern for open-ended investigation tasks. The agent should autonomously break down the vague request into concrete, actionable sub-tasks (e.g., \u0027check CPU usage\u0027, \u0027analyze query latency\u0027, \u0027review error rates\u0027). This demonstrates \u003cstrong\u003eproactive architectural judgment\u003c/strong\u003e rather than requiring human clarification at every step. The decomposition should be explicit in the agent\u0027s reasoning so the user can see and validate the plan.",
@@ -310,7 +310,7 @@
         "options":  [
                         "Retry immediately up to ten times in rapid succession without delay",
                         "Use exponential backoff with a reasonable max delay and retry limit",
-                        "Never retry and always escalate to a human operator immediately",
+                        "Retry immediately once, then escalate to a monitoring alert on the second consecutive failure",
                         "Retry exactly one time after a fixed thirty second delay period"
                     ],
         "correctAnswer":  1,
@@ -1918,5 +1918,90 @@
         "domain":  "D5",
         "task":  "Task 5.18",
         "source":  "Exam Guide Ã‚Â§Task 5.18"
+    },
+    {
+        "id":  "q121",
+        "text":  "An architect is designing a multi-agent research system where a coordinator delegates to specialized subagents. Which principles should guide the tool and context design between the coordinator and subagents? (Select all that apply.)",
+        "scenario":  "The system has a coordinator agent that delegates research tasks to subagents for competitor analysis, customer sentiment, and pricing trends. Each subagent produces findings the coordinator synthesizes.",
+        "options":  [
+                        "Subagents should receive only the context and tools relevant to their specific investigation task",
+                        "The coordinator should pass the full conversation history of the entire system to each subagent",
+                        "Each subagent should maintain context isolation from other subagents to prevent pollution",
+                        "All subagents should share a common tool pool to maximize flexibility and coverage"
+                    ],
+        "correctAnswers":  [0, 2],
+        "correctAnswer":  0,
+        "explanation":  "The correct principles are \u003cstrong\u003econtext isolation\u003c/strong\u003e and \u003cstrong\u003eleast-privilege tool assignment\u003c/strong\u003e. Each subagent should receive \u003cstrong\u003eonly the context and tools relevant to its task\u003c/strong\u003e (option 0) to prevent distraction and reduce token costs. Subagents must \u003cstrong\u003emaintain context isolation\u003c/strong\u003e from each other (option 2) to avoid information leakage and context pollution. Passing full conversation history (option 1) would dilute focus and waste tokens. A shared tool pool (option 3) violates least-privilege principles.",
+        "domain":  "D1",
+        "task":  "Task 1.13",
+        "source":  "Exam Guide Ã‚Â§Task 1.13"
+    },
+    {
+        "id":  "q122",
+        "text":  "A team is deploying an MCP server that provides code analysis tools across a distributed development environment. Which architectural decisions are appropriate for this remote deployment? (Select all that apply.)",
+        "scenario":  "The MCP server must be accessible from multiple developer machines across different network segments. Some tools require access to sensitive internal APIs and proprietary codebases.",
+        "options":  [
+                        "Use SSE transport to enable network-accessible client-server communication",
+                        "Use stdio transport since MCP servers must always run as local subprocesses",
+                        "Implement authentication and authorization for all MCP tool invocations",
+                        "Disable all security since MCP servers only communicate over localhost connections"
+                    ],
+        "correctAnswers":  [0, 2],
+        "correctAnswer":  0,
+        "explanation":  "For remote MCP deployments, \u003cstrong\u003eSSE (Server-Sent Events)\u003c/strong\u003e transport is appropriate (option 0) because it enables client-server communication over HTTP across network segments. \u003cstrong\u003eAuthentication and authorization\u003c/strong\u003e are essential (option 2) when MCP servers access sensitive resources, including identity verification, least-privilege tool scoping, and audit logging. stdio transport (option 1) only works for local subprocesses. Disabling security (option 3) is never acceptable for production systems.",
+        "domain":  "D2",
+        "task":  "Task 2.10",
+        "source":  "Exam Guide Ã‚Â§Task 2.10"
+    },
+    {
+        "id":  "q123",
+        "text":  "A team is designing a structured data extraction pipeline that processes invoices from PDF documents. Which techniques help ensure consistent, reliable output from the extraction agent? (Select all that apply.)",
+        "scenario":  "The pipeline extracts invoice fields (invoice number, date, total amount, line items, vendor name) from scanned PDF invoices with varying layouts and quality.",
+        "options":  [
+                        "Use a JSON schema with tool_use to enforce the output structure and field types",
+                        "Rely on a single system prompt instruction describing the expected output format",
+                        "Make optional fields nullable in the schema to prevent fabrication of missing values",
+                        "Set the prompt temperature to 1.0 to encourage maximum output variety"
+                    ],
+        "correctAnswers":  [0, 2],
+        "correctAnswer":  0,
+        "explanation":  "\u003cstrong\u003eJSON schema enforcement via tool_use\u003c/strong\u003e (option 0) guarantees the output structure matches downstream expectations. \u003cstrong\u003eNullable optional fields\u003c/strong\u003e (option 2) prevent the model from fabricating values when information is absent from the source document. A single system prompt (option 1) is insufficient for reliable structured output. High temperature (option 3) reduces output consistency and increases hallucination risk.",
+        "domain":  "D4",
+        "task":  "Task 4.5",
+        "source":  "Exam Guide Ã‚Â§Task 4.5"
+    },
+    {
+        "id":  "q124",
+        "text":  "An AI-powered application handles customer-facing interactions and experiences occasional API failures. Which patterns are appropriate for maintaining system reliability during transient failures? (Select all that apply.)",
+        "scenario":  "The application processes customer support requests using Claude API. The API occasionally returns 429 (rate limit) and 503 (service unavailable) errors lasting 10-60 seconds.",
+        "options":  [
+                        "Implement exponential backoff retry logic for transient error responses",
+                        "Show customers a generic timeout message and discard the failed request entirely",
+                        "Use circuit breaker patterns to stop calling a failing endpoint and allow recovery time",
+                        "Immediately escalate every single API error to a human operator for resolution"
+                    ],
+        "correctAnswers":  [0, 2],
+        "correctAnswer":  0,
+        "explanation":  "\u003cstrong\u003eExponential backoff retry\u003c/strong\u003e (option 0) is the standard pattern for transient errors, starting with short delays and increasing between attempts. \u003cstrong\u003eCircuit breakers\u003c/strong\u003e (option 2) prevent cascading failures by stopping calls to a failing endpoint, allowing it time to recover, then gradually resuming traffic. Discarding requests (option 1) causes data loss. Escalating every error (option 3) is impractical and floods operators with non-critical alerts.",
+        "domain":  "D5",
+        "task":  "Task 5.19",
+        "source":  "Exam Guide Ã‚Â§Task 5.19"
+    },
+    {
+        "id":  "q125",
+        "text":  "A team is implementing a PR review agent and wants to maximize the value of AI-generated code reviews. Which criteria should guide the review scope to produce focused, actionable feedback? (Select all that apply.)",
+        "scenario":  "The agent reviews 50+ pull requests per week. Reviews should catch real issues without overwhelming developers with minor stylistic preferences or false positives.",
+        "options":  [
+                        "Report all functional bugs and security vulnerabilities discovered in the changed code",
+                        "Flag every formatting and naming style preference that differs from personal taste",
+                        "Identify API compatibility breaks and performance regressions introduced by the changes",
+                        "Comment on every line that could potentially be refactored or improved in any way"
+                    ],
+        "correctAnswers":  [0, 2],
+        "correctAnswer":  0,
+        "explanation":  "Effective PR reviews should focus on \u003cstrong\u003efunctional bugs and security issues\u003c/strong\u003e (option 0) and \u003cstrong\u003eAPI compatibility and performance regressions\u003c/strong\u003e (option 2). These are high-value findings that directly impact code quality and system stability. Formatting preferences (option 1) should be enforced by automated linters, not reviewer comments. Flagging every potential refactoring (option 3) creates review fatigue and drowns out critical issues.",
+        "domain":  "D4",
+        "task":  "Task 4.6",
+        "source":  "Exam Guide Ã‚Â§Task 4.6"
     }
 ]

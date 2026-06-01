@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
+import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const containerVariants: Variants = {
@@ -216,7 +216,7 @@ export function ReviewOverview() {
                       {/* Options review list */}
                       <VStack gap={2} align="stretch">
                         {q.options.map((opt, oi) => {
-                          const isUserAnswer = userAnswer === oi;
+                          const isUserAnswer = isAnswerSelected(userAnswer, oi);
                           return (
                             <HStack
                               key={oi}
@@ -243,7 +243,13 @@ export function ReviewOverview() {
                                 fontSize="2xs"
                                 fontWeight={700}
                               >
-                                {activeOptions[oi]}
+                                {isMultiSelect(q) && isUserAnswer ? (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                  </svg>
+                                ) : (
+                                  activeOptions[oi]
+                                )}
                               </Box>
                               <Text fontSize="xs" color={isUserAnswer ? 'brand.700' : 'gray.600'} fontWeight={isUserAnswer ? 600 : 500} flex={1} lineHeight={1.4}>
                                 {opt}
