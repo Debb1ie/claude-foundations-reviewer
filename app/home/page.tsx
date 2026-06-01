@@ -1,6 +1,5 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { ModeSelector } from '@/components/ModeSelector';
 import { Footer } from '@/components/Footer';
 import { useExamStore } from '@/hooks/useExamState';

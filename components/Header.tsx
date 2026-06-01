@@ -35,36 +35,28 @@ export function Header() {
       <Container maxW="container.lg" py={4}>
         <HStack justify="space-between" align="center">
           <HStack gap={3}>
-            <NextLink href="/home" passHref legacyBehavior>
-              <Link _hover={{ textDecoration: 'none' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                <Heading as="h1" size={{ base: 'sm', md: 'md' }} fontWeight={600} color="brand.700" lineHeight="1.3">
-                  Claude Certified Architect Exam Simulator
-                </Heading>
-              </Link>
-            </NextLink>
+            <Link as={NextLink} href="/home" _hover={{ textDecoration: 'none' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+              <Heading as="h1" size={{ base: 'sm', md: 'md' }} fontWeight={600} color="brand.700" lineHeight="1.3">
+                Claude Certified Architect Exam Simulator
+              </Heading>
+            </Link>
           </HStack>
 
           {/* Desktop Navigation */}
           <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
             {isHome ? (
               <>
-                <NextLink href="/overview" passHref legacyBehavior>
-                  <Link p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                    Exam Overview
-                  </Link>
-                </NextLink>
-                <NextLink href="/sources" passHref legacyBehavior>
-                  <Link p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                    Study Resources
-                  </Link>
-                </NextLink>
+                <Link as={NextLink} href="/overview" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                  Exam Overview
+                </Link>
+                <Link as={NextLink} href="/sources" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                  Study Resources
+                </Link>
               </>
             ) : (
-              <NextLink href="/" passHref legacyBehavior>
-                <Link p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                  Back to Simulator
-                </Link>
-              </NextLink>
+              <Link as={NextLink} href="/" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                Back to Simulator
+              </Link>
             )}
           </HStack>
 
@@ -118,64 +110,7 @@ export function Header() {
               >
                 {isHome ? (
                   <>
-                    <NextLink href="/overview" passHref legacyBehavior>
-                      <Link 
-                        py={3} 
-                        px={4} 
-                        fontSize="md" 
-                        fontWeight={600} 
-                        color="brand.700" 
-                        bg="rgba(57, 73, 171, 0.08)"
-                        border="1px solid"
-                        borderColor="rgba(57, 73, 171, 0.18)"
-                        borderRadius="md"
-                        _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
-                        _dark={{
-                          bg: "rgba(124, 110, 250, 0.12)",
-                          borderColor: "rgba(255, 255, 255, 0.12)",
-                          color: "brand.200",
-                          _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
-                        }}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        outline="none" 
-                        _focusVisible={{ boxShadow: 'outline' }}
-                        display="block"
-                        minH="44px"
-                      >
-                        Exam Overview
-                      </Link>
-                    </NextLink>
-                    <NextLink href="/sources" passHref legacyBehavior>
-                      <Link 
-                        py={3} 
-                        px={4} 
-                        fontSize="md" 
-                        fontWeight={600} 
-                        color="brand.700" 
-                        bg="rgba(57, 73, 171, 0.08)"
-                        border="1px solid"
-                        borderColor="rgba(57, 73, 171, 0.18)"
-                        borderRadius="md"
-                        _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
-                        _dark={{
-                          bg: "rgba(124, 110, 250, 0.12)",
-                          borderColor: "rgba(255, 255, 255, 0.12)",
-                          color: "brand.200",
-                          _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
-                        }}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        outline="none" 
-                        _focusVisible={{ boxShadow: 'outline' }}
-                        display="block"
-                        minH="44px"
-                      >
-                        Study Resources
-                      </Link>
-                    </NextLink>
-                  </>
-                ) : (
-                  <NextLink href="/" passHref legacyBehavior>
-                    <Link 
+                    <Link as={NextLink} href="/overview"
                       py={3} 
                       px={4} 
                       fontSize="md" 
@@ -198,9 +133,60 @@ export function Header() {
                       display="block"
                       minH="44px"
                     >
-                      Back to Simulator
+                      Exam Overview
                     </Link>
-                  </NextLink>
+                    <Link as={NextLink} href="/sources"
+                      py={3} 
+                      px={4} 
+                      fontSize="md" 
+                      fontWeight={600} 
+                      color="brand.700" 
+                      bg="rgba(57, 73, 171, 0.08)"
+                      border="1px solid"
+                      borderColor="rgba(57, 73, 171, 0.18)"
+                      borderRadius="md"
+                      _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                      _dark={{
+                        bg: "rgba(124, 110, 250, 0.12)",
+                        borderColor: "rgba(255, 255, 255, 0.12)",
+                        color: "brand.200",
+                        _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
+                      }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      outline="none" 
+                      _focusVisible={{ boxShadow: 'outline' }}
+                      display="block"
+                      minH="44px"
+                    >
+                      Study Resources
+                    </Link>
+                  </>
+                ) : (
+                  <Link as={NextLink} href="/"
+                    py={3} 
+                    px={4} 
+                    fontSize="md" 
+                    fontWeight={600} 
+                    color="brand.700" 
+                    bg="rgba(57, 73, 171, 0.08)"
+                    border="1px solid"
+                    borderColor="rgba(57, 73, 171, 0.18)"
+                    borderRadius="md"
+                    _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                    _dark={{
+                      bg: "rgba(124, 110, 250, 0.12)",
+                      borderColor: "rgba(255, 255, 255, 0.12)",
+                      color: "brand.200",
+                      _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
+                    }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    outline="none" 
+                    _focusVisible={{ boxShadow: 'outline' }}
+                    display="block"
+                    minH="44px"
+                  >
+                    Back to Simulator
+                  </Link>
                 )}
               </VStack>
             </motion.div>
