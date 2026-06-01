@@ -29,6 +29,10 @@ export function useTimer() {
     }, 1000);
   }, [stop]);
 
+  useEffect(() => {
+    useExamStore.setState({ timeRemaining: secondsLeft });
+  }, [secondsLeft]);
+
   const pause = useCallback(() => {
     isPausedRef.current = true;
     setIsPaused(true);

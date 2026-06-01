@@ -142,12 +142,14 @@ export function ExamView() {
     stopTimerRef.current = timer.stop;
   }, [timer.start, timer.stop]);
 
+  const initialTimeRef = useRef(timeRemaining);
+  
   useEffect(() => {
-    if (mode && MODE_LABELS[mode]?.timer && timeRemaining > 0) {
-      startTimerRef.current(timeRemaining);
+    if (mode && MODE_LABELS[mode]?.timer && initialTimeRef.current > 0) {
+      startTimerRef.current(initialTimeRef.current);
     }
     return () => stopTimerRef.current();
-  }, [mode, timeRemaining]);
+  }, [mode]);
 
   const handleExit = () => {
     exitingRef.current = true;
@@ -452,7 +454,7 @@ export function ExamView() {
 
         <HStack align="stretch" gap={6} flex={1} wrap="wrap">
           {/* LEFT PANEL: The Question details (70% width on desktop) */}
-          <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }}>
+          <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }} pb={{ base: 28, md: 0 }}>
             <Box
               bg="rgba(255, 255, 255, 0.45)"
               backdropFilter="blur(16px)"
@@ -738,7 +740,23 @@ export function ExamView() {
           </Box>
 
             {/* Bottom Nav Strip */}
-            <HStack justify="space-between" mt={2} mb={20}>
+            <HStack 
+              justify="space-between" 
+              mt={{ base: 0, md: 2 }} 
+              mb={{ base: 0, md: 20 }}
+              position={{ base: 'fixed', md: 'static' }}
+              bottom={{ base: 0, md: 'auto' }}
+              left={{ base: 0, md: 'auto' }}
+              right={{ base: 0, md: 'auto' }}
+              w={{ base: '100%', md: 'auto' }}
+              bg={{ base: 'rgba(255, 255, 255, 0.9)', md: 'transparent' }}
+              backdropFilter={{ base: 'blur(16px)', md: 'none' }}
+              p={{ base: 4, md: 0 }}
+              borderTop={{ base: '1px solid', md: 'none' }}
+              borderColor="rgba(0, 0, 0, 0.1)"
+              zIndex={100}
+              _dark={{ bg: { base: 'rgba(15, 23, 42, 0.9)', md: 'transparent' }, borderColor: 'rgba(255, 255, 255, 0.1)' }}
+            >
               <Button
                 variant="outline"
                 borderColor="border"

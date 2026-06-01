@@ -10,6 +10,7 @@ import {
   SimpleGrid,
   Badge,
   Progress,
+  Link,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
@@ -446,6 +447,14 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                 </VStack>
               </motion.div>
             )}
+
+            <motion.div variants={itemVariants}>
+              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(30, 41, 59, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
+                <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
+                  <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" isExternal color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
+                </Text>
+              </Box>
+            </motion.div>
           </VStack>
         </motion.div>
       </Container>

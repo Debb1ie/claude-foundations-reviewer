@@ -130,7 +130,6 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     style={{ display: 'flex', width: '100%' }}
                   >
                     <Box
-                      as="button"
                       onClick={() => {
                         setSelectedMode(mode.id);
                         if (mode.id !== 'focus') {
@@ -203,6 +202,23 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                             </HStack>
                           ))}
+                          {isSelected && mode.id !== 'focus' && (
+                            <Button
+                              mt={2}
+                              w="100%"
+                              size="sm"
+                              bg="brand.600"
+                              color="white"
+                              fontWeight={700}
+                              _hover={{ bg: 'brand.700' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onStart(mode.id);
+                              }}
+                            >
+                              Start {mode.title}
+                            </Button>
+                          )}
                         </VStack>
                       </VStack>
                     </Box>
@@ -245,7 +261,6 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         return (
                           <Box
                             key={d.id}
-                            as="button"
                             display="flex"
                             flexDirection="column"
                             alignItems="stretch"
@@ -291,9 +306,26 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                             <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>
                               {d.name}
                             </Text>
-                            <Text fontSize="xs" color="gray.500">
+                            <Text fontSize="xs" color="gray.500" mb={isDomainSelected ? 3 : 0}>
                               {d.shortName} deep dive
                             </Text>
+                            {isDomainSelected && (
+                              <Button
+                                mt="auto"
+                                w="100%"
+                                size="sm"
+                                bg="brand.600"
+                                color="white"
+                                fontWeight={700}
+                                _hover={{ bg: 'brand.700' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStart('focus', d.id);
+                                }}
+                              >
+                                Start Focus Practice
+                              </Button>
+                            )}
                           </Box>
                         );
                       })}
@@ -303,32 +335,12 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
               )}
             </AnimatePresence>
 
-            {/* Start CTA Button */}
             <motion.div variants={itemVariants}>
-              <HStack gap={4} justify="center" mt={4}>
-                <Button
-                  size="lg"
-                  disabled={!selectedMode || (selectedMode === 'focus' && !selectedDomain)}
-                  onClick={() => {
-                    if (selectedMode) {
-                      onStart(selectedMode, selectedMode === 'focus' ? selectedDomain! : undefined);
-                    }
-                  }}
-                  bg="brand.600"
-                  color="white"
-                  fontWeight={700}
-                  fontSize="sm"
-                  px={12}
-                  py={6}
-                  borderRadius="lg"
-                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
-                  _active={{ transform: 'translateY(0)' }}
-                  transition="all 0.2s"
-                  cursor={(!selectedMode || (selectedMode === 'focus' && !selectedDomain)) ? 'not-allowed' : 'pointer'}
-                >
-                  Start {selectedMode === 'focus' ? 'Focus practice' : selectedMode === 'zen' ? 'Zen practice' : selectedMode === 'review' ? 'Review practice' : 'Standard exam'}
-                </Button>
-              </HStack>
+              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(30, 41, 59, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
+                <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
+                  <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" isExternal color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
+                </Text>
+              </Box>
             </motion.div>
           </VStack>
         </motion.div>
