@@ -120,7 +120,93 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             </motion.div>
 
             {/* Grid of modes */}
-            <SimpleGrid columns={[1, 1, 2, 4]} gap={5}>
+            <SimpleGrid columns={[1, 1, 2, 5]} gap={5}>
+              {/* Review Resources card — links to /sources */}
+              <motion.div
+                key="review-resources"
+                variants={itemVariants}
+                style={{ display: 'flex', width: '100%' }}
+              >
+                <Link
+                  as={NextLink}
+                  href="/sources"
+                  w="100%"
+                  border="2px solid"
+                  borderColor="rgba(255, 255, 255, 0.35)"
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(12px)"
+                  _dark={{
+                    bg: "rgba(30, 41, 59, 0.45)",
+                    borderColor: "rgba(255, 255, 255, 0.08)"
+                  }}
+                  borderRadius="xl"
+                  p={5}
+                  textAlign="left"
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                  _hover={{
+                    borderColor: 'brand.400',
+                    bg: 'rgba(255, 255, 255, 0.65)',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
+                    textDecoration: 'none'
+                  }}
+                  display="flex"
+                  flexDirection="column"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <VStack gap={4} align="stretch" h="100%">
+                    <HStack justify="space-between" align="center">
+                      <Box
+                        p={2.5}
+                        borderRadius="lg"
+                        bg="rgba(57, 73, 171, 0.08)"
+                        border="1px solid"
+                        borderColor="rgba(57, 73, 171, 0.16)"
+                        color="brand.600"
+                        transition="all 0.2s"
+                        _dark={{
+                          bg: 'rgba(124, 110, 250, 0.15)',
+                          borderColor: 'rgba(255, 255, 255, 0.12)',
+                          color: 'brand.300'
+                        }}
+                      >
+                        {SVG_ICONS.BOOK}
+                      </Box>
+                    </HStack>
+
+                    <Box>
+                      <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
+                        Review Resources
+                      </Heading>
+                      <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
+                        Access curated study materials, official docs, and community guides.
+                      </Text>
+                    </Box>
+
+                    <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                      {['Official study guides', 'API documentation', 'Community resources', 'Exam tips & strategy'].map((f) => (
+                        <HStack key={f} gap={2} align="center">
+                          <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
+                          <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
+                        </HStack>
+                      ))}
+                      <Button
+                        mt={2}
+                        w="100%"
+                        size="sm"
+                        bg="brand.600"
+                        color="white"
+                        fontWeight={700}
+                        _hover={{ bg: 'brand.700' }}
+                      >
+                        Browse Resources
+                      </Button>
+                    </VStack>
+                  </VStack>
+                </Link>
+              </motion.div>
+
               {MODES.map((mode) => {
                 const isSelected = selectedMode === mode.id;
                 return (
