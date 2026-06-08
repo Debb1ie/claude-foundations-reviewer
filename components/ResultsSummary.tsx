@@ -12,9 +12,41 @@ import {
   Progress,
   Link,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { useExamStore } from '@/hooks/useExamState';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+
+const QUICK_RESOURCES = [
+  {
+    label: 'Official Docs',
+    title: 'CCA-F Exam Guide',
+    description: 'Official PDF covering all exam domains, weights, and format.',
+    url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
+    icon: 'pdf',
+  },
+  {
+    label: 'Essentials',
+    title: 'Claude Partner Network Path',
+    description: 'Official Skilljar learning path required for certification.',
+    url: 'https://anthropic.skilljar.com/page/claude-partner-network-learning-path',
+    icon: 'course',
+  },
+  {
+    label: 'Courses',
+    title: 'Learn Anthropic (Skilljar)',
+    description: "Anthropic's official platform with all Claude courses and modules.",
+    url: 'https://learn.anthropic.com/',
+    icon: 'learn',
+  },
+  {
+    label: 'Guides',
+    title: 'Prompt Engineering Guide',
+    description: 'Best practices and strategies for writing effective Claude prompts.',
+    url: 'https://docs.anthropic.com/en/docs/prompt-engineering',
+    icon: 'guide',
+  },
+];
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -243,6 +275,98 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                 </VStack>
               </Box>
             </motion.div>
+
+            {/* Quick Resources — shown only on fail */}
+            {!results.passed && (
+              <motion.div variants={itemVariants}>
+                <Box
+                  bg="rgba(255, 241, 241, 0.55)"
+                  backdropFilter="blur(16px)"
+                  _dark={{
+                    bg: "rgba(60, 20, 20, 0.35)",
+                    borderColor: "rgba(255, 100, 100, 0.15)"
+                  }}
+                  border="1.5px solid"
+                  borderColor="rgba(240, 90, 90, 0.22)"
+                  borderRadius="2xl"
+                  p={[6, 8]}
+                  boxShadow="0 8px 32px 0 rgba(240, 90, 90, 0.06)"
+                >
+                  <HStack justify="space-between" align="center" mb={5} wrap="wrap" gap={3}>
+                    <VStack align="flex-start" gap={0.5}>
+                      <Heading as="h3" size="sm" fontWeight={700} color="error.700" _dark={{ color: 'red.300' }} letterSpacing="0.05em">
+                        RECOMMENDED RESOURCES
+                      </Heading>
+                      <Text fontSize="xs" color="gray.500">Start here to close the gap before your next attempt.</Text>
+                    </VStack>
+                    <Link
+                      as={NextLink}
+                      href="/sources"
+                      fontSize="xs"
+                      fontWeight={700}
+                      color="brand.600"
+                      _hover={{ color: 'brand.700', textDecoration: 'underline' }}
+                    >
+                      View all resources →
+                    </Link>
+                  </HStack>
+
+                  <SimpleGrid columns={[1, 2]} gap={4}>
+                    {QUICK_RESOURCES.map((r) => (
+                      <Link
+                        key={r.url}
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        display="flex"
+                        flexDirection="column"
+                        p={4}
+                        borderRadius="xl"
+                        border="1.5px solid"
+                        borderColor="rgba(255, 255, 255, 0.4)"
+                        bg="rgba(255, 255, 255, 0.55)"
+                        backdropFilter="blur(10px)"
+                        _dark={{
+                          bg: 'rgba(30, 41, 59, 0.45)',
+                          borderColor: 'rgba(255, 255, 255, 0.08)'
+                        }}
+                        transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
+                        _hover={{
+                          borderColor: 'brand.400',
+                          bg: 'rgba(255,255,255,0.8)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
+                          textDecoration: 'none'
+                        }}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <HStack justify="space-between" mb={2}>
+                          <Badge
+                            px={2}
+                            py={0.5}
+                            borderRadius="full"
+                            bg="brand.100"
+                            color="brand.700"
+                            fontSize="2xs"
+                            fontWeight={700}
+                            fontFamily="mono"
+                          >
+                            {r.label}
+                          </Badge>
+                          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" color="var(--chakra-colors-gray-400)">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                        </HStack>
+                        <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>{r.title}</Text>
+                        <Text fontSize="xs" color="gray.500" lineHeight={1.5}>{r.description}</Text>
+                      </Link>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+              </motion.div>
+            )}
 
             {/* Incorrect Questions Review Panel */}
             {results.incorrectQuestions.length > 0 && (
