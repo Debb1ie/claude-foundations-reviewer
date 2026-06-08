@@ -132,15 +132,21 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
 
                 <Heading
                   as="h2"
-                  size="lg"
+                  size="md"
                   fontWeight={700}
                   mt={4}
                   color="brand.700"
                 >
                   {results.passed
-                    ? 'Congratulations! You achieved a passing score.'
-                    : 'Keep Studying — aim for 72% or higher to guarantee success.'}
+                    ? 'Mock Exam Success!'
+                    : 'Keep Pushing Forward'}
                 </Heading>
+
+                <Text fontSize="sm" color="gray.600" lineHeight={1.7} mt={3} textAlign="left" px={[0, 2]}>
+                  {results.passed
+                    ? 'Congratulations on passing the Claude certificate mock exam! While this is a great milestone, keep in mind that the actual exam can be 2–3 times harder, so stay focused on your preparation. Be sure to leverage our review kit, catch the latest podcast episodes, and consult the official Claude Partner Network resources for the most up-to-date information. Your consistency here is exactly what will help you cross the finish line with confidence.'
+                    : "You're doing great for your first few attempts! While you aren't quite there yet, treat this as a solid foundation to build on. Stay consistent with the review kit and official resources, and you'll definitely bridge that gap. Keep up the momentum — review the incorrect answers below and focus on the domains where you scored lowest."}
+                </Text>
 
                 {/* Quick Stats Grid */}
                 <SimpleGrid columns={[2, 4]} gap={4} mt={6} pt={6} borderTop="1px solid" borderColor="border">

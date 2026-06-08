@@ -62,18 +62,12 @@ const SVG_ICONS = {
 
 const MODES = [
   {
-    id: 'exam' as const,
-    title: 'Exam Mode',
-    description: '60 questions, 2 hours, no explanations during test. Randomized each attempt.',
-    icon: 'CLOCK' as const,
-    features: ['Timed (2 hours)', 'No feedback until end', 'Randomized order', 'Progress tracking'],
-  },
-  {
     id: 'review' as const,
     title: 'Review Mode',
     description: 'Untimed, full feedback after each question. Learn as you go.',
     icon: 'BOOK' as const,
     features: ['Untimed', 'Show answers & explanations', 'Learn progressively', 'All questions visible'],
+    cta: 'Start Reviewing',
   },
   {
     id: 'zen' as const,
@@ -81,6 +75,7 @@ const MODES = [
     description: 'All exam features but no timer. Low-pressure practice.',
     icon: 'MOON' as const,
     features: ['No timer', 'Same structure as exam', 'No time pressure', 'Focus on learning'],
+    cta: 'Practice Calmly',
   },
   {
     id: 'focus' as const,
@@ -88,6 +83,15 @@ const MODES = [
     description: 'All questions from a single domain. Timed (1 hour).',
     icon: 'TARGET' as const,
     features: ['Single domain', '1 hour timed', 'Targeted practice', 'Domain deep dive'],
+    cta: 'Select Domain',
+  },
+  {
+    id: 'exam' as const,
+    title: 'Timed Exam Mode',
+    description: '60 questions, 2 hours, no explanations during test. Randomized each attempt.',
+    icon: 'CLOCK' as const,
+    features: ['Timed (2 hours)', 'No feedback until end', 'Randomized order', 'Progress tracking'],
+    cta: 'Begin Exam',
   },
 ];
 
@@ -120,7 +124,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             </motion.div>
 
             {/* Grid of modes */}
-            <SimpleGrid columns={[1, 1, 2, 5]} gap={5}>
+            <SimpleGrid columns={[1, 2, 3, 5]} gap={5}>
               {/* Review Resources card — links to /sources */}
               <motion.div
                 key="review-resources"
@@ -198,7 +202,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         bg="brand.600"
                         color="white"
                         fontWeight={700}
-                        _hover={{ bg: 'brand.700' }}
+                        borderRadius="lg"
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                        transition="all 0.2s"
                       >
                         Browse Resources
                       </Button>
@@ -288,21 +294,41 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                             </HStack>
                           ))}
-                          {isSelected && mode.id !== 'focus' && (
+                          {mode.id !== 'focus' ? (
                             <Button
                               mt={2}
                               w="100%"
                               size="sm"
-                              bg="brand.600"
+                              bg={isSelected ? 'brand.600' : 'brand.500'}
                               color="white"
                               fontWeight={700}
-                              _hover={{ bg: 'brand.700' }}
+                              borderRadius="lg"
+                              _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                              transition="all 0.2s"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onStart(mode.id);
                               }}
                             >
-                              Start {mode.title}
+                              {mode.cta}
+                            </Button>
+                          ) : (
+                            <Button
+                              mt={2}
+                              w="100%"
+                              size="sm"
+                              bg={isSelected ? 'brand.600' : 'brand.500'}
+                              color="white"
+                              fontWeight={700}
+                              borderRadius="lg"
+                              _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                              transition="all 0.2s"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedMode('focus');
+                              }}
+                            >
+                              {mode.cta}
                             </Button>
                           )}
                         </VStack>

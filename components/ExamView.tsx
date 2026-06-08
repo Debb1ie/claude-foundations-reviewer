@@ -33,7 +33,7 @@ const DOMAIN_COLORS: Record<Domain, string> = {
 };
 
 const MODE_LABELS = {
-  exam: { title: 'Exam Mode', timer: true, showExplanations: false },
+  exam: { title: 'Timed Exam Mode', timer: true, showExplanations: false },
   review: { title: 'Review Mode', timer: false, showExplanations: true },
   zen: { title: 'Zen Mode', timer: false, showExplanations: false },
   focus: { title: 'Focus Mode', timer: true, showExplanations: false },
@@ -772,11 +772,16 @@ export function ExamView() {
               </Text>
               {currentQuestion < questions.length - 1 ? (
                 <Button
-                  variant="outline"
-                  borderColor="border"
+                  bg="blue.600"
+                  color="white"
+                  fontWeight={700}
                   size="md"
+                  px={6}
+                  borderRadius="lg"
+                  _hover={{ bg: 'blue.700', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(37,99,235,0.45)' }}
+                  _active={{ transform: 'translateY(0)', boxShadow: 'none' }}
+                  transition="all 0.2s"
                   onClick={nextQuestion}
-                  fontWeight={600}
                 >
                   Next
                 </Button>
