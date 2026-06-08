@@ -46,11 +46,6 @@ const SVG_ICONS = {
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
     </svg>
   ),
-  MOON: (
-    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-  ),
   TARGET: (
     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
       <circle cx="12" cy="12" r="10"></circle>
@@ -59,7 +54,6 @@ const SVG_ICONS = {
     </svg>
   ),
 };
-
 const MODES = [
   {
     id: 'review' as const,
@@ -70,12 +64,12 @@ const MODES = [
     cta: 'Start Reviewing',
   },
   {
-    id: 'zen' as const,
-    title: 'Zen Mode',
-    description: 'All exam features but no timer. Low-pressure practice.',
-    icon: 'MOON' as const,
-    features: ['No timer', 'Same structure as exam', 'No time pressure', 'Focus on learning'],
-    cta: 'Practice Calmly',
+    id: 'exam' as const,
+    title: 'Exam Mode',
+    description: '60 questions, no explanations during the test. Randomized each attempt.',
+    icon: 'CLOCK' as const,
+    features: ['Randomized order', 'No feedback until end', 'Full results summary', 'Progress tracking'],
+    cta: 'Begin Exam',
   },
   {
     id: 'focus' as const,
@@ -84,14 +78,6 @@ const MODES = [
     icon: 'TARGET' as const,
     features: ['Single domain', '1 hour timed', 'Targeted practice', 'Domain deep dive'],
     cta: 'Select Domain',
-  },
-  {
-    id: 'exam' as const,
-    title: 'Timed Exam Mode',
-    description: '60 questions, 2 hours, no explanations during test. Randomized each attempt.',
-    icon: 'CLOCK' as const,
-    features: ['Timed (2 hours)', 'No feedback until end', 'Randomized order', 'Progress tracking'],
-    cta: 'Begin Exam',
   },
 ];
 
@@ -102,6 +88,7 @@ interface ModeSelectorProps {
 export function ModeSelector({ onStart }: ModeSelectorProps) {
   const [selectedMode, setSelectedMode] = React.useState<'exam' | 'review' | 'zen' | 'focus' | null>(null);
   const [selectedDomain, setSelectedDomain] = React.useState<Domain | null>(null);
+  const [examTimed, setExamTimed] = React.useState<boolean>(true);
 
   return (
     <Box bg="transparent" minH="100vh">
@@ -124,7 +111,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             </motion.div>
 
             {/* Grid of modes */}
-            <SimpleGrid columns={[1, 2, 3, 5]} gap={5}>
+            <SimpleGrid columns={[1, 2, 4]} gap={5}>
               {/* Review Resources card — links to /sources */}
               <motion.div
                 key="review-resources"
@@ -294,7 +281,77 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                             </HStack>
                           ))}
-                          {mode.id !== 'focus' ? (
+                          {mode.id === 'exam' ? (
+                            <>
+                              {/* Timer toggle for Exam Mode */}
+                              <Box
+                                mt={2}
+                                p={3}
+                                borderRadius="lg"
+                                bg="rgba(57, 73, 171, 0.04)"
+                                border="1px solid"
+                                borderColor="rgba(57, 73, 171, 0.12)"
+                                _dark={{ bg: 'rgba(124, 110, 250, 0.08)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                              >
+                                <Text fontSize="2xs" fontWeight={700} color="gray.500" textTransform="uppercase" letterSpacing="0.06em" mb={2}>
+                                  Timer
+                                </Text>
+                                <HStack gap={1.5} w="100%">
+                                  <Box
+                                    as="button"
+                                    flex={1}
+                                    py={1.5}
+                                    borderRadius="md"
+                                    fontSize="xs"
+                                    fontWeight={700}
+                                    border="1.5px solid"
+                                    borderColor={examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
+                                    bg={examTimed ? 'brand.600' : 'transparent'}
+                                    color={examTimed ? 'white' : 'gray.500'}
+                                    transition="all 0.18s"
+                                    _hover={{ borderColor: 'brand.400' }}
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); setExamTimed(true); }}
+                                  >
+                                    Timed · 2h
+                                  </Box>
+                                  <Box
+                                    as="button"
+                                    flex={1}
+                                    py={1.5}
+                                    borderRadius="md"
+                                    fontSize="xs"
+                                    fontWeight={700}
+                                    border="1.5px solid"
+                                    borderColor={!examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
+                                    bg={!examTimed ? 'brand.600' : 'transparent'}
+                                    color={!examTimed ? 'white' : 'gray.500'}
+                                    transition="all 0.18s"
+                                    _hover={{ borderColor: 'brand.400' }}
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); setExamTimed(false); }}
+                                  >
+                                    No Timer
+                                  </Box>
+                                </HStack>
+                              </Box>
+                              <Button
+                                mt={2}
+                                w="100%"
+                                size="sm"
+                                bg={isSelected ? 'brand.600' : 'brand.500'}
+                                color="white"
+                                fontWeight={700}
+                                borderRadius="lg"
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                transition="all 0.2s"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStart(examTimed ? 'exam' : 'zen');
+                                }}
+                              >
+                                {examTimed ? 'Begin Timed Exam' : 'Begin Without Timer'}
+                              </Button>
+                            </>
+                          ) : mode.id !== 'focus' ? (
                             <Button
                               mt={2}
                               w="100%"
