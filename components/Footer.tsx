@@ -17,7 +17,7 @@ export function Footer() {
     >
       <Container maxW="container.lg" textAlign="center">
         <Text fontSize={{ base: "xs", md: "sm" }} color="brand.500" px={4} lineHeight="tall">
-          Made by <Link href="https://github.com/rocketwolf98" color="brand.600" fontWeight="semibold" target="_blank" rel="noopener noreferrer" outline="none" _focusVisible={{ boxShadow: "outline", borderRadius: "sm" }}>rocketwolf98</Link> from DEVCON Jumpstart Internships Program - Cohort 4. For review purposes only.
+          Made by <Link href="https://github.com/rocketwolf98" color="brand.600" fontWeight="semibold" target="_blank" rel="noopener noreferrer" outline="none" _focusVisible={{ boxShadow: "outline", borderRadius: "sm" }}>Kenshin Juanico</Link> from DEVCON Jumpstart Internships Program - Cohort 4. For review purposes only.
         </Text>
       </Container>
     </Box>
