@@ -14,24 +14,24 @@ import {
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
-const ESSENTIALS = [
+const PARTNER_LINKS = [
   {
-    title: 'Learn Anthropic (Skilljar)',
-    description: 'Official Anthropic learning resources covering Claude, AI safety, and best practices for building with large language models.',
-    url: 'https://www.anthropic.com/learn?utm_medium=email&_hsenc=p2ANqtz-_xGekKxgckZqetoQto6lym2CfPCtsCUv3DDl_tMpLZ_42hFizoqJAhw9r0SApy2OS5rI20CBH18IPSJ8CBQ_1Sl86lbQ&_hsmi=418799463&utm_content=418799463&utm_source=hs_email',
-    category: 'Essentials'
+    title: 'Anthropic Partner Portal',
+    description: 'Exclusive hub access for Claude Partner Network members. Your primary destination for partner resources.',
+    url: 'https://partnerhub.anthropic.com/signin/anthropic',
+    category: 'Partner Portal'
   },
   {
     title: 'Claude Partner Network Learning Path',
     description: 'The official Skilljar learning path for the Claude Partner Network program — essential for partners completing certification requirements.',
-    url: 'https://anthropic.skilljar.com/page/claude-partner-network-learning-path?utm_medium=email&_hsenc=p2ANqtz-8ooqRbsR8aHL8cY4lW6UwDzIQ_G50cZmQeXBmMehnpfu-IyT6kJDD690d1I0IavYUb9NwuICvQpJY8W23Df5o7RC2WQQ&_hsmi=418799463&utm_content=418799463&utm_source=hs_email',
-    category: 'Essentials'
+    url: 'https://anthropic-partners.skilljar.com/',
+    category: 'Partner Academy'
   },
   {
     title: 'Introduction to Model Context Protocol',
     description: 'A dedicated Skilljar course on MCP — understanding protocol specifications, transport selection, and building custom integrations.',
-    url: 'https://anthropic.skilljar.com/introduction-to-model-context-protocol',
-    category: 'Essentials'
+    url: 'https://anthropic-partners.skilljar.com/introduction-to-model-context-protocol',
+    category: 'Partner Academy'
   },
 ];
 
@@ -102,10 +102,10 @@ export default function SourcesPage() {
 
           <Box>
             <Heading as="h3" size="lg" fontWeight={700} color="brand.700" mb={5}>
-              Essentials for Claude Partner Networks
+              Exclusive Partner Network and Priority Links to Check
             </Heading>
             <SimpleGrid columns={[1, 1, 2]} gap={6}>
-              {ESSENTIALS.map((source, idx) => (
+              {PARTNER_LINKS.map((source, idx) => (
                 <Link
                   key={idx}
                   href={source.url}
