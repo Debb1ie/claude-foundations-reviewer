@@ -590,7 +590,7 @@ export default function OverviewPage() {
                       <Heading as="h3" size="xs" fontWeight={700} color="brand.700">Constitutional AI &amp; Safety</Heading>
                     </HStack>
                     <Text fontSize="xs" color="gray.600" lineHeight={1.6}>
-                      This is where Anthropic differentiates itself. Study the Critiques &amp; Revisions loop, RLHF principles, and the Helpfulness vs. Harmlessness trade-off. Community test-takers consistently report this domain being harder than expected.
+                      This is where Anthropic differentiates itself. Study the Critiques &amp; Revisions loop, RLHF principles, and the Helpfulness vs. Harmlessness trade-off.                       Community test-takers consistently report this domain requiring focused attention.
                     </Text>
                   </Box>
                   <Box

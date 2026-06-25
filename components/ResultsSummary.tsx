@@ -176,7 +176,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
 
                 <Text fontSize="sm" color="gray.600" lineHeight={1.7} mt={3} textAlign="left" px={[0, 2]}>
                   {results.passed
-                    ? 'Congratulations on passing the Claude certificate mock exam! While this is a great milestone, keep in mind that the actual exam can be 2–3 times harder, so stay focused on your preparation. Be sure to leverage our review kit, catch the latest podcast episodes, and consult the official Claude Partner Network resources for the most up-to-date information. Your consistency here is exactly what will help you cross the finish line with confidence.'
+                    ? 'Congratulations on passing the Claude certificate mock exam! While this is a great milestone, keep in mind that the actual exam can be more challenging, so stay focused on your preparation. Be sure to leverage our review kit, catch the latest podcast episodes, and consult the official Claude Partner Network resources for the most up-to-date information. Your consistency here is exactly what will help you cross the finish line with confidence.'
                     : "You're doing great for your first few attempts! While you aren't quite there yet, treat this as a solid foundation to build on. Stay consistent with the review kit and official resources, and you'll definitely bridge that gap. Keep up the momentum — review the incorrect answers below and focus on the domains where you scored lowest."}
                 </Text>
 

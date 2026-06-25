@@ -495,9 +495,26 @@ export function ExamView() {
                       {q.domain}
                     </Badge>
                     {domainInfo && (
-                      <Text fontSize="xs" color="gray.500" fontFamily="mono" fontWeight={600}>
+                      <Box
+                        display="inline-flex"
+                        alignItems="center"
+                        px={2}
+                        py={0.5}
+                        borderRadius="sm"
+                        bg={DOMAIN_BADGE_BGS[q.domain]._light}
+                        _dark={{
+                          bg: DOMAIN_BADGE_BGS[q.domain]._dark,
+                          color: DOMAIN_TEXT_COLORS[q.domain]._dark,
+                        }}
+                        borderLeft="2px solid"
+                        borderLeftColor={DOMAIN_SOLID_BGS[q.domain]}
+                        fontSize="xs"
+                        fontFamily="mono"
+                        fontWeight={700}
+                        color={DOMAIN_TEXT_COLORS[q.domain]._light}
+                      >
                         {domainInfo.shortName}
-                      </Text>
+                      </Box>
                     )}
                   </HStack>
 

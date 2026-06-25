@@ -1,13 +1,17 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Box, Container, HStack, Heading, Link, Flex, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function Header() {
+  const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
 
   // Completely hide header on any active exam pages
   const isExam = pathname?.startsWith('/exam');
