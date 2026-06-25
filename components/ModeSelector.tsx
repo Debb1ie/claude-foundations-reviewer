@@ -566,7 +566,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                           fontSize="2xs" fontWeight={700}
                           _dark={{ color: '#b996fb' }}
                         >
-                          60 Questions · Advanced Level
+                          80 Questions · Advanced Level
                         </Badge>
                       </HStack>
                       <Text fontSize="sm" color="gray.500" lineHeight="tall">
