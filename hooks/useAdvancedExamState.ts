@@ -37,7 +37,22 @@ interface AdvancedExamStore {
   getScore: () => { correct: number; total: number; pct: number };
 }
 
-const typedQuestions = advancedQuestionsData as AdvancedQuestion[];
+export const TOTAL_SECONDS = 7200; // 2 hours
+
+// Keep all 3x questions + proportional 2x to reach exactly 60 total
+const keep2xPerDomain: Record<string, number> = {
+  'agentic-architecture': 4,
+  'tool-design-mcp': 3,
+  'claude-code': 5,
+  'prompt-engineering': 3,
+  'context-management': 3,
+};
+const counts2x: Record<string, number> = {};
+const typedQuestions = (advancedQuestionsData as AdvancedQuestion[]).filter((q) => {
+  if (q.difficulty === '3x') return true;
+  counts2x[q.domain] = (counts2x[q.domain] || 0) + 1;
+  return counts2x[q.domain] <= (keep2xPerDomain[q.domain] ?? 0);
+});
 
 export const useAdvancedExamStore = create<AdvancedExamStore>()(
   persist(
@@ -135,7 +150,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       },
     }),
     {
-      name: 'advanced-exam-storage-v4',
+      name: 'advanced-exam-storage-v5',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         currentQuestion: state.currentQuestion,

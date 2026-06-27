@@ -281,7 +281,45 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                             </HStack>
                           ))}
-                          {mode.id === 'exam' ? (
+                          {mode.id === 'review' ? (
+                            <HStack mt={2} gap={2}>
+                              <Button
+                                flex={1}
+                                size="sm"
+                                bg={isSelected ? 'brand.600' : 'brand.500'}
+                                color="white"
+                                fontWeight={700}
+                                borderRadius="lg"
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                transition="all 0.2s"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStart(mode.id);
+                                }}
+                              >
+                                Start Reviewing
+                              </Button>
+                              <Link
+                                as={NextLink}
+                                href="/advanced"
+                                style={{ textDecoration: 'none', flexShrink: 0 }}
+                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              >
+                                <Button
+                                  size="sm"
+                                  bg={isSelected ? 'brand.600' : 'brand.500'}
+                                  color="white"
+                                  fontWeight={700}
+                                  borderRadius="lg"
+                                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                  transition="all 0.2s"
+                                  whiteSpace="nowrap"
+                                >
+                                  Advanced Practice
+                                </Button>
+                              </Link>
+                            </HStack>
+                          ) : mode.id === 'exam' ? (
                             <>
                               {/* Timer toggle for Exam Mode */}
                               <Box
@@ -351,24 +389,6 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 {examTimed ? 'Begin Timed Exam' : 'Begin Without Timer'}
                               </Button>
                             </>
-                          ) : mode.id !== 'focus' ? (
-                            <Button
-                              mt={2}
-                              w="100%"
-                              size="sm"
-                              bg={isSelected ? 'brand.600' : 'brand.500'}
-                              color="white"
-                              fontWeight={700}
-                              borderRadius="lg"
-                              _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                              transition="all 0.2s"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onStart(mode.id);
-                              }}
-                            >
-                              {mode.cta}
-                            </Button>
                           ) : (
                             <Button
                               mt={2}
@@ -504,102 +524,10 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
               )}
             </AnimatePresence>
 
-            {/* Advanced Practice Mode — new container */}
-            <motion.div variants={itemVariants}>
-              <Link
-                as={NextLink}
-                href="/advanced"
-                display="block"
-                style={{ textDecoration: 'none' }}
-              >
-                <Box
-                  p={[5, 6]}
-                  bg="rgba(255, 255, 255, 0.45)"
-                  backdropFilter="blur(12px)"
-                  _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(160, 110, 250, 0.2)' }}
-                  border="2px solid"
-                  borderColor="rgba(160, 110, 250, 0.22)"
-                  borderRadius="xl"
-                  boxShadow="0 8px 32px 0 rgba(160, 110, 250, 0.05)"
-                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                  _hover={{
-                    borderColor: 'rgba(160, 110, 250, 0.55)',
-                    bg: 'rgba(255, 255, 255, 0.65)',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(160, 110, 250, 0.14)',
-                  }}
-                >
-                  <HStack gap={4} align="flex-start" flexWrap={['wrap', 'nowrap']}>
-                    <Box
-                      p={3}
-                      borderRadius="xl"
-                      bg="rgba(160, 110, 250, 0.1)"
-                      border="1px solid rgba(160, 110, 250, 0.25)"
-                      color="#6f2bc8"
-                      flexShrink={0}
-                      _dark={{ bg: 'rgba(160,110,250,0.18)', color: '#b996fb' }}
-                    >
-                      <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                      </svg>
-                    </Box>
-                    <Box flex={1}>
-                      <HStack gap={2.5} mb={1.5} flexWrap="wrap">
-                        <Heading as="h3" size="sm" fontWeight={800} color="brand.700">
-                          Advanced Practice
-                        </Heading>
-                        <Badge
-                          bg="rgba(160, 110, 250, 0.12)"
-                          color="#6f2bc8"
-                          border="1px solid rgba(160, 110, 250, 0.3)"
-                          px={2} py={0.5} borderRadius="full"
-                          fontSize="2xs" fontWeight={700}
-                          _dark={{ color: '#b996fb', bg: 'rgba(160,110,250,0.2)' }}
-                        >
-                          NEW
-                        </Badge>
-                        <Badge
-                          bg="rgba(160, 110, 250, 0.08)"
-                          color="#6f2bc8"
-                          border="1px solid rgba(160, 110, 250, 0.2)"
-                          px={2} py={0.5} borderRadius="full"
-                          fontSize="2xs" fontWeight={700}
-                          _dark={{ color: '#b996fb' }}
-                        >
-                          80 Questions · Advanced Level
-                        </Badge>
-                      </HStack>
-                      <Text fontSize="sm" color="gray.500" lineHeight="tall">
-                        A separate set of advanced-level questions covering all 5 CCA-F domains. Instant feedback with detailed explanations after every answer.
-                      </Text>
-                    </Box>
-                    <Box
-                      as="div"
-                      flexShrink={0}
-                      alignSelf={['stretch', 'center']}
-                      px={5}
-                      py={1.5}
-                      bg="#6f2bc8"
-                      color="white"
-                      fontWeight={700}
-                      fontSize="sm"
-                      borderRadius="lg"
-                      textAlign="center"
-                      _hover={{ bg: '#5a1fa3' }}
-                      transition="all 0.2s"
-                      whiteSpace="nowrap"
-                    >
-                      Start →
-                    </Box>
-                  </HStack>
-                </Box>
-              </Link>
-            </motion.div>
-
             <motion.div variants={itemVariants}>
               <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(30, 41, 59, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
                 <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
-                  <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
+                  <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by Kenshin Juanico &amp; Precious Manucom from the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
                 </Text>
               </Box>
             </motion.div>

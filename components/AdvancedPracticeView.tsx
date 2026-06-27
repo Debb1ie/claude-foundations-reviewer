@@ -13,7 +13,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvancedExamStore, type AdvancedQuestion } from '@/hooks/useAdvancedExamState';
+import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 
@@ -55,7 +55,7 @@ function MiniProgress({ value, colorBg }: { value: number; colorBg: string }) {
 }
 
 function StartScreen({ onStart }: { onStart: () => void }) {
-  const domainCounts: Record<string, number> = { D1: 20, D2: 13, D3: 17, D4: 16, D5: 14 };
+  const domainCounts: Record<string, number> = { D1: 15, D2: 9, D3: 12, D4: 12, D5: 12 };
   return (
     <Box minH="100vh" bg="transparent">
       <Container maxW="container.md" py={[8, 14]}>
@@ -75,8 +75,8 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 CCA-F Advanced Practice
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
-                80 scenario-based questions covering all 5 exam domains.
-                Answers and explanations are revealed after you finish.
+                60 scenario-based questions covering all 5 exam domains.
+                2-hour timed — answers and explanations revealed after you finish.
               </Text>
             </Box>
 
@@ -115,8 +115,8 @@ function StartScreen({ onStart }: { onStart: () => void }) {
             >
               <SimpleGrid columns={[1, 3]} gap={4}>
                 {[
-                  { label: '80 Questions', sub: 'All 5 domains covered' },
-                  { label: 'Exam Mode', sub: 'Review all answers after finishing' },
+                  { label: '60 Questions', sub: 'All 5 domains covered' },
+                  { label: '2-Hour Timer', sub: 'Matches real exam format' },
                   { label: 'Scenario-Based', sub: 'Deep comprehension questions' },
                 ].map((item) => (
                   <Box key={item.label} textAlign="center">
@@ -421,6 +421,33 @@ function QuestionView() {
   } = useAdvancedExamStore();
 
   const [isPaused, setIsPaused] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
+  const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isPaused) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!);
+          complete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isPaused, complete]);
+
+  const timerHours = Math.floor(secondsLeft / 3600);
+  const timerMinutes = Math.floor((secondsLeft % 3600) / 60);
+  const timerSeconds = secondsLeft % 60;
+  const timerDisplay = `${timerHours.toString().padStart(2, '0')}:${timerMinutes.toString().padStart(2, '0')}:${timerSeconds.toString().padStart(2, '0')}`;
+  const timerIsLow = secondsLeft < 300 && secondsLeft > 0;
 
   const q: AdvancedQuestion = questions[currentQuestion];
   const domainKey = DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1';
@@ -447,8 +474,56 @@ function QuestionView() {
     complete();
   };
 
+  const renderQuestionGrid = () => (
+    <Box display="flex" flexWrap="wrap" gap={1.5}>
+      {questions.map((_, idx) => {
+        const ans = answers[idx];
+        const isAnsweredQ = ans !== null;
+        const isCurrent = idx === currentQuestion;
+        const isFlaggedQ = flagged[idx];
+        return (
+          <Box
+            key={idx}
+            as="button"
+            w="32px"
+            h="32px"
+            borderRadius="md"
+            fontSize="xs"
+            fontFamily="mono"
+            fontWeight={isCurrent ? 700 : 500}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            bg={
+              isCurrent ? 'rgba(57,73,171,0.08)' :
+              isAnsweredQ ? 'rgba(57,73,171,0.06)' :
+              'transparent'
+            }
+            color={
+              isCurrent ? 'brand.600' :
+              isAnsweredQ ? 'brand.600' :
+              'gray.500'
+            }
+            border="1px solid"
+            borderColor={
+              isCurrent ? 'brand.500' :
+              isFlaggedQ ? 'orange.400' :
+              isAnsweredQ ? 'brand.400' :
+              'border'
+            }
+            transition="all 0.15s"
+            _hover={{ borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' }}
+            onClick={() => { goToQuestion(idx); setMobileNavOpen(false); }}
+          >
+            {idx + 1}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+
   return (
-    <Box minH="100vh" bg="transparent">
+    <Box minH="100vh" bg="transparent" display="flex" flexDirection="column">
       {/* Pause overlay */}
       <AnimatePresence>
         {isPaused && (
@@ -480,7 +555,6 @@ function QuestionView() {
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"
                 overflow="hidden"
               >
-                {/* Header */}
                 <Box px={6} pt={7} pb={5} textAlign="center">
                   <Box
                     display="inline-flex" alignItems="center" justifyContent="center"
@@ -497,7 +571,6 @@ function QuestionView() {
                   <Text fontSize="sm" color="gray.500">Your progress is saved automatically.</Text>
                 </Box>
 
-                {/* Stats */}
                 <Box mx={6} mb={5} p={4} borderRadius="xl"
                   bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
                   _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
@@ -516,7 +589,6 @@ function QuestionView() {
                   </SimpleGrid>
                 </Box>
 
-                {/* Actions */}
                 <VStack gap={2.5} px={6} pb={7}>
                   <Button
                     w="full" size="lg"
@@ -564,7 +636,7 @@ function QuestionView() {
         )}
       </AnimatePresence>
 
-      {/* Top bar */}
+      {/* Sticky top bar */}
       <Box
         position="sticky"
         top={0}
@@ -573,12 +645,10 @@ function QuestionView() {
         backdropFilter="blur(16px)"
         borderBottom="1px solid rgba(255,255,255,0.35)"
         _dark={{ bg: 'rgba(15,23,42,0.8)', borderColor: 'rgba(255,255,255,0.08)' }}
-        px={[4, 6]}
-        py={3}
       >
-        <Container maxW="container.md">
-          <HStack justify="space-between" mb={2}>
-            <HStack gap={2}>
+        <Container maxW="container.xl" py={3}>
+          <HStack justify="space-between" align="center" wrap="wrap" gap={3}>
+            <HStack gap={3}>
               <Button
                 variant="ghost"
                 size="xs"
@@ -592,268 +662,344 @@ function QuestionView() {
               >
                 ⏸ Pause
               </Button>
-              <Text fontSize="xs" fontWeight={700} color="brand.700">
+              <Text fontSize="sm" fontWeight={700} color="brand.700">
                 Advanced Practice
               </Text>
-            </HStack>
-            <HStack gap={2}>
-              <Text fontSize="xs" color="gray.500" display={['none', 'block']}>
-                {totalAnswered}/{questions.length} answered
-              </Text>
-              <Badge
-                bg="rgba(57,73,171,0.08)"
-                color="brand.700"
-                borderRadius="full"
-                px={2.5}
-                fontSize="2xs"
-                fontWeight={700}
-              >
-                Q {currentQuestion + 1} / {questions.length}
-              </Badge>
-              <Button
-                size="xs"
-                bg={unanswered === 0 ? 'green.500' : 'rgba(239,68,68,0.08)'}
-                color={unanswered === 0 ? 'white' : 'red.500'}
+              <HStack
+                gap={1.5}
+                px={3}
+                py={1}
+                bg={timerIsLow ? 'rgba(239,68,68,0.08)' : 'rgba(57,73,171,0.08)'}
+                borderRadius="md"
                 border="1px solid"
-                borderColor={unanswered === 0 ? 'transparent' : 'rgba(239,68,68,0.22)'}
+                borderColor={timerIsLow ? 'rgba(239,68,68,0.25)' : 'rgba(57,73,171,0.18)'}
+              >
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ color: timerIsLow ? '#ef4444' : '#5C4EFA' }}>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <Text
+                  fontFamily="mono"
+                  fontSize="xs"
+                  fontWeight={700}
+                  color={timerIsLow ? 'red.500' : 'brand.700'}
+                >
+                  {timerDisplay}
+                </Text>
+              </HStack>
+            </HStack>
+            <HStack gap={3}>
+              <Text fontSize="xs" fontFamily="mono" color="gray.500" fontWeight={600} display={['none', 'block']}>
+                Completed: {totalAnswered}/{questions.length} Questions
+              </Text>
+              <Button
+                display={['flex', 'flex', 'none']}
+                size="sm"
+                variant="outline"
+                borderColor="border"
+                onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              >
+                {mobileNavOpen ? 'Hide Map' : 'Show Map'}
+              </Button>
+              <Button
+                size="sm"
+                bg={unanswered === 0 ? 'green.500' : 'brand.600'}
+                color="white"
                 fontWeight={700}
                 borderRadius="lg"
-                px={3}
-                boxShadow={unanswered === 0 ? '0 2px 8px rgba(34,197,94,0.3)' : 'none'}
-                _hover={{
-                  bg: unanswered === 0 ? 'green.600' : 'rgba(239,68,68,0.14)',
-                  transform: 'translateY(-1px)',
-                }}
-                transition="all 0.18s"
+                _hover={{ bg: unanswered === 0 ? 'green.600' : 'brand.700' }}
                 onClick={handleFinish}
               >
                 {unanswered === 0 ? '✓ Finish' : `Finish (${unanswered} left)`}
               </Button>
             </HStack>
           </HStack>
-          <MiniProgress value={progress} colorBg="#5C4EFA" />
+          <MiniProgress value={(secondsLeft / TOTAL_SECONDS) * 100} colorBg={timerIsLow ? '#ef4444' : '#5C4EFA'} />
         </Container>
       </Box>
 
-      <Container maxW="container.md" py={[6, 8]}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQuestion}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <VStack gap={5} align="stretch">
-              {/* Badges row */}
-              <HStack gap={2} flexWrap="wrap">
-                <Badge
-                  bg={DOMAIN_SOLID_BGS[domainKey]}
-                  color={DOMAIN_SOLID_TEXT[domainKey]}
-                  px={2.5} py={0.5} borderRadius="md"
-                  fontSize="2xs" fontFamily="mono" fontWeight={700}
-                >
-                  {q.domain}
-                </Badge>
-                <Badge
-                  bg={diffColors.bg}
-                  color={diffColors.text}
-                  border="1px solid"
-                  borderColor={diffColors.border}
-                  px={2.5} py={0.5} borderRadius="md"
-                  fontSize="2xs" fontWeight={700}
-                  _dark={{ color: q.difficulty === '3x' ? '#b996fb' : '#fa9a80' }}
-                >
-                  {q.difficulty} Difficulty
-                </Badge>
-                <Box flex={1} />
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  color={isFlagged ? 'orange.500' : 'gray.400'}
-                  px={2}
-                  fontWeight={700}
-                  _hover={{ bg: 'orange.50', color: 'orange.500' }}
-                  onClick={() => toggleFlag(currentQuestion)}
-                >
-                  {isFlagged ? '⚑ Flagged' : '⚐ Flag'}
-                </Button>
-              </HStack>
-
-              {/* Question card */}
+      {/* Main content */}
+      <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column">
+        {/* Mobile collapsible question map */}
+        <AnimatePresence>
+          {mobileNavOpen && (
+            <motion.div
+              key="mobile-map"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden', width: '100%' }}
+            >
               <Box
-                p={[5, 6]}
-                bg="rgba(255,255,255,0.55)"
-                backdropFilter="blur(12px)"
+                display={['block', 'block', 'none']}
+                mb={4} p={4}
+                bg="rgba(255,255,255,0.45)"
+                backdropFilter="blur(16px)"
                 borderRadius="xl"
-                border="1px solid"
-                borderColor={`${DOMAIN_SOLID_BGS[domainKey]}40`}
-                borderTop="3px solid"
-                borderTopColor={DOMAIN_SOLID_BGS[domainKey]}
-                boxShadow="0 8px 32px 0 rgba(31,38,135,0.04)"
-                _dark={{ bg: 'rgba(30,41,59,0.5)', borderColor: `${DOMAIN_SOLID_BGS[domainKey]}30` }}
+                border="1px solid rgba(255,255,255,0.35)"
+                _dark={{ bg: 'rgba(30,41,59,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
               >
-                <Text fontSize={['sm', 'md']} fontWeight={600} color="brand.800" lineHeight="tall"
-                  _dark={{ color: 'gray.100' }}>
-                  {q.text}
+                <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono" mb={3}>
+                  QUESTION MAP ({totalAnswered}/{questions.length})
                 </Text>
+                {renderQuestionGrid()}
               </Box>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              {/* Options — no correct/wrong reveal during exam */}
-              <VStack gap={2.5} align="stretch">
-                {q.options.map((opt, idx) => {
-                  const isSelected = userAnswer === idx;
-                  const borderColor = isSelected ? 'brand.400' : 'rgba(255,255,255,0.35)';
-                  const bg = isSelected ? 'rgba(57,73,171,0.07)' : 'rgba(255,255,255,0.45)';
-                  const labelBg = isSelected ? 'rgba(57,73,171,0.15)' : 'rgba(57,73,171,0.08)';
-
-                  return (
-                    <Box
-                      key={idx}
-                      as={answered ? 'div' : 'button'}
-                      w="100%"
-                      display="flex"
-                      alignItems="flex-start"
-                      gap={3}
-                      p={4}
-                      borderRadius="xl"
-                      border="2px solid"
-                      borderColor={borderColor}
-                      bg={bg}
-                      backdropFilter="blur(8px)"
-                      cursor={answered ? 'default' : 'pointer'}
-                      transition="all 0.18s"
-                      textAlign="left"
-                      boxShadow={isSelected ? '0 4px 12px rgba(57,73,171,0.08)' : 'none'}
-                      _dark={{
-                        bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.4)',
-                        borderColor,
-                      }}
-                      _hover={!answered ? {
-                        borderColor: 'brand.400',
-                        bg: 'rgba(255,255,255,0.65)',
-                        transform: 'translateX(2px)',
-                      } : {}}
-                      onClick={() => handleOptionClick(idx)}
-                    >
-                      <Box
-                        minW={7} h={7}
-                        borderRadius="lg"
-                        bg={labelBg}
-                        color="brand.600"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        fontSize="xs"
-                        fontWeight={800}
-                        fontFamily="mono"
-                        flexShrink={0}
-                        mt={0.5}
-                        _dark={{ color: isSelected ? 'brand.200' : 'brand.300' }}
-                      >
-                        {OPTION_LABELS[idx]}
-                      </Box>
-                      <Text fontSize="sm" fontWeight={500} color="gray.700" lineHeight="tall"
-                        _dark={{ color: 'gray.200' }}>
-                        {opt}
-                      </Text>
-                      {isSelected && (
-                        <Box ml="auto" color="brand.400" fontSize="sm" flexShrink={0} mt={1}>●</Box>
-                      )}
-                    </Box>
-                  );
-                })}
-              </VStack>
-
-              {/* Navigation */}
-              <HStack gap={3} justify="space-between" pt={2}>
-                <Button
-                  variant="outline"
-                  borderColor="brand.200"
-                  color="brand.600"
-                  fontWeight={700}
-                  borderRadius="xl"
-                  disabled={currentQuestion === 0}
-                  onClick={prevQuestion}
-                  _hover={{ bg: 'brand.50', borderColor: 'brand.400' }}
+        <HStack align="stretch" gap={6} flex={1} wrap="wrap">
+          {/* LEFT: Question + Options */}
+          <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }} pb={{ base: 28, md: 0 }}>
+            <Box
+              bg="rgba(255,255,255,0.45)"
+              backdropFilter="blur(16px)"
+              border="1px solid rgba(255,255,255,0.35)"
+              borderRadius="xl"
+              p={[4, 6]}
+              boxShadow="0 8px 32px 0 rgba(31,38,135,0.03)"
+              overflow="hidden"
+              _dark={{ bg: 'rgba(15,23,42,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion}
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
                 >
-                  ← Prev
+                  <VStack gap={5} align="stretch">
+                    {/* Meta row */}
+                    <HStack justify="space-between">
+                      <HStack gap={2} flexWrap="wrap">
+                        <Badge
+                          bg={DOMAIN_SOLID_BGS[domainKey]}
+                          color={DOMAIN_SOLID_TEXT[domainKey]}
+                          px={2.5} py={0.5} borderRadius="md"
+                          fontSize="xs" fontFamily="mono" fontWeight={700}
+                        >
+                          {q.domain}
+                        </Badge>
+                        <Badge
+                          bg={diffColors.bg}
+                          color={diffColors.text}
+                          border="1px solid"
+                          borderColor={diffColors.border}
+                          px={2.5} py={0.5} borderRadius="md"
+                          fontSize="2xs" fontWeight={700}
+                          _dark={{ color: q.difficulty === '3x' ? '#b996fb' : '#fa9a80' }}
+                        >
+                          {q.difficulty} Difficulty
+                        </Badge>
+                      </HStack>
+                      <HStack gap={3}>
+                        <Button
+                          size="xs"
+                          variant={isFlagged ? 'solid' : 'outline'}
+                          borderColor="orange.300"
+                          color={isFlagged ? 'white' : 'orange.600'}
+                          bg={isFlagged ? 'orange.500' : 'transparent'}
+                          _hover={{ bg: isFlagged ? 'orange.600' : 'orange.50' }}
+                          onClick={() => toggleFlag(currentQuestion)}
+                        >
+                          <Text fontSize="2xs" fontWeight={700}>
+                            {isFlagged ? '⚑ Flagged' : '⚐ Flag'}
+                          </Text>
+                        </Button>
+                        <Text fontSize="xs" fontFamily="mono" color="gray.400" fontWeight={600}>
+                          Question {currentQuestion + 1} of {questions.length}
+                        </Text>
+                      </HStack>
+                    </HStack>
+
+                    {/* Question text */}
+                    <Heading as="p" size="md" fontWeight={600} lineHeight={1.6} color="brand.700"
+                      _dark={{ color: 'gray.100' }}>
+                      {q.text}
+                    </Heading>
+
+                    {/* Options */}
+                    <VStack gap={3} align="stretch">
+                      {q.options.map((opt, idx) => {
+                        const isSelected = userAnswer === idx;
+                        const borderColor = isSelected ? 'brand.500' : 'border';
+                        const bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
+                        const keyBg = isSelected ? 'brand.600' : 'transparent';
+                        const keyBorderColor = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
+                        const keyTextColor = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
+
+                        return (
+                          <Box
+                            key={idx}
+                            as="button"
+                            w="100%"
+                            display="flex"
+                            alignItems="flex-start"
+                            gap={3.5}
+                            p={4}
+                            borderRadius="xl"
+                            border="2px solid"
+                            borderColor={borderColor}
+                            bg={bg}
+                            backdropFilter="blur(8px)"
+                            cursor={answered ? 'default' : 'pointer'}
+                            transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                            textAlign="left"
+                            _dark={{
+                              bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
+                              borderColor: isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
+                            }}
+                            _hover={!answered ? {
+                              borderColor: 'brand.400',
+                              bg: 'rgba(255,255,255,0.45)',
+                              _dark: { bg: 'rgba(30,41,59,0.5)' },
+                            } : {}}
+                            onClick={() => handleOptionClick(idx)}
+                          >
+                            <Box
+                              w="24px"
+                              h="24px"
+                              borderRadius="md"
+                              border="1.5px solid"
+                              borderColor={keyBorderColor}
+                              bg={keyBg}
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              flexShrink={0}
+                              color={keyTextColor}
+                              fontFamily="mono"
+                              fontSize="xs"
+                              fontWeight={700}
+                              mt="1px"
+                            >
+                              {OPTION_LABELS[idx]}
+                            </Box>
+                            <Text fontSize="sm" color="gray.700" fontWeight={isSelected ? 600 : 500}
+                              lineHeight={1.5} mt="1px" _dark={{ color: 'gray.200' }}>
+                              {opt}
+                            </Text>
+                          </Box>
+                        );
+                      })}
+                    </VStack>
+                  </VStack>
+                </motion.div>
+              </AnimatePresence>
+            </Box>
+
+            {/* Bottom nav strip */}
+            <HStack
+              justify="space-between"
+              mt={{ base: 0, md: 2 }}
+              position={{ base: 'fixed', md: 'static' }}
+              bottom={{ base: 0, md: 'auto' }}
+              left={{ base: 0, md: 'auto' }}
+              right={{ base: 0, md: 'auto' }}
+              w={{ base: '100%', md: 'auto' }}
+              bg={{ base: 'rgba(255,255,255,0.9)', md: 'transparent' }}
+              backdropFilter={{ base: 'blur(16px)', md: 'none' }}
+              p={{ base: 4, md: 0 }}
+              borderTop={{ base: '1px solid', md: 'none' }}
+              borderColor="rgba(0,0,0,0.1)"
+              zIndex={100}
+              _dark={{ bg: { base: 'rgba(15,23,42,0.9)', md: 'transparent' }, borderColor: 'rgba(255,255,255,0.1)' }}
+            >
+              <Button
+                variant="outline"
+                borderColor="border"
+                size="md"
+                disabled={currentQuestion === 0}
+                onClick={prevQuestion}
+                fontWeight={600}
+              >
+                Previous
+              </Button>
+              <Text fontSize="xs" fontFamily="mono" color="gray.500" fontWeight={600}>
+                {totalAnswered} of {questions.length} Answered
+              </Text>
+              {!isLast ? (
+                <Button
+                  bg="blue.600"
+                  color="white"
+                  fontWeight={700}
+                  size="md"
+                  px={6}
+                  borderRadius="lg"
+                  _hover={{ bg: 'blue.700', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(37,99,235,0.45)' }}
+                  _active={{ transform: 'translateY(0)', boxShadow: 'none' }}
+                  transition="all 0.2s"
+                  onClick={nextQuestion}
+                >
+                  Next
                 </Button>
+              ) : (
                 <Button
                   bg="brand.600"
                   color="white"
                   fontWeight={700}
-                  borderRadius="xl"
-                  disabled={isLast}
-                  onClick={nextQuestion}
-                  boxShadow="0 4px 12px rgba(57,73,171,0.25)"
-                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
-                  transition="all 0.2s"
+                  _hover={{ bg: 'brand.700' }}
+                  size="md"
+                  onClick={handleFinish}
                 >
-                  Next →
+                  Finish Exam
                 </Button>
-              </HStack>
+              )}
+            </HStack>
+          </VStack>
 
-              {/* Question grid jump */}
-              <Box
-                p={4}
-                bg="rgba(255,255,255,0.4)"
-                backdropFilter="blur(8px)"
-                borderRadius="xl"
-                border="1px solid rgba(255,255,255,0.3)"
-                _dark={{ bg: 'rgba(30,41,59,0.35)', borderColor: 'rgba(255,255,255,0.06)' }}
-              >
-                <Text fontSize="2xs" fontWeight={700} color="gray.500" textTransform="uppercase"
-                  letterSpacing="0.08em" mb={2.5}>
-                  Jump to question
+          {/* RIGHT: Question navigation sidebar (desktop only) */}
+          <Box
+            display={['none', 'none', 'block']}
+            flex={{ base: '100%', md: 1 }}
+            maxW="320px"
+          >
+            <Box
+              position="sticky"
+              top="74px"
+              bg="rgba(255,255,255,0.45)"
+              backdropFilter="blur(16px)"
+              border="1px solid rgba(255,255,255,0.35)"
+              borderRadius="xl"
+              p={5}
+              boxShadow="0 8px 32px 0 rgba(31,38,135,0.03)"
+              _dark={{ bg: 'rgba(15,23,42,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              <VStack gap={4} align="stretch">
+                <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono" letterSpacing="0.05em">
+                  QUESTION NAVIGATION MAP
                 </Text>
-                <Box display="flex" flexWrap="wrap" gap={1.5}>
-                  {questions.map((_, idx) => {
-                    const ans = answers[idx];
-                    const isAnswered = ans !== null;
-                    const isCurrent = idx === currentQuestion;
-                    const isFlaggedQ = flagged[idx];
-                    return (
-                      <Box
-                        key={idx}
-                        as="button"
-                        w={7} h={7}
-                        borderRadius="md"
-                        fontSize="2xs"
-                        fontWeight={700}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        bg={
-                          isCurrent ? 'brand.600' :
-                          isAnswered ? 'rgba(57,73,171,0.12)' :
-                          'rgba(255,255,255,0.5)'
-                        }
-                        color={
-                          isCurrent ? 'white' :
-                          isAnswered ? 'brand.600' :
-                          'gray.500'
-                        }
-                        border="1.5px solid"
-                        borderColor={
-                          isCurrent ? 'brand.500' :
-                          isFlaggedQ ? 'orange.400' :
-                          isAnswered ? 'rgba(57,73,171,0.3)' :
-                          'rgba(255,255,255,0.3)'
-                        }
-                        transition="all 0.15s"
-                        _hover={{ borderColor: 'brand.400', transform: 'scale(1.1)' }}
-                        onClick={() => goToQuestion(idx)}
-                      >
-                        {idx + 1}
-                      </Box>
-                    );
-                  })}
-                </Box>
-              </Box>
-            </VStack>
-          </motion.div>
-        </AnimatePresence>
+
+                {renderQuestionGrid()}
+
+                {/* Legend */}
+                <VStack gap={2} align="stretch" pt={4} borderTop="1px solid" borderColor="border">
+                  <Text fontSize="2xs" color="gray.400" fontWeight={700} fontFamily="mono" mb={1}>
+                    COLOR LEGEND
+                  </Text>
+                  <HStack gap={2}>
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(57,73,171,0.08)" />
+                    <Text fontSize="11px" color="gray.600" fontWeight={500}>Active Question</Text>
+                  </HStack>
+                  <HStack gap={2}>
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(57,73,171,0.06)" />
+                    <Text fontSize="11px" color="gray.600" fontWeight={500}>Answered Question</Text>
+                  </HStack>
+                  <HStack gap={2}>
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="border" bg="transparent" />
+                    <Text fontSize="11px" color="gray.600" fontWeight={500}>Unanswered Question</Text>
+                  </HStack>
+                  <HStack gap={2}>
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="orange.400" bg="transparent" />
+                    <Text fontSize="11px" color="gray.600" fontWeight={500}>Flagged Question</Text>
+                  </HStack>
+                </VStack>
+              </VStack>
+            </Box>
+          </Box>
+        </HStack>
       </Container>
     </Box>
   );
