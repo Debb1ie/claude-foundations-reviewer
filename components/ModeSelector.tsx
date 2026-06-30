@@ -1,21 +1,20 @@
 'use client';
-import React from 'react';
-import NextLink from 'next/link';
+import { DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, DOMAINS, type Domain } from '@/types/exam';
 import {
+  Badge,
   Box,
+  Button,
   Container,
   Heading,
-  Text,
-  VStack,
   HStack,
-  Button,
-  Card,
-  SimpleGrid,
-  Badge,
   Link,
+  SimpleGrid,
+  Text,
+  VStack
 } from '@chakra-ui/react';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
+import NextLink from 'next/link';
+import React from 'react';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -53,6 +52,11 @@ const SVG_ICONS = {
       <circle cx="12" cy="12" r="2"></circle>
     </svg>
   ),
+  STAR: (
+    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg>
+  ),
 };
 const MODES = [
   {
@@ -70,14 +74,6 @@ const MODES = [
     icon: 'CLOCK' as const,
     features: ['Randomized order', 'No feedback until end', 'Full results summary', 'Progress tracking'],
     cta: 'Begin Exam',
-  },
-  {
-    id: 'focus' as const,
-    title: 'Focus Mode',
-    description: 'All questions from a single domain. Timed (1 hour).',
-    icon: 'TARGET' as const,
-    features: ['Single domain', '1 hour timed', 'Targeted practice', 'Domain deep dive'],
-    cta: 'Select Domain',
   },
 ];
 
@@ -211,9 +207,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     <Box
                       onClick={() => {
                         setSelectedMode(mode.id);
-                        if (mode.id !== 'focus') {
-                          setSelectedDomain(null);
-                        }
+                        setSelectedDomain(null);
                       }}
                       cursor="pointer"
                       border="2px solid"
@@ -299,27 +293,25 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               >
                                 Start Reviewing
                               </Button>
-                              <Link
-                                as={NextLink}
-                                href="/advanced"
-                                style={{ textDecoration: 'none', flexShrink: 0 }}
-                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              <Button
+                                size="sm"
+                                bg={isSelected ? 'brand.600' : 'brand.500'}
+                                color="white"
+                                fontWeight={700}
+                                borderRadius="lg"
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                transition="all 0.2s"
+                                whiteSpace="nowrap"
+                                flexShrink={0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedMode(selectedMode === 'focus' ? null : 'focus');
+                                }}
                               >
-                                <Button
-                                  size="sm"
-                                  bg={isSelected ? 'brand.600' : 'brand.500'}
-                                  color="white"
-                                  fontWeight={700}
-                                  borderRadius="lg"
-                                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                                  transition="all 0.2s"
-                                  whiteSpace="nowrap"
-                                >
-                                  Advanced Practice
-                                </Button>
-                              </Link>
+                                Focus Mode
+                              </Button>
                             </HStack>
-                          ) : mode.id === 'exam' ? (
+                          ) : (
                             <>
                               {/* Timer toggle for Exam Mode */}
                               <Box
@@ -389,24 +381,6 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 {examTimed ? 'Begin Timed Exam' : 'Begin Without Timer'}
                               </Button>
                             </>
-                          ) : (
-                            <Button
-                              mt={2}
-                              w="100%"
-                              size="sm"
-                              bg={isSelected ? 'brand.600' : 'brand.500'}
-                              color="white"
-                              fontWeight={700}
-                              borderRadius="lg"
-                              _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                              transition="all 0.2s"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedMode('focus');
-                              }}
-                            >
-                              {mode.cta}
-                            </Button>
                           )}
                         </VStack>
                       </VStack>
@@ -414,6 +388,94 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   </motion.div>
                 );
               })}
+
+              {/* Advanced Practice card */}
+              <motion.div
+                key="advanced-practice"
+                variants={itemVariants}
+                style={{ display: 'flex', width: '100%' }}
+              >
+                <Link
+                  as={NextLink}
+                  href="/advanced"
+                  w="100%"
+                  border="2px solid"
+                  borderColor="rgba(255, 255, 255, 0.35)"
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(12px)"
+                  _dark={{
+                    bg: "rgba(30, 41, 59, 0.45)",
+                    borderColor: "rgba(255, 255, 255, 0.08)"
+                  }}
+                  borderRadius="xl"
+                  p={5}
+                  textAlign="left"
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                  _hover={{
+                    borderColor: 'brand.400',
+                    bg: 'rgba(255, 255, 255, 0.65)',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
+                    textDecoration: 'none'
+                  }}
+                  display="flex"
+                  flexDirection="column"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <VStack gap={4} align="stretch" h="100%">
+                    <HStack justify="space-between" align="center">
+                      <Box
+                        p={2.5}
+                        borderRadius="lg"
+                        bg="rgba(57, 73, 171, 0.08)"
+                        border="1px solid"
+                        borderColor="rgba(57, 73, 171, 0.16)"
+                        color="brand.600"
+                        transition="all 0.2s"
+                        _dark={{
+                          bg: 'rgba(124, 110, 250, 0.15)',
+                          borderColor: 'rgba(255, 255, 255, 0.12)',
+                          color: 'brand.300'
+                        }}
+                      >
+                        {SVG_ICONS.STAR}
+                      </Box>
+                    </HStack>
+
+                    <Box>
+                      <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
+                        Advanced Practice
+                      </Heading>
+                      <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
+                        60 challenging questions across all domains. Push your limits.
+                      </Text>
+                    </Box>
+
+                    <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                      {['60 advanced questions', 'All 5 domains', 'Harder scenarios', 'Detailed explanations'].map((f) => (
+                        <HStack key={f} gap={2} align="center">
+                          <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
+                          <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
+                        </HStack>
+                      ))}
+                      <Button
+                        mt={2}
+                        w="100%"
+                        size="sm"
+                        bg="brand.600"
+                        color="white"
+                        fontWeight={700}
+                        borderRadius="lg"
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                        transition="all 0.2s"
+                      >
+                        Start Advanced Practice
+                      </Button>
+                    </VStack>
+                  </VStack>
+                </Link>
+              </motion.div>
             </SimpleGrid>
 
             {/* Domain selector for Focus Mode */}
