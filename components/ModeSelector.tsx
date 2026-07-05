@@ -171,27 +171,28 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       </Text>
                     </Box>
 
-                    <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                    <VStack gap={2} align="stretch" pt={3} borderTop="1px solid" borderColor="border">
                       {['Official study guides', 'API documentation', 'Community resources', 'Exam tips & strategy'].map((f) => (
                         <HStack key={f} gap={2} align="center">
                           <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
                           <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                         </HStack>
                       ))}
-                      <Button
-                        mt={2}
-                        w="100%"
-                        size="sm"
-                        bg="brand.600"
-                        color="white"
-                        fontWeight={700}
-                        borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                        transition="all 0.2s"
-                      >
-                        Browse Resources
-                      </Button>
                     </VStack>
+
+                    <Button
+                      mt="auto"
+                      w="100%"
+                      size="sm"
+                      bg="brand.600"
+                      color="white"
+                      fontWeight={700}
+                      borderRadius="lg"
+                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                      transition="all 0.2s"
+                    >
+                      Browse Resources
+                    </Button>
                   </VStack>
                 </Link>
               </motion.div>
@@ -268,13 +269,16 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                           </Text>
                         </Box>
 
-                        <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                        <VStack gap={2} align="stretch" pt={3} borderTop="1px solid" borderColor="border">
                           {mode.features.map((f) => (
                             <HStack key={f} gap={2} align="center">
                               <Box w={1.5} h={1.5} borderRadius="full" bg={isSelected ? 'accent.500' : 'brand.300'} />
                               <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                             </HStack>
                           ))}
+                        </VStack>
+
+                        <VStack gap={2} align="stretch" mt="auto">
                           {mode.id === 'review' ? (
                             <HStack mt={2} gap={2}>
                               <Button
@@ -452,27 +456,28 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       </Text>
                     </Box>
 
-                    <VStack gap={2} align="stretch" mt="auto" pt={3} borderTop="1px solid" borderColor="border">
+                    <VStack gap={2} align="stretch" pt={3} borderTop="1px solid" borderColor="border">
                       {['60 advanced questions', 'All 5 domains', 'Harder scenarios', 'Detailed explanations'].map((f) => (
                         <HStack key={f} gap={2} align="center">
                           <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
                           <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
                         </HStack>
                       ))}
-                      <Button
-                        mt={2}
-                        w="100%"
-                        size="sm"
-                        bg="brand.600"
-                        color="white"
-                        fontWeight={700}
-                        borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                        transition="all 0.2s"
-                      >
-                        Start Advanced Practice
-                      </Button>
                     </VStack>
+
+                    <Button
+                      mt="auto"
+                      w="100%"
+                      size="sm"
+                      bg="brand.600"
+                      color="white"
+                      fontWeight={700}
+                      borderRadius="lg"
+                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                      transition="all 0.2s"
+                    >
+                      Start Advanced Practice
+                    </Button>
                   </VStack>
                 </Link>
               </motion.div>

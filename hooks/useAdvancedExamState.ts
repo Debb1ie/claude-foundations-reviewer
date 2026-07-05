@@ -11,6 +11,12 @@ export interface AdvancedQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  sourceLabel?: string;
+  sourceUrl?: string;
+  /** Short verbatim excerpt from the source page, shown & highlighted in-app (no navigation needed). */
+  sourceExcerpt?: string;
+  /** Exact substring of sourceExcerpt to visually highlight. */
+  sourceHighlight?: string;
 }
 
 interface AdvancedExamStore {

@@ -12,7 +12,11 @@
       "The stop_reason handler skips tool result processing on alternate iterations, re-issuing identical tool calls."
     ],
     "correctAnswer": 0,
-    "explanation": "Tool results must be returned with role tool, not user. Appending them as user messages breaks the model's understanding of conversation state and can cause it to re-request the same tools in a loop, since it no longer recognizes the prior result as a tool response."
+    "explanation": "Tool results must be returned with role tool, not user. Appending them as user messages breaks the model's understanding of conversation state and can cause it to re-request the same tools in a loop, since it no longer recognizes the prior result as a tool response.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works#:~:text=The%20loop%20exits%20on%20any%20other%20stop%20reason",
+    "sourceLabel": "Claude Docs: How Tool Use Works",
+    "sourceExcerpt": "In practice this reads as: while stop_reason == \"tool_use\", execute the tools and continue the conversation. The loop exits on any other stop reason (\"end_turn\", \"max_tokens\", \"stop_sequence\", or \"refusal\"), which means Claude has either produced a final answer or stopped for another reason that your application should handle.",
+    "sourceHighlight": "The loop exits on any other stop reason"
   },
   {
     "id": "adv-002",
@@ -27,7 +31,11 @@
       "Increase the token budget for the Planner so it can anticipate Reviewer objections during initial decomposition."
     ],
     "correctAnswer": 1,
-    "explanation": "This is the Reflexion pattern. A structured feedback loop to the upstream orchestrator via shared state preserves separation of concerns while enabling iterative correction. Direct write access to the Planner's queue breaks agent isolation. Parallel execution does not solve the dependency problem."
+    "explanation": "This is the Reflexion pattern. A structured feedback loop to the upstream orchestrator via shared state preserves separation of concerns while enabling iterative correction. Direct write access to the Planner's queue breaks agent isolation. Parallel execution does not solve the dependency problem.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Each Subagent independently performs web searches, evaluates tool results using interleaved thinking, and returns findings to the LeadResearcher. The LeadResearcher synthesizes these results and decides whether more research is needed.",
+    "sourceHighlight": "returns findings to the LeadResearcher"
   },
   {
     "id": "adv-003",
@@ -42,7 +50,11 @@
       "The behavior is undefined; different deployments may resolve this conflict in fundamentally different ways."
     ],
     "correctAnswer": 2,
-    "explanation": "System prompt instructions define an agent's operational boundary. Runtime messages from a coordinator cannot override system-prompt-defined constraints. The subagent must decline the out-of-scope request. This enforces the minimal footprint and isolation principles."
+    "explanation": "System prompt instructions define an agent's operational boundary. Runtime messages from a coordinator cannot override system-prompt-defined constraints. The subagent must decline the out-of-scope request. This enforces the minimal footprint and isolation principles.",
+    "sourceUrl": "https://code.claude.com/docs/en/sub-agents#:~:text=Enforce%20constraints%20by%20limiting%20which%20tools%20a%20subagent%20can%20use",
+    "sourceLabel": "Claude Code Docs: Subagents",
+    "sourceExcerpt": "Each subagent runs in its own context window with a custom system prompt, specific tool access, and independent permissions. When Claude encounters a task that matches a subagent's description, it delegates to that subagent, which works independently and returns results.",
+    "sourceHighlight": "specific tool access, and independent permissions"
   },
   {
     "id": "adv-004",
@@ -57,7 +69,11 @@
       "Option A: a single coordinator parallelizes subagent calls across all domains, avoiding inter-pair overhead."
     ],
     "correctAnswer": 3,
-    "explanation": "When workflows regularly span domains, a single coordinator with specialized subagents (Option A) enables true parallel fan-out via concurrent tool calls. Option B requires complex cross-pair communication for every multi-domain task, adding latency and additional failure points."
+    "explanation": "When workflows regularly span domains, a single coordinator with specialized subagents (Option A) enables true parallel fan-out via concurrent tool calls. Option B requires complex cross-pair communication for every multi-domain task, adding latency and additional failure points.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "We introduced two kinds of parallelization: (1) the lead agent spins up 3-5 subagents in parallel rather than serially; (2) the subagents use 3+ tools in parallel. These changes cut research time by up to 90%.",
+    "sourceHighlight": "the lead agent spins up 3-5 subagents in parallel"
   },
   {
     "id": "adv-005",
@@ -72,7 +88,11 @@
       "Log the planned deletion and continue asynchronously, notifying the user only after the operation completes."
     ],
     "correctAnswer": 0,
-    "explanation": "Irreversible actions with ambiguous scope are a mandatory pause point. The minimal footprint principle requires explicit confirmation before destructive operations, especially when the original instruction was vague."
+    "explanation": "Irreversible actions with ambiguous scope are a mandatory pause point. The minimal footprint principle requires explicit confirmation before destructive operations, especially when the original instruction was vague.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic: Building Effective Agents",
+    "sourceExcerpt": "Agents can then pause for human feedback at checkpoints or when encountering blockers. It's also common to include stopping conditions (such as a maximum number of iterations) to maintain control.",
+    "sourceHighlight": "pause for human feedback at checkpoints or when encountering blockers"
   },
   {
     "id": "adv-006",
@@ -87,7 +107,11 @@
       "Anthropic bears responsibility because the underlying model was trained to handle these situations autonomously."
     ],
     "correctAnswer": 1,
-    "explanation": "In multi-agent hierarchies, the initiating human operator retains ultimate responsibility. Legal liability decisions cannot be delegated to sub-subagents. Agent C must propagate the pause signal up the full chain to reach the human; no intermediate agent has authority to authorize legal risk."
+    "explanation": "In multi-agent hierarchies, the initiating human operator retains ultimate responsibility. Legal liability decisions cannot be delegated to sub-subagents. Agent C must propagate the pause signal up the full chain to reach the human; no intermediate agent has authority to authorize legal risk.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.",
+    "sourceHighlight": "a lead agent coordinates the process while delegating to specialized subagents"
   },
   {
     "id": "adv-007",
@@ -102,7 +126,11 @@
       "Block all prepare_statement calls and require all SQL to be submitted through execute_sql with hook inspection."
     ],
     "correctAnswer": 2,
-    "explanation": "String-matching in hooks is inherently bypassable through encoding, splitting, or obfuscation. SQL safety must be enforced at the database layer with least-privilege credentials and schema-level restrictions. The hook provides a first-line heuristic, not a security boundary—defense-in-depth requires the database itself to prevent the operation."
+    "explanation": "String-matching in hooks is inherently bypassable through encoding, splitting, or obfuscation. SQL safety must be enforced at the database layer with least-privilege credentials and schema-level restrictions. The hook provides a first-line heuristic, not a security boundary—defense-in-depth requires the database itself to prevent the operation.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks",
+    "sourceLabel": "Claude Code Docs: Hooks Reference",
+    "sourceExcerpt": "Because the if filter is best-effort, use the permission system rather than a hook to enforce a hard allow or deny.",
+    "sourceHighlight": "use the permission system rather than a hook to enforce a hard allow or deny"
   },
   {
     "id": "adv-008",
@@ -117,7 +145,11 @@
       "The 6,000-token result is injected as input; the orchestrator fails only if total context exceeds the window."
     ],
     "correctAnswer": 3,
-    "explanation": "max_tokens controls the length of the model's output, not the size of input it can receive. Tool results are injected as input tokens. The orchestrator fails only if total context—prompt, history, and tool results—exceeds the model's context window, not the max_tokens limit."
+    "explanation": "max_tokens controls the length of the model's output, not the size of input it can receive. Tool results are injected as input tokens. The orchestrator fails only if total context—prompt, history, and tool results—exceeds the model's context window, not the max_tokens limit.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Everything%20in%20the%20request%20counts%20toward%20the%20context%20window",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Everything in the request counts toward the context window: the system prompt, every message in messages (including tool results, images, and documents), and your tool definitions. The output Claude generates for the turn, including its extended thinking, counts too.",
+    "sourceHighlight": "Everything in the request counts toward the context window"
   },
   {
     "id": "adv-009",
@@ -132,7 +164,11 @@
       "Provide a partial answer connecting the French Revolution to employment history as a scope compromise."
     ],
     "correctAnswer": 0,
-    "explanation": "Prompt injection attempts via user messages must be rejected, not negotiated with. Engaging with the framing treats the injection as a legitimate instruction. The agent declines out-of-scope content and redirects without validating the override claim."
+    "explanation": "Prompt injection attempts via user messages must be rejected, not negotiated with. Engaging with the framing treats the injection as a legitimate instruction. The agent declines out-of-scope content and redirects without validating the override claim.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Golden rule: Show your prompt to a colleague with minimal context on the task and ask them to follow it. If they'd be confused, Claude will be too.",
+    "sourceHighlight": "Show your prompt to a colleague"
   },
   {
     "id": "adv-010",
@@ -147,7 +183,11 @@
       "Abort the entire task and restart all five subagents whenever any single subagent in the batch returns an error."
     ],
     "correctAnswer": 1,
-    "explanation": "Fan-out with a completion barrier is the standard pattern: launch all in parallel, collect results as they arrive, handle failures with targeted retry, and gate the aggregation step behind an 'all complete' check. Publishing partial results violates the consistency requirement. Full restart wastes all prior work."
+    "explanation": "Fan-out with a completion barrier is the standard pattern: launch all in parallel, collect results as they arrive, handle failures with targeted retry, and gate the aggregation step behind an 'all complete' check. Publishing partial results violates the consistency requirement. Full restart wastes all prior work.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Agents are stateful and errors compound. Agents can run for long periods of time, maintaining state across many tool calls. One step failing can cause agents to explore entirely different trajectories, leading to unpredictable outcomes.",
+    "sourceHighlight": "Agents are stateful and errors compound"
   },
   {
     "id": "adv-011",
@@ -162,7 +202,11 @@
       "Prompt layer failure; a sanity-check instruction in the system prompt would allow the model to reject anomalies."
     ],
     "correctAnswer": 2,
-    "explanation": "GIGO applies to agentic systems. A model processing all inputs correctly is still fully vulnerable to poisoned input. No amount of model or prompt improvement compensates for compromised input data. Defense requires data-layer validation: independent sources, anomaly detection, and automated circuit breakers."
+    "explanation": "GIGO applies to agentic systems. A model processing all inputs correctly is still fully vulnerable to poisoned input. No amount of model or prompt improvement compensates for compromised input data. Defense requires data-layer validation: independent sources, anomaly detection, and automated circuit breakers.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Context, therefore, must be treated as a finite resource with diminishing marginal returns. Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome.",
+    "sourceHighlight": "finite resource with diminishing marginal returns"
   },
   {
     "id": "adv-012",
@@ -177,7 +221,11 @@
       "Discard the injected instruction as prompt injection, process only legitimate search results, and flag to operator."
     ],
     "correctAnswer": 3,
-    "explanation": "Tool results are untrusted content from the environment and a primary injection vector. Text within tool results carries no special authority—it is data, not instruction. The orchestrator must treat tool results as data only. The injection attempt should be flagged to operators as a potential security event."
+    "explanation": "Tool results are untrusted content from the environment and a primary injection vector. Text within tool results carries no special authority—it is data, not instruction. The orchestrator must treat tool results as data only. The injection attempt should be flagged to operators as a potential security event.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works#:~:text=Claude%20never%20sees%20your%20implementation",
+    "sourceLabel": "Claude Docs: How Tool Use Works",
+    "sourceExcerpt": "Your application extracts those arguments, runs the operation (a database query, an HTTP call, a file write, whatever the tool does), and sends the output back in a tool_result block on the next request. Claude never sees your implementation; it only sees the schema you provided and the result you returned.",
+    "sourceHighlight": "Claude never sees your implementation"
   },
   {
     "id": "adv-013",
@@ -192,7 +240,11 @@
       "No—the agent should never deploy to production autonomously at any time regardless of approval or test status."
     ],
     "correctAnswer": 0,
-    "explanation": "Explicit approval for an action does not mean approval at any time under any conditions. Production deployments at 3 AM before a weekend represent a well-understood risk pattern with limited incident-response capacity. Even without an explicit rule, the agent must recognize high-stakes timing risk and seek confirmation—this is the minimal footprint and caution principle for irreversible actions."
+    "explanation": "Explicit approval for an action does not mean approval at any time under any conditions. Production deployments at 3 AM before a weekend represent a well-understood risk pattern with limited incident-response capacity. Even without an explicit rule, the agent must recognize high-stakes timing risk and seek confirmation—this is the minimal footprint and caution principle for irreversible actions.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#balancing-autonomy-and-safety#:~:text=Consider%20the%20reversibility%20and%20potential%20impact%20of%20your%20actions",
+    "sourceLabel": "Claude Docs: Prompting Best Practices (Autonomy & Safety)",
+    "sourceExcerpt": "Consider the reversibility and potential impact of your actions. You are encouraged to take local, reversible actions like editing files or running tests, but for actions that are hard to reverse, affect shared systems, or could be destructive, ask the user before proceeding.",
+    "sourceHighlight": "Consider the reversibility and potential impact of your actions"
   },
   {
     "id": "adv-014",
@@ -207,7 +259,11 @@
       "Only one safeguard is needed; implementing both creates redundant overhead slowing multi-agent task completion."
     ],
     "correctAnswer": 1,
-    "explanation": "This is a compound failure requiring compound fixes. Single-point safeguards are insufficient for catastrophic outcomes. Both are necessary: (1) Agent A uses confidence thresholds before writing high-stakes intents, AND (2) Agent B requires explicit user confirmation before irreversible destructive actions, regardless of what shared context says."
+    "explanation": "This is a compound failure requiring compound fixes. Single-point safeguards are insufficient for catastrophic outcomes. Both are necessary: (1) Agent A uses confidence thresholds before writing high-stakes intents, AND (2) Agent B requires explicit user confirmation before irreversible destructive actions, regardless of what shared context says.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "When encountering obstacles, do not use destructive actions as a shortcut. For example, don't bypass safety checks (e.g. --no-verify) or discard unfamiliar files that may be in-progress work.",
+    "sourceHighlight": "do not use destructive actions as a shortcut"
   },
   {
     "id": "adv-015",
@@ -222,7 +278,11 @@
       "The risk is purely theoretical; prompt injection in documents cannot realistically trigger tool calls at runtime."
     ],
     "correctAnswer": 2,
-    "explanation": "Minimal privilege is a core agentic safety principle. Every unnecessary capability is an attack surface. A read-only task with write access means a successful prompt injection via document content can write, modify, or delete files. Granting only read_file eliminates this entire class of risk."
+    "explanation": "Minimal privilege is a core agentic safety principle. Every unnecessary capability is an attack surface. A read-only task with write access means a successful prompt injection via document content can write, modify, or delete files. Granting only read_file eliminates this entire class of risk.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "More tools don't always lead to better outcomes. Too many tools or overlapping tools can also distract agents from pursuing efficient strategies.",
+    "sourceHighlight": "Too many tools or overlapping tools can also distract agents"
   },
   {
     "id": "adv-016",
@@ -237,7 +297,11 @@
       "Optimistic locking with compare-and-swap: write only if version matches since read; conflicting agent re-reads."
     ],
     "correctAnswer": 3,
-    "explanation": "A simple status check is subject to a race condition: both agents read 'unassigned' and both decide to claim. Optimistic locking (compare-and-swap / conditional write) ensures only one agent successfully claims the task—the other receives a conflict signal and must retry with fresh state. Option D also prevents the race but eliminates parallelism."
+    "explanation": "A simple status check is subject to a race condition: both agents read 'unassigned' and both decide to claim. Optimistic locking (compare-and-swap / conditional write) ensures only one agent successfully claims the task—the other receives a conflict signal and must retry with fresh state. Option D also prevents the race but eliminates parallelism.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.",
+    "sourceHighlight": "orchestrator-worker pattern"
   },
   {
     "id": "adv-017",
@@ -252,7 +316,11 @@
       "Use a PreToolUse hook to auto-inject correct filter values when the model omits or incorrectly sets the parameter."
     ],
     "correctAnswer": 0,
-    "explanation": "The model selects and parameterizes tools based on their descriptions. Adding concrete examples of when and how to use optional parameters directly in the description is the highest-leverage fix. Splitting tools or hook-based correction are secondary workarounds for what is fundamentally a description-quality problem."
+    "explanation": "The model selects and parameterizes tools based on their descriptions. Adding concrete examples of when and how to use optional parameters directly in the description is the highest-leverage fix. Splitting tools or hook-based correction are secondary workarounds for what is fundamentally a description-quality problem.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools#:~:text=Provide%20extremely%20detailed%20descriptions.",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Provide extremely detailed descriptions. This is by far the most important factor in tool performance. Your descriptions should explain every detail about the tool, including what it does and when it should be used.",
+    "sourceHighlight": "Provide extremely detailed descriptions"
   },
   {
     "id": "adv-018",
@@ -267,7 +335,11 @@
       "Latency increases but accuracy is unaffected; cache tool definitions to reduce repeated context overhead."
     ],
     "correctAnswer": 1,
-    "explanation": "Tool definitions consume context tokens and the model considers all available tools when deciding what to call. Excess tools increase misselection risk—the model may choose a plausible but wrong tool. Filtering to task-relevant tools is a reliability optimization, not merely a performance one."
+    "explanation": "Tool definitions consume context tokens and the model considers all available tools when deciding what to call. Excess tools increase misselection risk—the model may choose a plausible but wrong tool. Filtering to task-relevant tools is a reliability optimization, not merely a performance one.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Consolidate related operations into fewer tools. Rather than creating a separate tool for every action, group them into a single tool with an action parameter. Fewer, more capable tools reduce selection ambiguity and make your tool surface easier for Claude to navigate.",
+    "sourceHighlight": "Fewer, more capable tools reduce selection ambiguity"
   },
   {
     "id": "adv-019",
@@ -282,7 +354,11 @@
       "Continue to the next workflow step and circle back to the rate-limited call after other steps complete."
     ],
     "correctAnswer": 2,
-    "explanation": "Structured error responses with retry metadata are designed to be parsed and acted upon. Honoring the retry_after signal prevents exponential retry storms that can lead to account suspension and system degradation."
+    "explanation": "Structured error responses with retry metadata are designed to be parsed and acted upon. Honoring the retry_after signal prevents exponential retry storms that can lead to account suspension and system degradation.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls",
+    "sourceLabel": "Claude Docs: Handle Tool Calls",
+    "sourceExcerpt": "Write instructive error messages. Instead of generic errors like \"failed\", include what went wrong and what Claude should try next, e.g., \"Rate limit exceeded. Retry after 60 seconds.\" This gives Claude the context it needs to recover or adapt without guessing.",
+    "sourceHighlight": "Rate limit exceeded. Retry after 60 seconds"
   },
   {
     "id": "adv-020",
@@ -297,7 +373,11 @@
       "In the tool's server-side implementation using OS-level path canonicalization to confirm the path is within bounds."
     ],
     "correctAnswer": 3,
-    "explanation": "Path traversal requires server-side OS-level canonicalization (e.g., realpath()). JSON schema regex and string-matching are bypassable with encoded variants (%2e%2e, unicode equivalents). System prompt instructions are not security boundaries. Only the server-side canonical path check is reliable."
+    "explanation": "Path traversal requires server-side OS-level canonicalization (e.g., realpath()). JSON schema regex and string-matching are bypassable with encoded variants (%2e%2e, unicode equivalents). System prompt instructions are not security boundaries. Only the server-side canonical path check is reliable.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "Namespacing (grouping related tools under common prefixes) can help delineate boundaries between lots of tools.",
+    "sourceHighlight": "delineate boundaries between lots of tools"
   },
   {
     "id": "adv-021",
@@ -312,7 +392,11 @@
       "Wait 60 seconds then retry exactly once before escalating to a human for manual resolution of the timeout."
     ],
     "correctAnswer": 0,
-    "explanation": "Network timeouts are non-idempotent ambiguity—the operation may have fully completed, partially completed, or not started on the server. Blindly retrying can duplicate operations. The correct pattern uses a read/status-check first to assess actual state before deciding on retry versus rollback."
+    "explanation": "Network timeouts are non-idempotent ambiguity—the operation may have fully completed, partially completed, or not started on the server. Blindly retrying can duplicate operations. The correct pattern uses a read/status-check first to assess actual state before deciding on retry versus rollback.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "If a tool call raises an error (for example, during input validation), you can prompt-engineer your error responses to clearly communicate specific and actionable improvements.",
+    "sourceHighlight": "prompt-engineer your error responses to clearly communicate specific and actionable improvements"
   },
   {
     "id": "adv-022",
@@ -327,7 +411,11 @@
       "Use a PreToolUse hook to redirect tool calls to the correct tool based on argument content in each invocation."
     ],
     "correctAnswer": 1,
-    "explanation": "Overlapping descriptions prevent reliable tool selection. Mutually exclusive use_when criteria (e.g., 'Use for unstructured document content, NOT for file system paths') gives the model clear decision rules. Consolidation may not be feasible; hook-based redirection is fragile and masks the underlying description problem."
+    "explanation": "Overlapping descriptions prevent reliable tool selection. Mutually exclusive use_when criteria (e.g., 'Use for unstructured document content, NOT for file system paths') gives the model clear decision rules. Consolidation may not be feasible; hook-based redirection is fragile and masks the underlying description problem.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools#:~:text=Fewer%2C%20more%20capable%20tools%20reduce%20selection%20ambiguity%20and%20make%20your%20tool%20surface%20easier%20for%20Claude%20to%20navigate.",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Consolidate related operations into fewer tools. Rather than creating a separate tool for every action, group them into a single tool with an action parameter. Fewer, more capable tools reduce selection ambiguity and make your tool surface easier for Claude to navigate.",
+    "sourceHighlight": "easier for Claude to navigate"
   },
   {
     "id": "adv-023",
@@ -342,7 +430,11 @@
       "Increase the context window size to accommodate full tool response payloads when tools return large JSON."
     ],
     "correctAnswer": 2,
-    "explanation": "Tools must return minimal, task-relevant data. A fields projection parameter is the correct tool design pattern. Returning 100 KB when three fields are needed wastes context budget and buries signal in noise. Context is a scarce resource—tools must be economical with it."
+    "explanation": "Tools must return minimal, task-relevant data. A fields projection parameter is the correct tool design pattern. Returning 100 KB when three fields are needed wastes context budget and buries signal in noise. Context is a scarce resource—tools must be economical with it.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools#:~:text=Design%20tool%20responses%20to%20return%20only%20high-signal%20information.",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Design tool responses to return only high-signal information. Return semantic, stable identifiers (e.g., slugs or UUIDs) rather than opaque internal references, and include only the fields Claude needs to reason about its next step.",
+    "sourceHighlight": "Design tool responses to return only high-signal information"
   },
   {
     "id": "adv-024",
@@ -357,7 +449,11 @@
       "Pause the task, surface the authentication error to the user with context, and wait for a refreshed token."
     ],
     "correctAnswer": 3,
-    "explanation": "Authentication failures are recoverable but require human action. The correct pattern: pause and preserve task state, surface the auth error with context, resume after token refresh. Abandoning wastes all prior work. Using stale financial data is dangerous. Infinite retry on auth errors can trigger account lockout."
+    "explanation": "Authentication failures are recoverable but require human action. The correct pattern: pause and preserve task state, surface the auth error with context, resume after token refresh. Abandoning wastes all prior work. Using stale financial data is dangerous. Infinite retry on auth errors can trigger account lockout.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "As of v2.1.195, when a token refresh fails because the server rejects the stored refresh token, Claude Code immediately shows a notice pointing at /mcp.",
+    "sourceHighlight": "when a token refresh fails because the server rejects the stored refresh token"
   },
   {
     "id": "adv-025",
@@ -372,7 +468,11 @@
       "Only update_record retries automatically; delete_record fails permanently on any error needing manual recovery."
     ],
     "correctAnswer": 0,
-    "explanation": "Idempotency is a first-class architectural concern. Idempotent operations can be retried unconditionally. Non-idempotent operations require state verification before retry. A successful delete followed by a retry returns 'not found'—which must not be treated as a new error in retry logic."
+    "explanation": "Idempotency is a first-class architectural concern. Idempotent operations can be retried unconditionally. Non-idempotent operations require state verification before retry. A successful delete followed by a retry returns 'not found'—which must not be treated as a new error in retry logic.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "Tool truncation and error responses can steer agents towards more token-efficient tool-use behaviors (using filters or pagination) or give examples of correctly formatted tool inputs.",
+    "sourceHighlight": "Tool truncation and error responses can steer agents"
   },
   {
     "id": "adv-026",
@@ -387,7 +487,11 @@
       "Issue the same token to both agents but specify the chatbot's role in its system prompt to restrict tool access."
     ],
     "correctAnswer": 1,
-    "explanation": "Authorization must be enforced server-side with scoped credentials. System prompts and client-side hooks are bypassable via prompt injection. Server-scoped OAuth tokens mean even a fully compromised agent client cannot access admin tools—the server simply rejects the request. This is the defense-in-depth principle."
+    "explanation": "Authorization must be enforced server-side with scoped credentials. System prompts and client-side hooks are bypassable via prompt injection. Server-scoped OAuth tokens mean even a fully compromised agent client cannot access admin tools—the server simply rejects the request. This is the defense-in-depth principle.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Set oauth.scopes to pin the scopes Claude Code requests during the authorization flow. This is the supported way to restrict an MCP server to a security-team-approved subset when the upstream authorization server advertises more scopes than you want to grant.",
+    "sourceHighlight": "Set oauth.scopes to pin the scopes Claude Code requests during the authorization flow"
   },
   {
     "id": "adv-027",
@@ -402,7 +506,11 @@
       "CLAUDE.md only functions at the repository root and cannot be placed in subdirectories for specific rules."
     ],
     "correctAnswer": 2,
-    "explanation": "CLAUDE.md files follow a hierarchical inheritance model. The root sets global defaults; subdirectory files add or override for their scope. This prevents rule duplication while enabling directory-specific customization."
+    "explanation": "CLAUDE.md files follow a hierarchical inheritance model. The root sets global defaults; subdirectory files add or override for their scope. This prevents rule duplication while enabling directory-specific customization.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=CLAUDE.md%20files%20can%20live%20in%20several%20locations%2C%20each%20with%20a%20different%20scope.",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "CLAUDE.md files can live in several locations, each with a different scope. The table below lists them in load order, from broadest scope to most specific, so a project instruction appears in context after a user instruction.",
+    "sourceHighlight": "CLAUDE.md files can live in several locations, each with a different scope"
   },
   {
     "id": "adv-028",
@@ -417,7 +525,11 @@
       "The agent makes broad irreversible changes—deleting files, refactoring APIs—based on its own interpretation."
     ],
     "correctAnswer": 3,
-    "explanation": "Vague instructions to autonomous agents in irreversible contexts are a major risk. 'Clean up' could mean anything from fixing comments to deleting entire modules. The minimal footprint principle requires scoping the instruction precisely before an autonomous agent executes."
+    "explanation": "Vague instructions to autonomous agents in irreversible contexts are a major risk. 'Clean up' could mean anything from fixing comments to deleting entire modules. The minimal footprint principle requires scoping the instruction precisely before an autonomous agent executes.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#balancing-autonomy-and-safety#:~:text=Consider%20the%20reversibility%20and%20potential%20impact%20of%20your%20actions",
+    "sourceLabel": "Claude Docs: Prompting Best Practices (Autonomy & Safety)",
+    "sourceExcerpt": "Consider the reversibility and potential impact of your actions. You are encouraged to take local, reversible actions like editing files or running tests, but for actions that are hard to reverse, affect shared systems, or could be destructive, ask the user before proceeding.",
+    "sourceHighlight": "ask the user before proceeding"
   },
   {
     "id": "adv-029",
@@ -432,7 +544,11 @@
       "Use the Message Batches API to split the remaining 40% of work into parallel async requests outside the session."
     ],
     "correctAnswer": 0,
-    "explanation": "When approaching context limits, the correct pattern is a context fork: generate a dense structured summary of state and progress, then bootstrap a fresh session from it. max_tokens controls output length, not context capacity. The Batches API is for async bulk work, not session context management."
+    "explanation": "When approaching context limits, the correct pattern is a context fork: generate a dense structured summary of state and progress, then bootstrap a fresh session from it. max_tokens controls output length, not context capacity. The Batches API is for async bulk work, not session context management.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Compaction%20automatically%20summarizes%20earlier%20parts%20of%20the%20conversation%20on%20the%20server",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Compaction automatically summarizes earlier parts of the conversation on the server, so the conversation can continue past the context window limit.",
+    "sourceHighlight": "Compaction automatically summarizes earlier parts of the conversation"
   },
   {
     "id": "adv-030",
@@ -447,7 +563,11 @@
       "Do not break any existing tests when implementing new features or refactoring code in any part of the repo."
     ],
     "correctAnswer": 1,
-    "explanation": "Specific, enforceable constraints outperform vague outcome statements. 'Do not break tests' cannot be reliably predicted before execution. 'Public API surfaces are frozen' is a structural rule the agent can apply deterministically before making any changes."
+    "explanation": "Specific, enforceable constraints outperform vague outcome statements. 'Do not break tests' cannot be reliably predicted before execution. 'Public API surfaces are frozen' is a structural rule the agent can apply deterministically before making any changes.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=write%20instructions%20that%20are%20concrete%20enough%20to%20verify",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Specificity: write instructions that are concrete enough to verify. For example: \"Use 2-space indentation\" instead of \"Format code properly\", \"Run npm test before committing\" instead of \"Test your changes\".",
+    "sourceHighlight": "write instructions that are concrete enough to verify"
   },
   {
     "id": "adv-031",
@@ -462,7 +582,11 @@
       "Not a real threat because Claude Code only follows instructions from the authenticated developer, not source files."
     ],
     "correctAnswer": 2,
-    "explanation": "This is prompt injection via an indirect channel (third-party source code). --dangerously-skip-permissions removes the human approval gate, making Claude Code directly exploitable. Defense requires both: (1) never skip permissions in untrusted contexts, and (2) network-level controls preventing agent-initiated exfiltration. System prompt instructions alone are not security boundaries."
+    "explanation": "This is prompt injection via an indirect channel (third-party source code). --dangerously-skip-permissions removes the human approval gate, making Claude Code directly exploitable. Defense requires both: (1) never skip permissions in untrusted contexts, and (2) network-level controls preventing agent-initiated exfiltration. System prompt instructions alone are not security boundaries.",
+    "sourceUrl": "https://code.claude.com/docs/en/settings",
+    "sourceLabel": "Claude Code Docs: Settings",
+    "sourceExcerpt": "When the same setting appears in multiple scopes, Claude Code applies them in priority order: Managed (highest): can't be overridden by anything.",
+    "sourceHighlight": "can't be overridden by anything"
   },
   {
     "id": "adv-032",
@@ -477,7 +601,11 @@
       "Project-level rules apply for shared library code; user preferences suit personal files, not team artifacts."
     ],
     "correctAnswer": 3,
-    "explanation": "The CLAUDE.md hierarchy is not purely about specificity—it is about appropriate scope. User preferences for rapid prototyping do not override the production standard for shared team artifacts. For shared library code, the project-level Airbnb config governs."
+    "explanation": "The CLAUDE.md hierarchy is not purely about specificity—it is about appropriate scope. User preferences for rapid prototyping do not override the production standard for shared team artifacts. For shared library code, the project-level Airbnb config governs.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=if%20two%20rules%20contradict%20each%20other%2C%20Claude%20may%20pick%20one%20arbitrarily",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Consistency: if two rules contradict each other, Claude may pick one arbitrarily. Review your CLAUDE.md files, nested CLAUDE.md files in subdirectories, and .claude/rules/ periodically to remove outdated or conflicting instructions.",
+    "sourceHighlight": "if two rules contradict each other, Claude may pick one arbitrarily"
   },
   {
     "id": "adv-033",
@@ -492,7 +620,11 @@
       "Have a separate model instance review all generated tests for completeness before they are committed."
     ],
     "correctAnswer": 0,
-    "explanation": "Specific structural requirements outperform vague quality goals. 'Comprehensive' and '100% coverage' are unmeasurable or gameable. An explicit checklist—happy path, edge cases, invalid input, boundaries, error cases—gives the agent a concrete, verifiable definition of test completeness."
+    "explanation": "Specific structural requirements outperform vague quality goals. 'Comprehensive' and '100% coverage' are unmeasurable or gameable. An explicit checklist—happy path, edge cases, invalid input, boundaries, error cases—gives the agent a concrete, verifiable definition of test completeness.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=instead%20of%20%22Format%20code%20properly%22",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Specificity: write instructions that are concrete enough to verify. For example: \"Use 2-space indentation\" instead of \"Format code properly\", \"Run npm test before committing\" instead of \"Test your changes\".",
+    "sourceHighlight": "\"Use 2-space indentation\" instead of \"Format code properly\""
   },
   {
     "id": "adv-034",
@@ -507,7 +639,11 @@
       "Document all new dependencies in the README.md file so the team is aware of additions to the project stack."
     ],
     "correctAnswer": 1,
-    "explanation": "The key risk is scope expansion—implementing 'improve performance' by introducing unapproved infrastructure. A specific prohibition on new infrastructure dependencies without approval is the only rule that prevents this. Vague constraints like 'simplest implementation' do not."
+    "explanation": "The key risk is scope expansion—implementing 'improve performance' by introducing unapproved infrastructure. A specific prohibition on new infrastructure dependencies without approval is the only rule that prevents this. Vague constraints like 'simplest implementation' do not.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=write%20instructions%20that%20are%20concrete%20enough%20to%20verify",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Specificity: write instructions that are concrete enough to verify. For example: \"Use 2-space indentation\" instead of \"Format code properly\", \"Run npm test before committing\" instead of \"Test your changes\".",
+    "sourceHighlight": "\"Run npm test before committing\" instead of \"Test your changes\""
   },
   {
     "id": "adv-035",
@@ -522,7 +658,11 @@
       "Self-review is unreliable only when the original code was generated with a high temperature setting."
     ],
     "correctAnswer": 2,
-    "explanation": "Self-evaluation is subject to confirmation bias—the model tends to validate its own outputs using the same reasoning that produced them. A separate reviewer instance, especially one prompted to 'find all errors,' provides genuinely independent scrutiny. This is why agentic review patterns use separate model instances."
+    "explanation": "Self-evaluation is subject to confirmation bias—the model tends to validate its own outputs using the same reasoning that produced them. A separate reviewer instance, especially one prompted to 'find all errors,' provides genuinely independent scrutiny. This is why agentic review patterns use separate model instances.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic: Building Effective Agents",
+    "sourceExcerpt": "In the evaluator-optimizer workflow, one LLM call generates a response while another provides evaluation and feedback in a loop.",
+    "sourceHighlight": "one LLM call generates a response while another provides evaluation and feedback"
   },
   {
     "id": "adv-036",
@@ -537,7 +677,11 @@
       "Tiered review: Claude Code auto-approves non-sensitive files; security-sensitive files require human review."
     ],
     "correctAnswer": 3,
-    "explanation": "Tiered review by file sensitivity is the correct pattern. It allows automation efficiency for routine code while maintaining human oversight on high-stakes changes. Blanket rejection removes the usefulness of Claude Code; dual automated passes don't add independence."
+    "explanation": "Tiered review by file sensitivity is the correct pattern. It allows automation efficiency for routine code while maintaining human oversight on high-stakes changes. Blanket rejection removes the usefulness of Claude Code; dual automated passes don't add independence.",
+    "sourceUrl": "https://code.claude.com/docs/en/settings",
+    "sourceLabel": "Claude Code Docs: Settings",
+    "sourceExcerpt": "Managed scope is for: Security policies that must be enforced organization-wide, Compliance requirements that can't be overridden, Standardized configurations deployed by IT/DevOps.",
+    "sourceHighlight": "Security policies that must be enforced organization-wide"
   },
   {
     "id": "adv-037",
@@ -552,7 +696,11 @@
       "Ask the user in the session to explicitly override the CLAUDE.md rule in writing before proceeding."
     ],
     "correctAnswer": 0,
-    "explanation": "Explicit CLAUDE.md rules are constraints, not guidelines. Claude Code must not override them based on its own situational judgment. The correct behavior is to find a compliant path (hotfix branch) and escalate—not to self-authorize a rule exception."
+    "explanation": "Explicit CLAUDE.md rules are constraints, not guidelines. Claude Code must not override them based on its own situational judgment. The correct behavior is to find a compliant path (hotfix branch) and escalate—not to self-authorize a rule exception.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=CLAUDE.md%20instructions%20shape%20Claude%27s%20behavior%20but%20are%20not%20a%20hard%20enforcement%20layer",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Settings rules are enforced by the client regardless of what Claude decides to do. CLAUDE.md instructions shape Claude's behavior but are not a hard enforcement layer.",
+    "sourceHighlight": "CLAUDE.md instructions shape Claude's behavior but are not a hard enforcement layer"
   },
   {
     "id": "adv-038",
@@ -567,7 +715,11 @@
       "Create a documented cleanup shell script showing what would be deleted but do not execute it without confirmation."
     ],
     "correctAnswer": 1,
-    "explanation": "Minimal footprint in bash contexts means operating on the smallest necessary scope and confirming before potentially irreversible system-wide operations. rm -rf /tmp/* is dangerous—/tmp is system-wide, may contain files from other processes, and the operation is irreversible. Confirming scope first is correct."
+    "explanation": "Minimal footprint in bash contexts means operating on the smallest necessary scope and confirming before potentially irreversible system-wide operations. rm -rf /tmp/* is dangerous—/tmp is system-wide, may contain files from other processes, and the operation is irreversible. Confirming scope first is correct.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#balancing-autonomy-and-safety#:~:text=Destructive%20operations%3A%20deleting%20files%20or%20branches%2C%20dropping%20database%20tables%2C%20rm%20-rf",
+    "sourceLabel": "Claude Docs: Prompting Best Practices (Autonomy & Safety)",
+    "sourceExcerpt": "Examples of actions that warrant confirmation: - Destructive operations: deleting files or branches, dropping database tables, rm -rf - Hard to reverse operations: git push --force, git reset --hard, amending published commits.",
+    "sourceHighlight": "Destructive operations: deleting files or branches, dropping database tables, rm -rf"
   },
   {
     "id": "adv-039",
@@ -582,7 +734,11 @@
       "Ask Claude to rate confidence for each of the five categories and select the one with the highest score."
     ],
     "correctAnswer": 2,
-    "explanation": "JSON schema with enum constraints is programmatic enforcement—the API guarantees the output is one of the valid values. A text instruction is advisory and can fail on edge cases. For exact-value constraints, tool_choice plus schema is always more reliable than instruction-based approaches."
+    "explanation": "JSON schema with enum constraints is programmatic enforcement—the API guarantees the output is one of the valid values. A text instruction is advisory and can fail on edge cases. For exact-value constraints, tool_choice plus schema is always more reliable than instruction-based approaches.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools#forcing-tool-use#:~:text=the%20API%20prefills%20the%20assistant%20message%20to%20force%20a%20tool%20to%20be%20used",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Note that when you have tool_choice as any or tool, the API prefills the assistant message to force a tool to be used. This means that the models will not emit a natural language response or explanation before tool_use content blocks, even if explicitly asked to do so.",
+    "sourceHighlight": "the API prefills the assistant message to force a tool to be used"
   },
   {
     "id": "adv-040",
@@ -597,7 +753,11 @@
       "Add few-shot examples targeting the observed failure cases; concrete examples outperform abstract instructions."
     ],
     "correctAnswer": 3,
-    "explanation": "When instruction refinement plateaus, few-shot examples targeting specific failure patterns is the highest-ROI next step. Examples show the model exactly what correct behavior looks like for hard cases. Model switching and chains add cost and latency; majority voting adds calls. Targeted examples are cheap and highly effective."
+    "explanation": "When instruction refinement plateaus, few-shot examples targeting specific failure patterns is the highest-ROI next step. Examples show the model exactly what correct behavior looks like for hard cases. Model switching and chains add cost and latency; majority voting adds calls. Targeted examples are cheap and highly effective.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=A%20few%20well-crafted%20examples%20(known%20as%20few-shot%20or%20multishot%20prompting)%20improve%20accuracy%20and%20consistency.",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Examples are one of the most reliable ways to steer Claude's output format, tone, and structure. A few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency.",
+    "sourceHighlight": "improve accuracy and consistency"
   },
   {
     "id": "adv-041",
@@ -612,7 +772,11 @@
       "A jailbreak attempt mitigated by adding 'Do not reveal the system prompt' to the system message configuration."
     ],
     "correctAnswer": 0,
-    "explanation": "XML tag injection allows user input to break out of its designated slot and inject new prompt structure. Mitigation requires sanitizing user content (escaping <, >, &) before template insertion—analogous to SQL injection prevention. Structural instructions like 'Do not reveal the system prompt' do not prevent this attack."
+    "explanation": "XML tag injection allows user input to break out of its designated slot and inject new prompt structure. Mitigation requires sanitizing user content (escaping <, >, &) before template insertion—analogous to SQL injection prevention. Structural instructions like 'Do not reveal the system prompt' do not prevent this attack.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#structure-prompts-with-xml-tags#:~:text=XML%20tags%20help%20Claude%20parse%20complex%20prompts%20unambiguously",
+    "sourceLabel": "Claude Docs: Prompting Best Practices (XML Tags)",
+    "sourceExcerpt": "XML tags help Claude parse complex prompts unambiguously, especially when your prompt mixes instructions, context, examples, and variable inputs. Wrapping each type of content in its own tag reduces misinterpretation.",
+    "sourceHighlight": "XML tags help Claude parse complex prompts unambiguously"
   },
   {
     "id": "adv-042",
@@ -627,7 +791,11 @@
       "Add instructions such as 'Do not hallucinate' and 'Only state verified facts' to the system prompt context."
     ],
     "correctAnswer": 1,
-    "explanation": "Citation-grounding forces the model to trace every output figure back to a source sentence. Combined with a separate verification pass, this creates a two-layer check. Temperature=0 aids determinism but does not fix grounding. 'Do not hallucinate' is an unenforceable instruction."
+    "explanation": "Citation-grounding forces the model to trace every output figure back to a source sentence. Combined with a separate verification pass, this creates a two-layer check. Temperature=0 aids determinism but does not fix grounding. 'Do not hallucinate' is an unenforceable instruction.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=Ground%20responses%20in%20quotes",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Ground responses in quotes: For long document tasks, ask Claude to quote relevant parts of the documents first before carrying out its task. This helps Claude cut through the noise of the rest of the document's contents.",
+    "sourceHighlight": "ask Claude to quote relevant parts of the documents first"
   },
   {
     "id": "adv-043",
@@ -642,7 +810,11 @@
       "The reasoning field is required for regulatory compliance and audit trail purposes even when unused downstream."
     ],
     "correctAnswer": 2,
-    "explanation": "This is the scratchpad-in-schema pattern—a structural form of chain-of-thought prompting. Externalizing reasoning before the answer field improves answer quality. Removing it degrades output quality even when the field itself is unused downstream."
+    "explanation": "This is the scratchpad-in-schema pattern—a structural form of chain-of-thought prompting. Externalizing reasoning before the answer field improves answer quality. Removing it degrades output quality even when the field itself is unused downstream.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=Manual%20chain-of-thought%20(CoT)%20prompting%20as%20a%20fallback.",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Manual chain-of-thought (CoT) prompting as a fallback. When thinking is off, you can still encourage step-by-step reasoning by asking Claude to think through the problem. Use structured tags like <thinking> and <answer> to cleanly separate reasoning from the final output.",
+    "sourceHighlight": "Manual chain-of-thought (CoT) prompting as a fallback"
   },
   {
     "id": "adv-044",
@@ -657,7 +829,11 @@
       "Dynamically retrieve the 5-10 examples most semantically similar to the current input via embedding search."
     ],
     "correctAnswer": 3,
-    "explanation": "Dynamic few-shot selection (RAG for examples) retrieves the most relevant exemplars per input, maintaining near-full accuracy at a fraction of the token cost. Fine-tuning is valid but expensive and requires a training pipeline. Complexity-based selection using input length is a weak proxy for which examples are actually relevant."
+    "explanation": "Dynamic few-shot selection (RAG for examples) retrieves the most relevant exemplars per input, maintaining near-full accuracy at a fraction of the token cost. Fine-tuning is valid but expensive and requires a training pipeline. Complexity-based selection using input length is a weak proxy for which examples are actually relevant.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=A%20few%20well-crafted%20examples%20(known%20as%20few-shot%20or%20multishot%20prompting)%20improve%20accuracy%20and%20consistency.",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Examples are one of the most reliable ways to steer Claude's output format, tone, and structure. A few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency.",
+    "sourceHighlight": "A few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency"
   },
   {
     "id": "adv-045",
@@ -672,7 +848,11 @@
       "Performance degradation is unavoidable as prompts grow; accept the quality trade-off as an operational cost."
     ],
     "correctAnswer": 0,
-    "explanation": "Prompt bloat causes real degradation. Incrementally added instructions often become contradictory or redundant. The model attempts to satisfy all instructions simultaneously, degrading coherence. Regular prompt audits—removing redundancy, resolving contradictions, prioritizing critical rules—are essential production maintenance."
+    "explanation": "Prompt bloat causes real degradation. Incrementally added instructions often become contradictory or redundant. The model attempts to satisfy all instructions simultaneously, degrading coherence. Regular prompt audits—removing redundancy, resolving contradictions, prioritizing critical rules—are essential production maintenance.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=if%20two%20rules%20contradict%20each%20other%2C%20Claude%20may%20pick%20one%20arbitrarily",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Consistency: if two rules contradict each other, Claude may pick one arbitrarily. Review your CLAUDE.md files, nested CLAUDE.md files in subdirectories, and .claude/rules/ periodically to remove outdated or conflicting instructions.",
+    "sourceHighlight": "remove outdated or conflicting instructions"
   },
   {
     "id": "adv-046",
@@ -687,7 +867,11 @@
       "Apply regex post-processing to fix the 30% of extraction failures by correcting common output format errors."
     ],
     "correctAnswer": 1,
-    "explanation": "Contract variability is the core problem. A single universal prompt cannot be optimal across all contract types. The two-stage router-plus-specialized-executor pattern—classify first, extract with type-specific prompts—is the architecture that achieves high accuracy across diverse formats."
+    "explanation": "Contract variability is the core problem. A single universal prompt cannot be optimal across all contract types. The two-stage router-plus-specialized-executor pattern—classify first, extract with type-specific prompts—is the architecture that achieves high accuracy across diverse formats.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+    "sourceLabel": "Claude Docs: Prompt Engineering Overview",
+    "sourceExcerpt": "All prompting techniques — from clarity and examples to XML structuring, role prompting, thinking, and prompt chaining — are covered in Prompting best practices. That's the living reference; start there.",
+    "sourceHighlight": "role prompting, thinking, and prompt chaining"
   },
   {
     "id": "adv-047",
@@ -702,7 +886,11 @@
       "Use a larger model for all requests since misclassification indicates the current model lacks sufficient capacity."
     ],
     "correctAnswer": 2,
-    "explanation": "Routing and task execution should be separate concerns. A dedicated classifier with clear category definitions and examples outperforms embedding routing logic inside task prompts. 'Always use step-by-step' wastes compute on simple requests."
+    "explanation": "Routing and task execution should be separate concerns. A dedicated classifier with clear category definitions and examples outperforms embedding routing logic inside task prompts. 'Always use step-by-step' wastes compute on simple requests.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+    "sourceLabel": "Claude Docs: Prompt Engineering Overview",
+    "sourceExcerpt": "All prompting techniques — from clarity and examples to XML structuring, role prompting, thinking, and prompt chaining — are covered in Prompting best practices. That's the living reference; start there.",
+    "sourceHighlight": "clarity and examples to XML structuring"
   },
   {
     "id": "adv-048",
@@ -717,7 +905,11 @@
       "Validate each step's output against a contract schema before passing it; interstitial validation catches errors early."
     ],
     "correctAnswer": 3,
-    "explanation": "Interstitial schema validation (the checkpoint pattern) catches errors before they propagate. Each step's output must conform to a contract before injection into the next step. Confidence scores are self-reported and unreliable. A monolithic prompt shifts the problem without eliminating error compounding."
+    "explanation": "Interstitial schema validation (the checkpoint pattern) catches errors before they propagate. Each step's output must conform to a contract before injection into the next step. Confidence scores are self-reported and unreliable. A monolithic prompt shifts the problem without eliminating error compounding.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+    "sourceLabel": "Claude Docs: Structured Outputs",
+    "sourceExcerpt": "Structured outputs constrain Claude's responses to follow a specific schema, ensuring valid, parseable output for downstream processing. Structured outputs provide two complementary features: JSON outputs and Strict tool use, which guarantees schema validation on tool names and inputs.",
+    "sourceHighlight": "constrain Claude's responses to follow a specific schema"
   },
   {
     "id": "adv-049",
@@ -732,7 +924,11 @@
       "Add multilingual few-shot examples for all 50 languages to demonstrate the expected response language behavior."
     ],
     "correctAnswer": 0,
-    "explanation": "A single explicit English instruction is sufficient—Claude can follow meta-linguistic instructions regardless of what language they are written in. Language detection adds an unnecessary tool call; 50 translated system prompts are unmaintainable. The explicit instruction is the optimal solution."
+    "explanation": "A single explicit English instruction is sufficient—Claude can follow meta-linguistic instructions regardless of what language they are written in. Language detection adds an unnecessary tool call; 50 translated system prompts are unmaintainable. The explicit instruction is the optimal solution.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Providing context or motivation behind your instructions, such as explaining to Claude why such behavior is important, can help Claude better understand your goals and deliver more targeted responses. Claude is smart enough to generalize from the explanation.",
+    "sourceHighlight": "Claude is smart enough to generalize from the explanation"
   },
   {
     "id": "adv-050",
@@ -747,7 +943,11 @@
       "Neither approach works and the entire report must be generated as a single monolithic prompt to avoid conflicts."
     ],
     "correctAnswer": 1,
-    "explanation": "Both sequential generation (correct dependency ordering) and constraint injection (providing expected Section 2 conclusions as explicit input to Section 4's prompt) are valid. Sequential guarantees real dependency resolution; constraint injection enables parallelism when conclusions can be predicted. The exam tests recognition that both approaches are architecturally correct."
+    "explanation": "Both sequential generation (correct dependency ordering) and constraint injection (providing expected Section 2 conclusions as explicit input to Section 4's prompt) are valid. Sequential guarantees real dependency resolution; constraint injection enables parallelism when conclusions can be predicted. The exam tests recognition that both approaches are architecturally correct.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+    "sourceLabel": "Claude Docs: Prompt Engineering Overview",
+    "sourceExcerpt": "All prompting techniques — from clarity and examples to XML structuring, role prompting, thinking, and prompt chaining — are covered in Prompting best practices. That's the living reference; start there.",
+    "sourceHighlight": "That's the living reference; start there"
   },
   {
     "id": "adv-051",
@@ -762,7 +962,11 @@
       "Rearrange the document to move all critical content to the final pages where model attention is strongest."
     ],
     "correctAnswer": 2,
-    "explanation": "The 'lost in the middle' effect is well-documented: attention degrades for content in the middle portion of long contexts while remaining strong at the beginning and end. Mitigation: place critical information at the beginning or end of context, or use RAG-style targeted retrieval to inject only the relevant sections."
+    "explanation": "The 'lost in the middle' effect is well-documented: attention degrades for content in the middle portion of long contexts while remaining strong at the beginning and end. Mitigation: place critical information at the beginning or end of context, or use RAG-style targeted retrieval to inject only the relevant sections.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=As%20token%20count%20grows%2C%20accuracy%20and%20recall%20degrade%2C%20a%20phenomenon%20known%20as%20context%20rot.",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "As token count grows, accuracy and recall degrade, a phenomenon known as context rot. This makes curating what's in context just as important as how much space is available.",
+    "sourceHighlight": "accuracy and recall degrade, a phenomenon known as context rot"
   },
   {
     "id": "adv-052",
@@ -777,7 +981,11 @@
       "Context contamination from #4,720 leaked into #4,721 because history was not cleared; use a fresh call per ticket."
     ],
     "correctAnswer": 3,
-    "explanation": "Context contamination between tasks is a critical stateful agent failure. Each independent task must start with a clean context window. Reusing a single conversation thread across different customers causes the model to mix contexts. The fix is architectural: one fresh API call per ticket."
+    "explanation": "Context contamination between tasks is a critical stateful agent failure. Each independent task must start with a clean context window. Reusing a single conversation thread across different customers causes the model to mix contexts. The fix is architectural: one fresh API call per ticket.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome.",
+    "sourceHighlight": "smallest possible set of high-signal tokens"
   },
   {
     "id": "adv-053",
@@ -792,7 +1000,11 @@
       "Sequential API calls with 100 ms delays between each request to stay within rate limits across 24 hours."
     ],
     "correctAnswer": 0,
-    "explanation": "Message Batches API is designed exactly for this use case: large-volume, non-urgent, non-blocking work. The key constraint is asynchronous, unordered results—you poll for completion. The 24-hour SLA is well within typical batch processing time. Sequential calls for 10K documents would be far slower and more fragile."
+    "explanation": "Message Batches API is designed exactly for this use case: large-volume, non-urgent, non-blocking work. The key constraint is asynchronous, unordered results—you poll for completion. The 24-hour SLA is well within typical batch processing time. Sequential calls for 10K documents would be far slower and more fragile.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing#:~:text=The%20batch%20is%20then%20processed%20asynchronously%2C%20with%20each%20request%20handled%20independently.",
+    "sourceLabel": "Claude Docs: Batch Processing",
+    "sourceExcerpt": "The batch is then processed asynchronously, with each request handled independently. This approach is well-suited to tasks that do not require immediate responses, with most batches finishing in less than 1 hour while reducing costs by 50% and increasing throughput.",
+    "sourceHighlight": "processed asynchronously, with each request handled independently"
   },
   {
     "id": "adv-054",
@@ -807,7 +1019,11 @@
       "Yes but only for pull requests touching fewer than five files where batch overhead relative to latency is justified."
     ],
     "correctAnswer": 1,
-    "explanation": "The Message Batches API is explicitly asynchronous—it cannot be used for synchronous pipeline gates that must block on a result. CI merge gates require a synchronous API call. Rapid polling of an async batch to simulate synchrony defeats its purpose and adds latency and complexity."
+    "explanation": "The Message Batches API is explicitly asynchronous—it cannot be used for synchronous pipeline gates that must block on a result. CI merge gates require a synchronous API call. Rapid polling of an async batch to simulate synchrony defeats its purpose and adds latency and complexity.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing#:~:text=This%20approach%20is%20well-suited%20to%20tasks%20that%20do%20not%20require%20immediate%20responses",
+    "sourceLabel": "Claude Docs: Batch Processing",
+    "sourceExcerpt": "This approach is well-suited to tasks that do not require immediate responses, with most batches finishing in less than 1 hour while reducing costs by 50% and increasing throughput.",
+    "sourceHighlight": "well-suited to tasks that do not require immediate responses"
   },
   {
     "id": "adv-055",
@@ -822,7 +1038,11 @@
       "Generate a comprehensive summary of all 80 turns and rely on it to capture the specific turn 3 decision."
     ],
     "correctAnswer": 2,
-    "explanation": "Persistent external memory is the correct pattern for long-running agent tasks. Important decisions should be explicitly written to the memory store as they are made. Models have no cross-session memory; asking to 'remember' what is no longer in context is impossible. Summaries are lossy and unreliable for specific verbatim decisions."
+    "explanation": "Persistent external memory is the correct pattern for long-running agent tasks. Important decisions should be explicitly written to the memory store as they are made. Models have no cross-session memory; asking to 'remember' what is no longer in context is impossible. Summaries are lossy and unreliable for specific verbatim decisions.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=Each%20Claude%20Code%20session%20begins%20with%20a%20fresh%20context%20window.",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Each Claude Code session begins with a fresh context window. Two mechanisms carry knowledge across sessions: CLAUDE.md files: instructions you write to give Claude persistent context; Auto memory: notes Claude writes itself based on your corrections and preferences.",
+    "sourceHighlight": "Each Claude Code session begins with a fresh context window"
   },
   {
     "id": "adv-056",
@@ -837,7 +1057,11 @@
       "Lossy summarization was used as if lossless; critical content must be extracted verbatim and injected downstream."
     ],
     "correctAnswer": 3,
-    "explanation": "Summarization is inherently lossy—models cannot reliably predict which content will be critical downstream. The correct pattern: extract must-preserve clauses verbatim into a separate critical_extracts field before summarization, and inject them directly into downstream prompts. Never rely on summarization to preserve specific verbatim content."
+    "explanation": "Summarization is inherently lossy—models cannot reliably predict which content will be critical downstream. The correct pattern: extract must-preserve clauses verbatim into a separate critical_extracts field before summarization, and inject them directly into downstream prompts. Never rely on summarization to preserve specific verbatim content.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Overly aggressive compaction can result in the loss of subtle but critical context whose importance only becomes apparent later.",
+    "sourceHighlight": "loss of subtle but critical context whose importance only becomes apparent later"
   },
   {
     "id": "adv-057",
@@ -852,7 +1076,11 @@
       "Use the Message Batches API to process each investigation thread independently then merge the thread summaries."
     ],
     "correctAnswer": 0,
-    "explanation": "When a conversation spans multiple distinct threads, per-thread summaries preserve the structure and actionable state of each investigation. A single monolithic summary loses thread-specific context. Dropping messages risks losing decisions from early turns. Batches API is for bulk async work, not conversation compression."
+    "explanation": "When a conversation spans multiple distinct threads, per-thread summaries preserve the structure and actionable state of each investigation. A single monolithic summary loses thread-specific context. Dropping messages risks losing decisions from early turns. Batches API is for bulk async work, not conversation compression.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Overly aggressive compaction can result in the loss of subtle but critical context whose importance only becomes apparent later.",
+    "sourceHighlight": "Overly aggressive compaction can result in the loss of subtle but critical context"
   },
   {
     "id": "adv-058",
@@ -867,7 +1095,11 @@
       "Instruct the model to use only relevant retrieved information and explicitly ignore any context that seems off-topic."
     ],
     "correctAnswer": 1,
-    "explanation": "RAG pipelines need post-retrieval filtering. Injecting irrelevant chunks wastes context tokens and introduces noise that degrades answers. A re-ranker (cross-encoder scoring) or relevance threshold filter is the correct architectural step between retrieval and generation. More chunks means more noise, not more accuracy."
+    "explanation": "RAG pipelines need post-retrieval filtering. Injecting irrelevant chunks wastes context tokens and introduces noise that degrades answers. A re-ranker (cross-encoder scoring) or relevance threshold filter is the correct architectural step between retrieval and generation. More chunks means more noise, not more accuracy.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome.",
+    "sourceHighlight": "high-signal tokens that maximize the likelihood of some desired outcome"
   },
   {
     "id": "adv-059",
@@ -882,7 +1114,11 @@
       "Normal expected behavior; users should re-state requirements at regular intervals throughout long conversations."
     ],
     "correctAnswer": 2,
-    "explanation": "Instruction dilution is real: a 100-token system prompt loses relative influence as 50K tokens of conversation accumulate. Critical constraints should be re-injected periodically as condensed 'rule reminder' messages and included in the most recent user message for tasks where adherence is critical."
+    "explanation": "Instruction dilution is real: a 100-token system prompt loses relative influence as 50K tokens of conversation accumulate. Critical constraints should be re-injected periodically as condensed 'rule reminder' messages and included in the most recent user message for tasks where adherence is critical.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=Longer%20files%20consume%20more%20context%20and%20reduce%20adherence.",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Size: target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence. If your instructions are growing large, use path-scoped rules so instructions load only when Claude works with matching files.",
+    "sourceHighlight": "Longer files consume more context and reduce adherence"
   },
   {
     "id": "adv-060",
@@ -897,7 +1133,11 @@
       "Adaptive management: maintain full history for short sessions; switch to sliding-window summarization at a threshold."
     ],
     "correctAnswer": 3,
-    "explanation": "Adaptive context management is the correct architecture. Short sessions need no intervention—full history is cheap and maximally accurate. Long sessions need sliding-window summarization triggered by a token threshold. A one-size-fits-all strategy either over-compresses short sessions or fails on long ones."
+    "explanation": "Adaptive context management is the correct architecture. Short sessions need no intervention—full history is cheap and maximally accurate. Long sessions need sliding-window summarization triggered by a token threshold. A one-size-fits-all strategy either over-compresses short sessions or fails on long ones.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Compaction%20automatically%20summarizes%20earlier%20parts%20of%20the%20conversation%20on%20the%20server",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "As the conversation advances through turns, each user message and assistant response accumulates within the context window, and previous turns are preserved completely.",
+    "sourceHighlight": "each user message and assistant response accumulates within the context window"
   },
   {
     "id": "adv-061",
@@ -912,7 +1152,11 @@
       "Switch from the Task tool to direct API calls so subagent findings bypass the coordinator conversation history."
     ],
     "correctAnswer": 0,
-    "explanation": "Context exhaustion from subagent injection requires two concurrent fixes: (1) constrain return payloads—structured schemas prevent verbose prose from consuming thousands of tokens per subagent, and (2) explicitly discard each subagent's conversation contribution from coordinator history once its findings are aggregated. A longer-context model (A) delays exhaustion without solving the growth pattern—it exhausts after proportionally more transactions. Session restart (B) breaks state continuity across transaction batches. Direct API calls (C) changes the communication channel but doesn't prevent context injection if the coordinator still receives responses."
+    "explanation": "Context exhaustion from subagent injection requires two concurrent fixes: (1) constrain return payloads—structured schemas prevent verbose prose from consuming thousands of tokens per subagent, and (2) explicitly discard each subagent's conversation contribution from coordinator history once its findings are aggregated. A longer-context model (A) delays exhaustion without solving the growth pattern—it exhausts after proportionally more transactions. Session restart (B) breaks state continuity across transaction batches. Direct API calls (C) changes the communication channel but doesn't prevent context injection if the coordinator still receives responses.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Each subagent might explore extensively, using tens of thousands of tokens or more, but returns only a condensed, distilled summary of its work.",
+    "sourceHighlight": "returns only a condensed, distilled summary of its work"
   },
   {
     "id": "adv-062",
@@ -927,7 +1171,11 @@
       "Fork again from the original shared base session and apply both branch changes as sequential patches."
     ],
     "correctAnswer": 1,
-    "explanation": "Fork session branches are isolated and cannot be merged automatically. The correct synthesis pattern is deliberate extraction: identify exactly which findings from each branch are needed, extract them explicitly (not full session history), and provide both as structured context in a new synthesis session. --resume with automatic merge (A) is not a Claude Code feature. Exporting full transcripts (B) floods the synthesis session with irrelevant context, degrading synthesis quality. Forking again and patching (D) doesn't address the synthesis requirement and produces another branch rather than a combined implementation."
+    "explanation": "Fork session branches are isolated and cannot be merged automatically. The correct synthesis pattern is deliberate extraction: identify exactly which findings from each branch are needed, extract them explicitly (not full session history), and provide both as structured context in a new synthesis session. --resume with automatic merge (A) is not a Claude Code feature. Exporting full transcripts (B) floods the synthesis session with irrelevant context, degrading synthesis quality. Forking again and patching (D) doesn't address the synthesis requirement and produces another branch rather than a combined implementation.",
+    "sourceUrl": "https://code.claude.com/docs/en/cli-reference",
+    "sourceLabel": "Claude Code Docs: CLI Reference",
+    "sourceExcerpt": "Resume a specific session by ID or name, or show an interactive picker to choose a session. The picker and name search include sessions that added this directory with /add-dir; passing a session ID searches only the current project directory and its git worktrees.",
+    "sourceHighlight": "Resume a specific session by ID or name"
   },
   {
     "id": "adv-063",
@@ -942,7 +1190,11 @@
       "A requiresApproval boolean plus approvalTeam string to route all non-transient failures to a human team."
     ],
     "correctAnswer": 2,
-    "explanation": "The three failure types demand three different behaviors: auto-retry with timed backoff (transient lock), halt with developer-specific notification (schema error), and billing team escalation (account suspended)—a destination generic human approval cannot specify. The rich schema (A) supports all three precisely via isRetryable, retryAfterSeconds, and escalateTo. HTTP codes (B) cover retry vs. no-retry but cannot distinguish developer from billing escalation. A permanent boolean (C) lumps schema errors and billing suspensions into the same bucket with no routing guidance. requiresApproval (D) conflates two distinct teams and provides no escalation destination or differentiated routing."
+    "explanation": "The three failure types demand three different behaviors: auto-retry with timed backoff (transient lock), halt with developer-specific notification (schema error), and billing team escalation (account suspended)—a destination generic human approval cannot specify. The rich schema (A) supports all three precisely via isRetryable, retryAfterSeconds, and escalateTo. HTTP codes (B) cover retry vs. no-retry but cannot distinguish developer from billing escalation. A permanent boolean (C) lumps schema errors and billing suspensions into the same bucket with no routing guidance. requiresApproval (D) conflates two distinct teams and provides no escalation destination or differentiated routing.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "If a tool call raises an error (for example, during input validation), you can prompt-engineer your error responses to clearly communicate specific and actionable improvements.",
+    "sourceHighlight": "clearly communicate specific and actionable improvements"
   },
   {
     "id": "adv-064",
@@ -957,7 +1209,11 @@
       "In ~/.claude.json (user-level configuration)—machine-local, never tracked in version control, only this developer."
     ],
     "correctAnswer": 3,
-    "explanation": "~/.claude.json is the canonical user-level MCP configuration file—it is machine-local, never committed to version control, and invisible to other developers and CI environments. Placing an entry in .mcp.json (A) is unreliable: .gitignore rules must be configured before the file is ever committed, and teammates who already cloned may not have the ignore entry. .claude/mcp-experimental.json with an environment variable flag (C) and shell-profile aliases (D) are not standard Claude Code MCP registration mechanisms."
+    "explanation": "~/.claude.json is the canonical user-level MCP configuration file—it is machine-local, never committed to version control, and invisible to other developers and CI environments. Placing an entry in .mcp.json (A) is unreliable: .gitignore rules must be configured before the file is ever committed, and teammates who already cloned may not have the ignore entry. .claude/mcp-experimental.json with an environment variable flag (C) and shell-profile aliases (D) are not standard Claude Code MCP registration mechanisms.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Local scope is the default. A local-scoped server loads only in the project where you added it and stays private to you. Claude Code stores it in ~/.claude.json under that project's path, so the same server won't appear in your other projects.",
+    "sourceHighlight": "Claude Code stores it in ~/.claude.json under that project's path"
   },
   {
     "id": "adv-065",
@@ -972,7 +1228,11 @@
       "The developer's Claude Code version is outdated and does not support the CLAUDE.md syntax used in this project."
     ],
     "correctAnswer": 0,
-    "explanation": "User-level CLAUDE.md (~/.claude/CLAUDE.md) is machine-local and never tracked in version control. If the original team placed their conventions there rather than in the project-level CLAUDE.md (committed to the repo), every new developer starts with no equivalent file and no shared conventions. @import failures (A) would affect all developers, not just new ones. /reload (B) is not a standard Claude Code command. Version mismatches (D) produce parsing errors or warnings, not silent non-application across all rules."
+    "explanation": "User-level CLAUDE.md (~/.claude/CLAUDE.md) is machine-local and never tracked in version control. If the original team placed their conventions there rather than in the project-level CLAUDE.md (committed to the repo), every new developer starts with no equivalent file and no shared conventions. @import failures (A) would affect all developers, not just new ones. /reload (B) is not a standard Claude Code command. Version mismatches (D) produce parsing errors or warnings, not silent non-application across all rules.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory#:~:text=Personal%20preferences%20for%20all%20projects",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "CLAUDE.md files can live in several locations, each with a different scope. The table below lists them in load order, from broadest scope to most specific, so a project instruction appears in context after a user instruction.",
+    "sourceHighlight": "from broadest scope to most specific"
   },
   {
     "id": "adv-066",
@@ -987,7 +1247,11 @@
       "Add a description notice warning developers to start a fresh session before invoking the skill each time."
     ],
     "correctAnswer": 1,
-    "explanation": "context: fork is the architectural solution: the skill runs as an independent sub-agent with its own context window. The main conversation never sees the 70,000 tokens of intermediate findings—only the skill's return value (e.g., a structured summary or critical issues list). This eliminates both contamination and the performance slowdown from a bloated main context. Argument scoping (A) reduces volume but doesn't prevent whatever findings remain from polluting the main context. Read-only tools (B) limits capability but doesn't isolate context. A description notice (C) is documentation, not enforcement—it relies on developers remembering to act on it each time."
+    "explanation": "context: fork is the architectural solution: the skill runs as an independent sub-agent with its own context window. The main conversation never sees the 70,000 tokens of intermediate findings—only the skill's return value (e.g., a structured summary or critical issues list). This eliminates both contamination and the performance slowdown from a bloated main context. Argument scoping (A) reduces volume but doesn't prevent whatever findings remain from polluting the main context. Read-only tools (B) limits capability but doesn't isolate context. A description notice (C) is documentation, not enforcement—it relies on developers remembering to act on it each time.",
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills",
+    "sourceExcerpt": "Add context: fork to your frontmatter when you want a skill to run in isolation. The skill content becomes the prompt that drives the subagent. It won't have access to your conversation history.",
+    "sourceHighlight": "context: fork to your frontmatter when you want a skill to run in isolation"
   },
   {
     "id": "adv-067",
@@ -1002,7 +1266,11 @@
       "Use regex patterns to extract file paths and line numbers from the current markdown prose output for the script."
     ],
     "correctAnswer": 2,
-    "explanation": "--output-format json with --json-schema enforces structured output at the CLI level—the model is constrained to produce output matching the schema, making it machine-parseable for all three downstream operations. Prompt-only JSON instructions (B) are probabilistic: the model may add prose before the JSON, wrap it in markdown code blocks, use slightly different field names, or produce invalid JSON on edge cases—all of which break the parser. Running twice (C) doubles cost and latency for every PR. Regex on markdown (D) is extremely brittle and fails whenever the model varies its phrasing."
+    "explanation": "--output-format json with --json-schema enforces structured output at the CLI level—the model is constrained to produce output matching the schema, making it machine-parseable for all three downstream operations. Prompt-only JSON instructions (B) are probabilistic: the model may add prose before the JSON, wrap it in markdown code blocks, use slightly different field names, or produce invalid JSON on edge cases—all of which break the parser. Running twice (C) doubles cost and latency for every PR. Regex on markdown (D) is extremely brittle and fails whenever the model varies its phrasing.",
+    "sourceUrl": "https://code.claude.com/docs/en/headless",
+    "sourceLabel": "Claude Code Docs: Headless Mode",
+    "sourceExcerpt": "Use --output-format json with --json-schema and a JSON Schema definition. The response includes metadata about the request (session ID, usage, etc.) with the structured output in the structured_output field.",
+    "sourceHighlight": "--output-format json with --json-schema and a JSON Schema definition"
   },
   {
     "id": "adv-068",
@@ -1017,7 +1285,11 @@
       "Direct execution—the fix is a single-line addition at a precisely identified location; plan mode adds no benefit."
     ],
     "correctAnswer": 3,
-    "explanation": "Plan mode is designed for tasks where the correct approach is unclear before exploration—open-ended refactors, feature additions with unknown scope, or changes where multiple implementation options exist. A single-line null-guard at a precisely identified location with a confirmed simple root cause has none of these characteristics. The developer has already done the exploration (confirmed callers, confirmed fix)—that IS the planning phase. Requiring formal plan mode here adds process friction without any benefit."
+    "explanation": "Plan mode is designed for tasks where the correct approach is unclear before exploration—open-ended refactors, feature additions with unknown scope, or changes where multiple implementation options exist. A single-line null-guard at a precisely identified location with a confirmed simple root cause has none of these characteristics. The developer has already done the exploration (confirmed callers, confirmed fix)—that IS the planning phase. Requiring formal plan mode here adds process friction without any benefit.",
+    "sourceUrl": "https://code.claude.com/docs/en/cli-reference",
+    "sourceLabel": "Claude Code Docs: CLI Reference",
+    "sourceExcerpt": "Begin in a specified permission mode. Accepts default, acceptEdits, plan, auto, dontAsk, bypassPermissions, or manual as an alias for default.",
+    "sourceHighlight": "Accepts default, acceptEdits, plan, auto, dontAsk, bypassPermissions"
   },
   {
     "id": "adv-069",
@@ -1032,7 +1304,11 @@
       "Set temperature to 0 to make the model's tool selection deterministic and eliminate probabilistic plain-text responses."
     ],
     "correctAnswer": 0,
-    "explanation": "tool_choice: 'any' is designed for the requirement 'a tool must always be called, but the model should choose which one.' tool_choice: 'auto' allows the model to decide whether to call a tool at all—producing the 8% plain-text responses when it judges no tool is needed. Prompt instructions (A) are probabilistic and cannot guarantee 100% tool invocation—the same reasoning that produced 8% failures can override instructions on different edge cases. Forcing a specific tool (C) prevents the model from selecting the contextually correct extractor. Temperature (D) affects output diversity but does not control tool usage behavior."
+    "explanation": "tool_choice: 'any' is designed for the requirement 'a tool must always be called, but the model should choose which one.' tool_choice: 'auto' allows the model to decide whether to call a tool at all—producing the 8% plain-text responses when it judges no tool is needed. Prompt instructions (A) are probabilistic and cannot guarantee 100% tool invocation—the same reasoning that produced 8% failures can override instructions on different edge cases. Forcing a specific tool (C) prevents the model from selecting the contextually correct extractor. Temperature (D) affects output diversity but does not control tool usage behavior.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools#forcing-tool-use#:~:text=any%20tells%20Claude%20that%20it%20must%20use%20one%20of%20the%20provided%20tools%2C%20but%20doesn%27t%20force%20a%20particular%20tool.",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "auto allows Claude to decide whether to call any provided tools or not. This is the default value when tools are provided. any tells Claude that it must use one of the provided tools, but doesn't force a particular tool.",
+    "sourceHighlight": "any tells Claude that it must use one of the provided tools, but doesn't force a particular tool"
   },
   {
     "id": "adv-070",
@@ -1047,7 +1323,11 @@
       "Restrict the agent scope to only authentication and authorization code to reduce the false positive surface area."
     ],
     "correctAnswer": 1,
-    "explanation": "The root cause is vague instruction with no precise definition of what constitutes certainty. The model interprets 'certain a real vulnerability exists' inconsistently, producing 41% false positives that don't improve when the threshold is raised—because the threshold language is still vague. Categorical criteria (A) give the model unambiguous rules with specific pattern names and explicit exclusion lists, eliminating the interpretation space where false positives originate. A dual-reviewer agent (B) applies the same vague criteria twice and adds cost. Temperature 0 (C) makes outputs deterministic but doesn't fix incorrect criteria. Narrowing scope (D) sacrifices coverage rather than improving precision."
+    "explanation": "The root cause is vague instruction with no precise definition of what constitutes certainty. The model interprets 'certain a real vulnerability exists' inconsistently, producing 41% false positives that don't improve when the threshold is raised—because the threshold language is still vague. Categorical criteria (A) give the model unambiguous rules with specific pattern names and explicit exclusion lists, eliminating the interpretation space where false positives originate. A dual-reviewer agent (B) applies the same vague criteria twice and adds cost. Temperature 0 (C) makes outputs deterministic but doesn't fix incorrect criteria. Narrowing scope (D) sacrifices coverage rather than improving precision.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=Being%20specific%20about%20your%20desired%20output%20can%20help%20enhance%20results.",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Claude responds well to clear, explicit instructions. Being specific about your desired output can help enhance results. If you want \"above and beyond\" behavior, explicitly request it rather than relying on the model to infer this from vague prompts.",
+    "sourceHighlight": "Being specific about your desired output can help enhance results"
   },
   {
     "id": "adv-071",
@@ -1062,7 +1342,11 @@
       "Workflows 1 and 3 because Workflow 2 can use rapid polling every few seconds to simulate synchronous response."
     ],
     "correctAnswer": 2,
-    "explanation": "The Message Batches API is designed for asynchronous workloads tolerating up to 24-hour latency, submitted as single prompt-to-response pairs. Workflow 1 fits perfectly—it has a 7-hour window and produces single responses per document. Workflow 2 requires sub-30-second synchronous response—the Batches API's asynchronous model takes minutes to hours and cannot meet this SLA. Workflow 3 requires the model to call verify_clause, receive its results, and continue reasoning before producing the final response—this agentic loop is architecturally impossible in the Batches API, which processes each request as a single non-interactive round-trip. Workflow 3 requires the synchronous Messages API."
+    "explanation": "The Message Batches API is designed for asynchronous workloads tolerating up to 24-hour latency, submitted as single prompt-to-response pairs. Workflow 1 fits perfectly—it has a 7-hour window and produces single responses per document. Workflow 2 requires sub-30-second synchronous response—the Batches API's asynchronous model takes minutes to hours and cannot meet this SLA. Workflow 3 requires the model to call verify_clause, receive its results, and continue reasoning before producing the final response—this agentic loop is architecturally impossible in the Batches API, which processes each request as a single non-interactive round-trip. Workflow 3 requires the synchronous Messages API.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing#:~:text=This%20approach%20is%20well-suited%20to%20tasks%20that%20do%20not%20require%20immediate%20responses",
+    "sourceLabel": "Claude Docs: Batch Processing",
+    "sourceExcerpt": "The system processes each batch as fast as possible, with most batches completing within 1 hour. You can access batch results when all messages have completed or after 24 hours, whichever comes first. Batches expire if processing does not complete within 24 hours.",
+    "sourceHighlight": "Batches expire if processing does not complete within 24 hours"
   },
   {
     "id": "adv-072",
@@ -1077,7 +1361,11 @@
       "Open with a cross-report key-findings digest before the full reports; add explicit section headers throughout."
     ],
     "correctAnswer": 3,
-    "explanation": "The lost-in-the-middle effect causes attention to drop for content in the middle of long prompts. Two structural interventions counteract this: (1) placing a cross-report digest at the beginning ensures all six reports' critical findings appear in high-attention positions, and (2) explicit section headers create retrieval anchors that improve recall of middle-section content throughout the 95,000-token context. Increasing max_tokens (A) expands output capacity but doesn't redirect attention within the input. Two-pass synthesis (B) breaks cross-report coherence and doubles cost. Reducing subagents (D) sacrifices research coverage rather than fixing the attention distribution problem."
+    "explanation": "The lost-in-the-middle effect causes attention to drop for content in the middle of long prompts. Two structural interventions counteract this: (1) placing a cross-report digest at the beginning ensures all six reports' critical findings appear in high-attention positions, and (2) explicit section headers create retrieval anchors that improve recall of middle-section content throughout the 95,000-token context. Increasing max_tokens (A) expands output capacity but doesn't redirect attention within the input. Two-pass synthesis (B) breaks cross-report coherence and doubles cost. Reducing subagents (D) sacrifices research coverage rather than fixing the attention distribution problem.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=As%20token%20count%20grows%2C%20accuracy%20and%20recall%20degrade%2C%20a%20phenomenon%20known%20as%20context%20rot.",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "As token count grows, accuracy and recall degrade, a phenomenon known as context rot. This makes curating what's in context just as important as how much space is available.",
+    "sourceHighlight": "curating what's in context just as important"
   },
   {
     "id": "adv-073",
@@ -1092,7 +1380,11 @@
       "Offer a clear choice between immediate automated resolution or escalation to a human supervisor right now."
     ],
     "correctAnswer": 0,
-    "explanation": "When a customer explicitly states they want a human supervisor—especially after a documented pattern of failed automated escalations—autonomous resolution, even if technically superior, violates the customer's stated authority over the interaction. The exam guide is unambiguous: explicit, emphatic customer requests for human agents must be honored immediately, without first attempting resolution, explanation, or offering alternatives. Options A, C, and D all involve the agent acting or negotiating before honoring the escalation—precisely what the customer is refusing after three prior automated failures."
+    "explanation": "When a customer explicitly states they want a human supervisor—especially after a documented pattern of failed automated escalations—autonomous resolution, even if technically superior, violates the customer's stated authority over the interaction. The exam guide is unambiguous: explicit, emphatic customer requests for human agents must be honored immediately, without first attempting resolution, explanation, or offering alternatives. Options A, C, and D all involve the agent acting or negotiating before honoring the escalation—precisely what the customer is refusing after three prior automated failures.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#balancing-autonomy-and-safety",
+    "sourceLabel": "Claude Docs: Prompting Best Practices (Autonomy & Safety)",
+    "sourceExcerpt": "Without guidance, Claude Opus 4.6 may take actions that are difficult to reverse or affect shared systems, such as deleting files, force-pushing, or posting to external services.",
+    "sourceHighlight": "difficult to reverse or affect shared systems"
   },
   {
     "id": "adv-074",
@@ -1107,7 +1399,11 @@
       "Extract a partial summary covering the still-accurate hour-5 findings and build the migration plan from that subset."
     ],
     "correctAnswer": 1,
-    "explanation": "Scratchpad files solve both problems simultaneously: specific findings are externalized to disk before context fills, making them immune to compression and dilution, and the agent can reference these files explicitly in subsequent queries to retrieve exact class names and signatures rather than reconstructing from degraded context. /compact (A) compresses history into a lossy summary—it reduces token usage but destroys the specificity of class names and method signatures. Fresh re-analysis (B) discards 6 hours of work and may surface different findings on a second pass. Partial summary extraction (C) produces lossy output for the already-degraded portions and risks missing information that should have been externalized earlier."
+    "explanation": "Scratchpad files solve both problems simultaneously: specific findings are externalized to disk before context fills, making them immune to compression and dilution, and the agent can reference these files explicitly in subsequent queries to retrieve exact class names and signatures rather than reconstructing from degraded context. /compact (A) compresses history into a lossy summary—it reduces token usage but destroys the specificity of class names and method signatures. Fresh re-analysis (B) discards 6 hours of work and may surface different findings on a second pass. Partial summary extraction (C) produces lossy output for the already-degraded portions and risks missing information that should have been externalized earlier.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Compaction%20automatically%20summarizes%20earlier%20parts%20of%20the%20conversation%20on%20the%20server",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Compaction automatically summarizes earlier parts of the conversation on the server, so the conversation can continue past the context window limit.",
+    "sourceHighlight": "automatically summarizes earlier parts of the conversation"
   },
   {
     "id": "adv-075",
@@ -1122,7 +1418,11 @@
       "Apply the standard OAuth 2.1 migration pattern since the protocol is well-documented and adapting is straightforward."
     ],
     "correctAnswer": 2,
-    "explanation": "This task has unknown complexity in multiple dimensions: undocumented quirks, cross-file token logic, mobile-specific edge cases, and an undefined test baseline. A fixed sequence (A) fails when undocumented quirks invalidate earlier steps. Parallel class-per-subagent analysis (B) produces class-level findings but misses cross-class session lifecycle flows and emergent behaviors distributed across 7 files. Standard pattern application (D) applies generic knowledge without adapting to specific undocumented behaviors—the cause of most migration regressions. Dynamic adaptive decomposition correctly treats this as an open-ended investigation: explore first, discover constraints, then plan and adapt."
+    "explanation": "This task has unknown complexity in multiple dimensions: undocumented quirks, cross-file token logic, mobile-specific edge cases, and an undefined test baseline. A fixed sequence (A) fails when undocumented quirks invalidate earlier steps. Parallel class-per-subagent analysis (B) produces class-level findings but misses cross-class session lifecycle flows and emergent behaviors distributed across 7 files. Standard pattern application (D) applies generic knowledge without adapting to specific undocumented behaviors—the cause of most migration regressions. Dynamic adaptive decomposition correctly treats this as an open-ended investigation: explore first, discover constraints, then plan and adapt.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic: Building Effective Agents",
+    "sourceExcerpt": "Whereas it's topographically similar, the key difference from parallelization is its flexibility—subtasks aren't pre-defined, but determined by the orchestrator based on the specific input.",
+    "sourceHighlight": "subtasks aren't pre-defined, but determined by the orchestrator"
   },
   {
     "id": "adv-076",
@@ -1137,7 +1437,11 @@
       "Restrict each agent to its own specialization tools; routing cross-agent needs through coordinator makes misuse impossible."
     ],
     "correctAnswer": 3,
-    "explanation": "The correct fix is structural, not instructional. Agents use available tools because they are available—the model explores capabilities when uncertainty triggers it. Removing out-of-role tools from each agent's toolset makes cross-role tool use architecturally impossible. Prompt prohibitions (B) are probabilistic; the same reasoning that causes misuse can override instructions on edge cases. Auditing (C) identifies the problem post-hoc but doesn't prevent it. Confidence thresholds (D) require meta-reasoning that may itself miscalibrate. The foundational principle: give agents only the tools their specialization requires."
+    "explanation": "The correct fix is structural, not instructional. Agents use available tools because they are available—the model explores capabilities when uncertainty triggers it. Removing out-of-role tools from each agent's toolset makes cross-role tool use architecturally impossible. Prompt prohibitions (B) are probabilistic; the same reasoning that causes misuse can override instructions on edge cases. Auditing (C) identifies the problem post-hoc but doesn't prevent it. Confidence thresholds (D) require meta-reasoning that may itself miscalibrate. The foundational principle: give agents only the tools their specialization requires.",
+    "sourceUrl": "https://code.claude.com/docs/en/sub-agents#:~:text=Enforce%20constraints%20by%20limiting%20which%20tools%20a%20subagent%20can%20use",
+    "sourceLabel": "Claude Code Docs: Subagents",
+    "sourceExcerpt": "Subagents help you: Preserve context by keeping exploration and implementation out of your main conversation. Enforce constraints by limiting which tools a subagent can use. Reuse configurations across projects with user-level subagents.",
+    "sourceHighlight": "Enforce constraints by limiting which tools a subagent can use"
   },
   {
     "id": "adv-077",
@@ -1152,7 +1456,11 @@
       "Add a specification to CLAUDE.md describing the exact transformation rules for currency parsing and null handling."
     ],
     "correctAnswer": 0,
-    "explanation": "Concrete input/output examples are more effective than prose specifications for defining transformation behavior precisely. The model can match examples exactly without interpreting ambiguous language. Option C describes the same requirements as the examples but in abstract language that still requires interpretation—the developer already tried this approach and it failed. Plan mode (A) adds a reasoning step but doesn't change what behavioral information the model receives. Test-first (B) also works but adds more steps; concrete examples are the most direct path to correct edge case handling."
+    "explanation": "Concrete input/output examples are more effective than prose specifications for defining transformation behavior precisely. The model can match examples exactly without interpreting ambiguous language. Option C describes the same requirements as the examples but in abstract language that still requires interpretation—the developer already tried this approach and it failed. Plan mode (A) adds a reasoning step but doesn't change what behavioral information the model receives. Test-first (B) also works but adds more steps; concrete examples are the most direct path to correct edge case handling.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#:~:text=Examples%20are%20one%20of%20the%20most%20reliable%20ways%20to%20steer%20Claude%27s%20output%20format%2C%20tone%2C%20and%20structure.",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Examples are one of the most reliable ways to steer Claude's output format, tone, and structure. A few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency.",
+    "sourceHighlight": "Examples are one of the most reliable ways to steer Claude's output format, tone, and structure"
   },
   {
     "id": "adv-078",
@@ -1167,7 +1475,11 @@
       "Mark governing_law_jurisdiction as optional in the schema since some contracts establish jurisdiction by reference."
     ],
     "correctAnswer": 1,
-    "explanation": "Eight consistent null results with confirmed source document absence is a diagnostic signal: this is a missing-data problem, not a model capability problem. Retries are effective for format errors, schema mismatches, and ambiguous prompts—not for information that simply isn't in the provided document. The correct response is to halt retries, record null with full provenance identifying the referenced document, flag for human review to obtain the MSA, and continue the pipeline. A better model (A) cannot extract information absent from its context. Few-shot on cross-reference patterns (B) teaches extraction from references that are present—this jurisdiction isn't present in any form. Making the field optional (D) silently accepts the null without surfacing the missing document dependency."
+    "explanation": "Eight consistent null results with confirmed source document absence is a diagnostic signal: this is a missing-data problem, not a model capability problem. Retries are effective for format errors, schema mismatches, and ambiguous prompts—not for information that simply isn't in the provided document. The correct response is to halt retries, record null with full provenance identifying the referenced document, flag for human review to obtain the MSA, and continue the pipeline. A better model (A) cannot extract information absent from its context. Few-shot on cross-reference patterns (B) teaches extraction from references that are present—this jurisdiction isn't present in any form. Making the field optional (D) silently accepts the null without surfacing the missing document dependency.",
+    "sourceUrl": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    "sourceLabel": "Anthropic Engineering: Writing Tools for Agents",
+    "sourceExcerpt": "If a tool call raises an error (for example, during input validation), you can prompt-engineer your error responses to clearly communicate specific and actionable improvements.",
+    "sourceHighlight": "prompt-engineer your error responses"
   },
   {
     "id": "adv-079",
@@ -1182,7 +1494,11 @@
       "Report Sources A and B with attribution and discard Source C as vendor-commissioned and therefore unreliable."
     ],
     "correctAnswer": 2,
-    "explanation": "When credible sources produce different figures due to different populations and methodologies, the synthesis agent's role is attribution and disambiguation—not selection or blending. All three numbers are accurate within their own sampling frames; the spread reflects genuine population differences, not measurement error. Selecting Source A (A) presents enterprise deployments as the whole market. Averaging (C) produces a meaningless composite that destroys the population-variation information. Discarding C (D) makes an editorial selection the agent is not positioned to make—vendor-customer data is useful for specific audiences and belongs in the attribution. Transparent attribution lets executives choose the relevant population for their context."
+    "explanation": "When credible sources produce different figures due to different populations and methodologies, the synthesis agent's role is attribution and disambiguation—not selection or blending. All three numbers are accurate within their own sampling frames; the spread reflects genuine population differences, not measurement error. Selecting Source A (A) presents enterprise deployments as the whole market. Averaging (C) produces a meaningless composite that destroys the population-variation information. Discarding C (D) makes an editorial selection the agent is not positioned to make—vendor-customer data is useful for specific audiences and belongs in the attribution. Transparent attribution lets executives choose the relevant population for their context.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+    "sourceLabel": "Claude Docs: Prompt Engineering Overview",
+    "sourceExcerpt": "All prompting techniques — from clarity and examples to XML structuring, role prompting, thinking, and prompt chaining — are covered in Prompting best practices. That's the living reference; start there.",
+    "sourceHighlight": "role prompting, thinking, and prompt chaining"
   },
   {
     "id": "adv-080",
@@ -1197,6 +1513,10 @@
       "Implement a PreToolUse hook that intercepts each refund call, computes cumulative session total, and blocks if over limit."
     ],
     "correctAnswer": 3,
-    "explanation": "Three prompt revisions that reduce but cannot eliminate violations confirm that probabilistic prompt-based compliance cannot satisfy the 0% regulatory requirement. PreToolUse hooks provide deterministic pre-execution enforcement: the hook executes at the SDK layer before the tool call reaches the server, with full access to tool parameters and cumulative session state for multi-turn amount tracking. This cannot be bypassed by any prompt interpretation path. A validation agent (B) has the same probabilistic limitations as the system prompt. Server-side validation (C) catches the error after the tool call is issued and requires a retry cycle rather than seamless workflow redirection. PostToolUse with rollback (D) processes the refund first—a compliance failure has already occurred, and rollback may not be complete or instantaneous."
+    "explanation": "Three prompt revisions that reduce but cannot eliminate violations confirm that probabilistic prompt-based compliance cannot satisfy the 0% regulatory requirement. PreToolUse hooks provide deterministic pre-execution enforcement: the hook executes at the SDK layer before the tool call reaches the server, with full access to tool parameters and cumulative session state for multi-turn amount tracking. This cannot be bypassed by any prompt interpretation path. A validation agent (B) has the same probabilistic limitations as the system prompt. Server-side validation (C) catches the error after the tool call is issued and requires a retry cycle rather than seamless workflow redirection. PostToolUse with rollback (D) processes the refund first—a compliance failure has already occurred, and rollback may not be complete or instantaneous.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks",
+    "sourceLabel": "Claude Code Docs: Hooks Reference",
+    "sourceExcerpt": "PreToolUse: Before a tool call executes. Can block it. PostToolUse: After a tool call succeeds.",
+    "sourceHighlight": "Before a tool call executes. Can block it"
   }
 ]

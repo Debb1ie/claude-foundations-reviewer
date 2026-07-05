@@ -40,6 +40,139 @@ const DIFFICULTY_COLORS = {
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
+// Renders sourceExcerpt with sourceHighlight wrapped in a <mark>. Since this is our
+// own DOM (not a cross-origin page), the highlight always works — no dependency on
+// browser support or the external page still containing the exact phrase.
+function renderHighlightedExcerpt(excerpt: string, highlight?: string) {
+  if (!highlight) return excerpt;
+  const idx = excerpt.indexOf(highlight);
+  if (idx === -1) return excerpt;
+  return (
+    <>
+      {excerpt.slice(0, idx)}
+      <Box
+        as="mark"
+        bg="rgba(250, 204, 21, 0.45)"
+        color="inherit"
+        px="2px"
+        borderRadius="sm"
+        _dark={{ bg: 'rgba(250, 204, 21, 0.3)' }}
+      >
+        {highlight}
+      </Box>
+      {excerpt.slice(idx + highlight.length)}
+    </>
+  );
+}
+
+function SourceModal({ question, onClose }: { question: AdvancedQuestion | null; onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      {question && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(10,14,40,0.72)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '24px',
+          }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.94, opacity: 0, y: 12 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.94, opacity: 0, y: 12 }}
+            transition={{ duration: 0.2 }}
+            style={{ width: '100%', maxWidth: '480px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Box
+              bg="rgba(255,255,255,0.97)"
+              _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+              borderRadius="2xl"
+              border="1px solid rgba(255,255,255,0.35)"
+              boxShadow="0 24px 64px rgba(10,14,40,0.35)"
+              overflow="hidden"
+              p={6}
+            >
+              <HStack justify="space-between" align="flex-start" mb={3}>
+                <Text fontSize="xs" fontWeight={800} color="brand.600" fontFamily="mono" letterSpacing="0.03em"
+                  _dark={{ color: 'brand.300' }}>
+                  {question.sourceLabel ?? 'Source'}
+                </Text>
+                <Box
+                  as="button"
+                  onClick={onClose}
+                  color="gray.400"
+                  _hover={{ color: 'gray.600' }}
+                  aria-label="Close"
+                  lineHeight={1}
+                  fontSize="lg"
+                >
+                  ✕
+                </Box>
+              </HStack>
+
+              {question.sourceExcerpt ? (
+                <Box
+                  p={4}
+                  bg="rgba(57,73,171,0.05)"
+                  borderRadius="lg"
+                  borderLeft="3px solid rgba(57,73,171,0.3)"
+                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.4)' }}
+                >
+                  <Text fontSize="sm" color="gray.700" lineHeight="tall" fontStyle="italic" _dark={{ color: 'gray.200' }}>
+                    &ldquo;{renderHighlightedExcerpt(question.sourceExcerpt, question.sourceHighlight)}&rdquo;
+                  </Text>
+                </Box>
+              ) : (
+                <Text fontSize="sm" color="gray.500">
+                  No excerpt available for this source yet — open the full page below to review it.
+                </Text>
+              )}
+
+              <HStack justify="space-between" align="center" mt={5} pt={4} borderTop="1px solid rgba(0,0,0,0.06)"
+                _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                <Button size="sm" variant="outline" borderColor="brand.300" color="brand.600" fontWeight={700}
+                  borderRadius="lg" onClick={onClose}>
+                  Close
+                </Button>
+                {question.sourceUrl && (
+                  <Link
+                    href={question.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    display="inline-flex"
+                    alignItems="center"
+                    gap={1}
+                    fontSize="xs"
+                    fontWeight={700}
+                    color="brand.500"
+                    _dark={{ color: 'brand.300' }}
+                    _hover={{ color: 'brand.700', textDecoration: 'underline' }}
+                  >
+                    Open full page
+                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </Link>
+                )}
+              </HStack>
+            </Box>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function MiniProgress({ value, colorBg }: { value: number; colorBg: string }) {
   return (
     <Box w="100%" h="6px" bg="rgba(0,0,0,0.06)" borderRadius="full" overflow="hidden">
@@ -166,12 +299,36 @@ function StartScreen({ onStart }: { onStart: () => void }) {
   );
 }
 
+type ReviewFilter = 'all' | 'correct' | 'incorrect' | 'flagged';
+
 function ResultsScreen({ onReset }: { onReset: () => void }) {
-  const { getScore, questions, answers } = useAdvancedExamStore();
+  const { getScore, questions, answers, flagged } = useAdvancedExamStore();
   const { correct, total, pct } = getScore();
   const scaledScore = Math.round(100 + (pct / 100) * 900);
   const passed = scaledScore >= 720;
   const [showReview, setShowReview] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
+  const [activeSource, setActiveSource] = useState<AdvancedQuestion | null>(null);
+
+  const incorrectCount = total - correct;
+  const flaggedCount = flagged.filter(Boolean).length;
+
+  const filteredEntries = questions
+    .map((q, idx) => ({ q, idx }))
+    .filter(({ q, idx }) => {
+      const isCorrectQ = answers[idx] === q.correctAnswer;
+      if (reviewFilter === 'correct') return isCorrectQ;
+      if (reviewFilter === 'incorrect') return !isCorrectQ;
+      if (reviewFilter === 'flagged') return flagged[idx];
+      return true;
+    });
+
+  const FILTER_TABS: { key: ReviewFilter; label: string; count: number }[] = [
+    { key: 'all', label: 'All', count: total },
+    { key: 'correct', label: 'Correct', count: correct },
+    { key: 'incorrect', label: 'Incorrect', count: incorrectCount },
+    { key: 'flagged', label: 'Flagged', count: flaggedCount },
+  ];
 
   const domainBreakdown = DOMAINS.map((d) => {
     const qs = questions.filter((q) => (DOMAIN_STRING_TO_KEY[q.domain] ?? q.domain) === d.id);
@@ -298,10 +455,38 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                   style={{ overflow: 'hidden' }}
                 >
                   <VStack gap={4} align="stretch" pt={2}>
-                    <Text fontSize="sm" fontWeight={700} color="brand.700">
-                      All {total} Questions — Full Review
-                    </Text>
-                    {questions.map((q, idx) => {
+                    <HStack justify="space-between" flexWrap="wrap" gap={3}>
+                      <Text fontSize="sm" fontWeight={700} color="brand.700">
+                        {total} Questions — Full Review
+                      </Text>
+                      <HStack gap={1.5} flexWrap="wrap">
+                        {FILTER_TABS.map((tab) => {
+                          const isActive = reviewFilter === tab.key;
+                          return (
+                            <Button
+                              key={tab.key}
+                              size="xs"
+                              variant={isActive ? 'solid' : 'outline'}
+                              bg={isActive ? 'brand.600' : 'transparent'}
+                              color={isActive ? 'white' : 'brand.600'}
+                              borderColor="brand.300"
+                              fontWeight={700}
+                              borderRadius="lg"
+                              _hover={{ bg: isActive ? 'brand.700' : 'brand.50' }}
+                              onClick={() => setReviewFilter(tab.key)}
+                            >
+                              {tab.label} ({tab.count})
+                            </Button>
+                          );
+                        })}
+                      </HStack>
+                    </HStack>
+                    {filteredEntries.length === 0 && (
+                      <Text fontSize="sm" color="gray.500" textAlign="center" py={6}>
+                        No questions match this filter.
+                      </Text>
+                    )}
+                    {filteredEntries.map(({ q, idx }) => {
                       const userAns = answers[idx];
                       const isCorrectQ = userAns === q.correctAnswer;
                       return (
@@ -398,6 +583,31 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                             <Text fontSize="xs" color="gray.600" lineHeight="tall" _dark={{ color: 'gray.400' }}>
                               {q.explanation}
                             </Text>
+                            {q.sourceUrl && (
+                              <Box
+                                as="button"
+                                display="inline-flex"
+                                alignItems="center"
+                                gap={1}
+                                mt={2.5}
+                                pt={2}
+                                w="100%"
+                                borderTop="1px solid rgba(57,73,171,0.12)"
+                                fontSize="2xs"
+                                fontWeight={700}
+                                color="brand.500"
+                                _dark={{ color: 'brand.300' }}
+                                _hover={{ color: 'brand.700', textDecoration: 'underline' }}
+                                onClick={() => setActiveSource(q)}
+                              >
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                {q.sourceLabel ?? 'View Source'}
+                              </Box>
+                            )}
                           </Box>
                         </Box>
                       );
@@ -409,6 +619,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
           </VStack>
         </motion.div>
       </Container>
+      <SourceModal question={activeSource} onClose={() => setActiveSource(null)} />
     </Box>
   );
 }
