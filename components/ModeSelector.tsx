@@ -285,23 +285,45 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         <VStack gap={2} align="stretch" mt="auto">
                           {mode.id === 'review' ? (
                             <VStack mt={2} gap={2} align="stretch">
-                              <Button
-                                size="sm"
-                                bg={isSelected ? 'brand.600' : 'brand.500'}
-                                color="white"
-                                fontWeight={700}
-                                borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                                transition="all 0.2s"
-                                whiteSpace="nowrap"
-                                flexShrink={0}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onStart(mode.id);
-                                }}
-                              >
-                                Start Reviewing
-                              </Button>
+                              <HStack gap={2} w="100%">
+                                <Button
+                                  flex={1}
+                                  size="sm"
+                                  bg={isSelected ? 'brand.600' : 'brand.500'}
+                                  color="white"
+                                  fontWeight={700}
+                                  borderRadius="lg"
+                                  _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                  transition="all 0.2s"
+                                  whiteSpace="nowrap"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onStart(mode.id);
+                                  }}
+                                >
+                                  Standard Practice
+                                </Button>
+                                <Button
+                                  flex={1}
+                                  size="sm"
+                                  bg="white"
+                                  color="brand.600"
+                                  border="1px solid"
+                                  borderColor="brand.200"
+                                  fontWeight={700}
+                                  borderRadius="lg"
+                                  _hover={{ bg: 'brand.50', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.15)' }}
+                                  transition="all 0.2s"
+                                  whiteSpace="nowrap"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    useAdvancedExamStore.getState().start(false);
+                                    router.push('/advanced');
+                                  }}
+                                >
+                                  Advanced Practice
+                                </Button>
+                              </HStack>
                               <Button
                                 size="sm"
                                 bg={isSelected ? 'brand.600' : 'brand.500'}
