@@ -11,6 +11,7 @@ import {
   Badge,
   SimpleGrid,
   Link,
+  Progress,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
@@ -626,7 +627,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
 function QuestionView() {
   const {
-    questions, currentQuestion, answers, flagged,
+    questions, currentQuestion, answers, flagged, isExpertMode,
     setAnswer, nextQuestion, prevQuestion, goToQuestion,
     toggleFlag, complete,
   } = useAdvancedExamStore();
@@ -676,7 +677,7 @@ function QuestionView() {
   const isLast = currentQuestion === questions.length - 1;
 
   const handleOptionClick = (idx: number) => {
-    if (answered) return;
+    if (isExpertMode && answered) return;
     setAnswer(idx);
   };
 
@@ -744,7 +745,7 @@ function QuestionView() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             style={{
-              position: 'fixed', inset: 0, zIndex: 100,
+              position: 'fixed', inset: 0, zIndex: 200,
               background: 'rgba(10,14,40,0.72)',
               backdropFilter: 'blur(8px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -849,30 +850,21 @@ function QuestionView() {
 
       {/* Sticky top bar */}
       <Box
+        borderBottom="1px solid"
+        borderColor="rgba(255, 255, 255, 0.3)"
+        bg="rgba(255, 255, 255, 0.45)"
+        backdropFilter="blur(16px)"
+        _dark={{
+          bg: "rgba(15, 23, 42, 0.45)",
+          borderColor: "rgba(255, 255, 255, 0.08)"
+        }}
         position="sticky"
         top={0}
         zIndex={10}
-        bg="rgba(255,255,255,0.75)"
-        backdropFilter="blur(16px)"
-        borderBottom="1px solid rgba(255,255,255,0.35)"
-        _dark={{ bg: 'rgba(15,23,42,0.8)', borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <Container maxW="container.xl" py={3}>
           <HStack justify="space-between" align="center" wrap="wrap" gap={3}>
             <HStack gap={3}>
-              <Button
-                variant="ghost"
-                size="xs"
-                color="gray.500"
-                fontWeight={700}
-                px={3}
-                borderRadius="lg"
-                border="1px solid rgba(0,0,0,0.08)"
-                _hover={{ color: 'brand.600', bg: 'rgba(57,73,171,0.06)', borderColor: 'brand.200' }}
-                onClick={() => setIsPaused(true)}
-              >
-                ⏸ Pause
-              </Button>
               <Text fontSize="sm" fontWeight={700} color="brand.700">
                 Advanced Practice
               </Text>
@@ -880,23 +872,41 @@ function QuestionView() {
                 gap={1.5}
                 px={3}
                 py={1}
-                bg={timerIsLow ? 'rgba(239,68,68,0.08)' : 'rgba(57,73,171,0.08)'}
+                bg="rgba(57, 73, 171, 0.08)"
                 borderRadius="md"
                 border="1px solid"
-                borderColor={timerIsLow ? 'rgba(239,68,68,0.25)' : 'rgba(57,73,171,0.18)'}
+                borderColor="rgba(57, 73, 171, 0.18)"
+                _dark={{
+                  bg: "rgba(124, 110, 250, 0.12)",
+                  borderColor: "rgba(255, 255, 255, 0.12)"
+                }}
               >
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ color: timerIsLow ? '#ef4444' : '#5C4EFA' }}>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <Text
-                  fontFamily="mono"
-                  fontSize="xs"
-                  fontWeight={700}
-                  color={timerIsLow ? 'red.500' : 'brand.700'}
-                >
-                  {timerDisplay}
-                </Text>
+                {isPaused ? (
+                  <Text
+                    as="button"
+                    fontFamily="mono"
+                    fontSize="xs"
+                    fontWeight={700}
+                    color="orange.500"
+                    onClick={() => setIsPaused(false)}
+                    _hover={{ textDecoration: 'underline' }}
+                  >
+                    PAUSED
+                  </Text>
+                ) : (
+                  <Text
+                    fontFamily="mono"
+                    fontSize="xs"
+                    fontWeight={700}
+                    color={timerIsLow ? 'error.600' : 'gray.700'}
+                  >
+                    {timerDisplay}
+                  </Text>
+                )}
               </HStack>
             </HStack>
             <HStack gap={3}>
@@ -914,18 +924,32 @@ function QuestionView() {
               </Button>
               <Button
                 size="sm"
-                bg={unanswered === 0 ? 'green.500' : 'brand.600'}
+                variant="outline"
+                borderColor="border"
+                onClick={() => setIsPaused(true)}
+              >
+                Pause
+              </Button>
+              <Button
+                size="sm"
+                bg="brand.600"
                 color="white"
                 fontWeight={700}
-                borderRadius="lg"
-                _hover={{ bg: unanswered === 0 ? 'green.600' : 'brand.700' }}
+                _hover={{ bg: 'brand.700' }}
                 onClick={handleFinish}
               >
-                {unanswered === 0 ? '✓ Finish' : `Finish (${unanswered} left)`}
+                Finish
               </Button>
             </HStack>
           </HStack>
-          <MiniProgress value={(secondsLeft / TOTAL_SECONDS) * 100} colorBg={timerIsLow ? '#ef4444' : '#5C4EFA'} />
+          <Progress.Root value={secondsLeft > 0 ? (secondsLeft / TOTAL_SECONDS) * 100 : 0} mt={2.5} size="xs">
+            <Progress.Track bg="border">
+              <Progress.Range
+                bg={timerIsLow ? 'error.500' : 'brand.600'}
+                transition="width 1s linear"
+              />
+            </Progress.Track>
+          </Progress.Root>
         </Container>
       </Box>
 
@@ -1055,14 +1079,14 @@ function QuestionView() {
                             borderColor={borderColor}
                             bg={bg}
                             backdropFilter="blur(8px)"
-                            cursor={answered ? 'default' : 'pointer'}
+                            cursor={isExpertMode && answered ? 'default' : 'pointer'}
                             transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                             textAlign="left"
                             _dark={{
                               bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
                               borderColor: isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
                             }}
-                            _hover={!answered ? {
+                            _hover={!(isExpertMode && answered) ? {
                               borderColor: 'brand.400',
                               bg: 'rgba(255,255,255,0.45)',
                               _dark: { bg: 'rgba(30,41,59,0.5)' },

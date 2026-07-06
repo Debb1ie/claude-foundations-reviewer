@@ -12,7 +12,10 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { useExamStore } from '@/hooks/useExamState';
+import { useAdvancedExamStore } from '@/hooks/useAdvancedExamState';
+import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import React from 'react';
 
@@ -82,6 +85,7 @@ interface ModeSelectorProps {
 }
 
 export function ModeSelector({ onStart }: ModeSelectorProps) {
+  const router = useRouter();
   const [selectedMode, setSelectedMode] = React.useState<'exam' | 'review' | 'zen' | 'focus' | null>(null);
   const [selectedDomain, setSelectedDomain] = React.useState<Domain | null>(null);
   const [examTimed, setExamTimed] = React.useState<boolean>(true);
@@ -280,9 +284,8 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
 
                         <VStack gap={2} align="stretch" mt="auto">
                           {mode.id === 'review' ? (
-                            <HStack mt={2} gap={2}>
+                            <VStack mt={2} gap={2} align="stretch">
                               <Button
-                                flex={1}
                                 size="sm"
                                 bg={isSelected ? 'brand.600' : 'brand.500'}
                                 color="white"
@@ -290,6 +293,8 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 borderRadius="lg"
                                 _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                                 transition="all 0.2s"
+                                whiteSpace="nowrap"
+                                flexShrink={0}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onStart(mode.id);
@@ -314,7 +319,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                               >
                                 Focus Mode
                               </Button>
-                            </HStack>
+                            </VStack>
                           ) : (
                             <>
                               {/* Timer toggle for Exam Mode */}
@@ -399,9 +404,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                 variants={itemVariants}
                 style={{ display: 'flex', width: '100%' }}
               >
-                <Link
-                  as={NextLink}
-                  href="/advanced"
+                <Box
                   w="100%"
                   border="2px solid"
                   borderColor="rgba(255, 255, 255, 0.35)"
@@ -421,11 +424,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
                     boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
-                    textDecoration: 'none'
                   }}
                   display="flex"
                   flexDirection="column"
-                  style={{ textDecoration: 'none' }}
                 >
                   <VStack gap={4} align="stretch" h="100%">
                     <HStack justify="space-between" align="center">
@@ -465,21 +466,42 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       ))}
                     </VStack>
 
-                    <Button
-                      mt="auto"
-                      w="100%"
-                      size="sm"
-                      bg="brand.600"
-                      color="white"
-                      fontWeight={700}
-                      borderRadius="lg"
-                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
-                      transition="all 0.2s"
-                    >
-                      Start Advanced Practice
-                    </Button>
+                    <VStack mt="auto" gap={2} align="stretch">
+                      <Button
+                        w="100%"
+                        size="sm"
+                        bg="brand.600"
+                        color="white"
+                        fontWeight={700}
+                        borderRadius="lg"
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                        transition="all 0.2s"
+                        onClick={() => {
+                          useAdvancedExamStore.getState().start(false);
+                          router.push('/advanced');
+                        }}
+                      >
+                        Start Advanced Practice
+                      </Button>
+                      <Button
+                        w="100%"
+                        size="sm"
+                        bg="red.500"
+                        color="white"
+                        fontWeight={700}
+                        borderRadius="lg"
+                        _hover={{ bg: 'red.600', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(239,68,68,0.35)' }}
+                        transition="all 0.2s"
+                        onClick={() => {
+                          useAdvancedExamStore.getState().start(true);
+                          router.push('/advanced');
+                        }}
+                      >
+                        Expert Mode (No Changing Answers)
+                      </Button>
+                    </VStack>
                   </VStack>
-                </Link>
+                </Box>
               </motion.div>
             </SimpleGrid>
 
