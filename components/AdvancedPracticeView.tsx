@@ -1142,7 +1142,7 @@ function QuestionView() {
                     </VStack>
 
                     {/* Check Answer / Explanation */}
-                    {answered && !revealed[currentQuestion] && (
+                    {answered && !revealed[currentQuestion] && !isExpertMode && (
                       <Box textAlign="center" pt={4}>
                         <Button
                           bg="brand.600"
