@@ -84,3 +84,12 @@ To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+## Changelog
+
+- **Advanced Practice Rework**: Removed mid-exam answer reveal, shuffled options, and rewrote distractors to prevent guessable patterns. Locked question navigation to match Exam Mode, making each selected answer final.
+- **Question Bank Updates**: Revised questions based on score reports and insights from test takers, incorporating scenario-based questions.
+- **Expert Mode**: Implemented expert mode in advanced practice with restricted answer changes.
+- **Answer Explanations**: Added an answer reveal mechanism featuring detailed explanations and source documentation.
+- **UI & Experience Enhancements**: Fixed exam layouts, added a 2-hour exam timer, added citations, fixed filtering, and unified practice mode views.
+- **Documentation**: Overhauled project documentation and setup guides.
