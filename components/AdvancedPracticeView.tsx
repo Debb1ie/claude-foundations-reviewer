@@ -627,15 +627,14 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
 function QuestionView() {
   const {
-    questions, currentQuestion, answers, flagged, isExpertMode, revealed,
+    questions, currentQuestion, answers, flagged,
     setAnswer, nextQuestion, prevQuestion, goToQuestion,
-    toggleFlag, complete, revealAnswer,
+    toggleFlag, complete,
   } = useAdvancedExamStore();
 
   const [isPaused, setIsPaused] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
-  const [activeSource, setActiveSource] = useState<AdvancedQuestion | null>(null);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -677,8 +676,14 @@ function QuestionView() {
   const diffColors = DIFFICULTY_COLORS[q.difficulty];
   const isLast = currentQuestion === questions.length - 1;
 
+  // Mirrors Exam Mode: the question map can only jump to an already-answered
+  // question or the next unanswered one — no skipping ahead to preview later questions.
+  const maxAnsweredIdx = answers.reduce<number>((max, a, i) => (a !== null ? Math.max(max, i) : max), -1);
+  const canNavigateTo = (idx: number) => idx <= maxAnsweredIdx + 1;
+
   const handleOptionClick = (idx: number) => {
-    if ((isExpertMode && answered) || revealed[currentQuestion]) return;
+    // Once an answer is picked for a question, it's final — no changing your mind.
+    if (answered) return;
     setAnswer(idx);
   };
 
@@ -694,6 +699,7 @@ function QuestionView() {
         const isAnsweredQ = ans !== null;
         const isCurrent = idx === currentQuestion;
         const isFlaggedQ = flagged[idx];
+        const isNavigable = canNavigateTo(idx);
         return (
           <Box
             key={idx}
@@ -715,18 +721,23 @@ function QuestionView() {
             color={
               isCurrent ? 'brand.600' :
               isAnsweredQ ? 'brand.600' :
-              'gray.500'
+              isNavigable ? 'gray.500' : 'gray.300'
             }
             border="1px solid"
             borderColor={
               isCurrent ? 'brand.500' :
               isFlaggedQ ? 'orange.400' :
               isAnsweredQ ? 'brand.400' :
-              'border'
+              isNavigable ? 'border' : 'bg.muted'
             }
+            cursor={isNavigable ? 'pointer' : 'not-allowed'}
             transition="all 0.15s"
-            _hover={{ borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' }}
-            onClick={() => { goToQuestion(idx); setMobileNavOpen(false); }}
+            _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' } : {}}
+            onClick={() => {
+              if (!isNavigable) return;
+              goToQuestion(idx);
+              setMobileNavOpen(false);
+            }}
           >
             {idx + 1}
           </Box>
@@ -1060,30 +1071,12 @@ function QuestionView() {
                     <VStack gap={3} align="stretch">
                       {q.options.map((opt, idx) => {
                         const isSelected = userAnswer === idx;
-                        const isCorrect = idx === q.correctAnswer;
-                        const isRevealed = revealed[currentQuestion];
-                        
-                        let borderColor = isSelected ? 'brand.500' : 'border';
-                        let bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
-                        let keyBg = isSelected ? 'brand.600' : 'transparent';
-                        let keyBorderColor: any = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
-                        let keyTextColor: any = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
 
-                        if (isRevealed) {
-                          if (isCorrect) {
-                            borderColor = 'green.400';
-                            bg = 'rgba(34,197,94,0.08)';
-                            keyBg = 'green.500';
-                            keyBorderColor = 'green.500';
-                            keyTextColor = 'white';
-                          } else if (isSelected) {
-                            borderColor = 'red.400';
-                            bg = 'rgba(239,68,68,0.08)';
-                            keyBg = 'red.500';
-                            keyBorderColor = 'red.500';
-                            keyTextColor = 'white';
-                          }
-                        }
+                        const borderColor = isSelected ? 'brand.500' : 'border';
+                        const bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
+                        const keyBg = isSelected ? 'brand.600' : 'transparent';
+                        const keyBorderColor: any = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
+                        const keyTextColor: any = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
 
                         return (
                           <Box
@@ -1099,19 +1092,19 @@ function QuestionView() {
                             borderColor={borderColor}
                             bg={bg}
                             backdropFilter="blur(8px)"
-                            cursor={(isExpertMode && answered) || isRevealed ? 'default' : 'pointer'}
+                            cursor={answered ? 'default' : 'pointer'}
                             transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                             textAlign="left"
                             _dark={{
-                              bg: isRevealed ? bg : (isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)'),
-                              borderColor: isRevealed ? borderColor : (isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)'),
+                              bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
+                              borderColor: isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
                             }}
-                            _hover={!((isExpertMode && answered) || isRevealed) ? {
+                            _hover={!answered ? {
                               borderColor: 'brand.400',
                               bg: 'rgba(255,255,255,0.45)',
                               _dark: { bg: 'rgba(30,41,59,0.5)' },
                             } : {}}
-                            onClick={() => { if (!isRevealed) handleOptionClick(idx); }}
+                            onClick={() => handleOptionClick(idx)}
                           >
                             <Box
                               w="24px"
@@ -1140,73 +1133,6 @@ function QuestionView() {
                         );
                       })}
                     </VStack>
-
-                    {/* Check Answer / Explanation */}
-                    {answered && !revealed[currentQuestion] && !isExpertMode && (
-                      <Box textAlign="center" pt={4}>
-                        <Button
-                          bg="brand.600"
-                          color="white"
-                          size="md"
-                          px={8}
-                          fontWeight={700}
-                          _hover={{ bg: 'brand.700' }}
-                          onClick={() => revealAnswer(currentQuestion)}
-                        >
-                          Check Answer
-                        </Button>
-                      </Box>
-                    )}
-
-                    {revealed[currentQuestion] && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        <Box
-                          p={5}
-                          bg="rgba(57, 73, 171, 0.05)"
-                          border="1px solid"
-                          borderColor="rgba(57, 73, 171, 0.15)"
-                          borderRadius="xl"
-                          boxShadow="inset 0 2px 4px rgba(0,0,0,0.01)"
-                          mt={4}
-                          _dark={{
-                            bg: "rgba(124, 110, 250, 0.08)",
-                            borderColor: "rgba(255, 255, 255, 0.08)"
-                          }}
-                        >
-                          <Text fontSize="sm" fontWeight={700} color="brand.700" fontFamily="mono" textTransform="uppercase" mb={2.5}>
-                            Explanation
-                          </Text>
-                          <Text fontSize="sm" color="gray.700" lineHeight="tall" _dark={{ color: 'gray.300' }}>
-                            {q.explanation}
-                          </Text>
-                          {q.sourceUrl && (
-                            <Box
-                              as="button"
-                              display="inline-flex"
-                              alignItems="center"
-                              gap={1}
-                              mt={3}
-                              pt={2.5}
-                              w="100%"
-                              borderTop="1px solid rgba(57,73,171,0.12)"
-                              fontSize="xs"
-                              fontWeight={700}
-                              color="brand.600"
-                              _dark={{ color: 'brand.400' }}
-                              onClick={() => setActiveSource(q)}
-                              _hover={{ color: 'brand.800', _dark: { color: 'brand.200' } }}
-                            >
-                              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                              View Source Material
-                            </Box>
-                          )}
-                        </Box>
-                      </motion.div>
-                    )}
                   </VStack>
                 </motion.div>
               </AnimatePresence>
@@ -1323,7 +1249,6 @@ function QuestionView() {
           </Box>
         </HStack>
       </Container>
-      <SourceModal question={activeSource} onClose={() => setActiveSource(null)} />
     </Box>
   );
 }
@@ -1335,7 +1260,7 @@ export function AdvancedPracticeView() {
   useEffect(() => { setMounted(true); }, []);
 
   if (!mounted) return null;
-  if (!isStarted) return <StartScreen onStart={start} />;
+  if (!isStarted) return <StartScreen onStart={() => start()} />;
   if (isComplete) return <ResultsScreen onReset={() => { reset(); start(); }} />;
   return <QuestionView />;
 }

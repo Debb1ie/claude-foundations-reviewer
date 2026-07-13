@@ -477,7 +477,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => {
-                          useAdvancedExamStore.getState().start(true);
+                          useAdvancedExamStore.getState().start();
                           router.push('/advanced');
                         }}
                       >

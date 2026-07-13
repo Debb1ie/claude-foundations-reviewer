@@ -25,19 +25,16 @@ interface AdvancedExamStore {
   answers: (number | null)[];
   isStarted: boolean;
   isComplete: boolean;
-  isExpertMode: boolean;
   startTime: number | null;
   endTime: number | null;
   flagged: boolean[];
-  revealed: boolean[];
 
-  start: (expertMode?: boolean) => void;
+  start: () => void;
   setAnswer: (answer: number) => void;
   goToQuestion: (index: number) => void;
   nextQuestion: () => void;
   prevQuestion: () => void;
   toggleFlag: (index: number) => void;
-  revealAnswer: (index: number) => void;
   complete: () => void;
   reset: () => void;
 
@@ -67,6 +64,21 @@ function systematicSample<T>(items: T[], n: number): T[] {
   return picked;
 }
 
+// Fisher-Yates. Re-run per attempt so the correct answer's position (and any
+// length/style tell in a fixed ordering) can't be memorized across attempts.
+function shuffleOptions(q: AdvancedQuestion): AdvancedQuestion {
+  const order = q.options.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return {
+    ...q,
+    options: order.map((i) => q.options[i]),
+    correctAnswer: order.indexOf(q.correctAnswer),
+  };
+}
+
 const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
 const typedQuestions: AdvancedQuestion[] = Object.keys(targetPerDomain).flatMap((domain) => {
   const target = targetPerDomain[domain];
@@ -84,23 +96,20 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       answers: new Array(typedQuestions.length).fill(null),
       isStarted: false,
       isComplete: false,
-      isExpertMode: false,
       startTime: null,
       endTime: null,
       flagged: new Array(typedQuestions.length).fill(false),
-      revealed: new Array(typedQuestions.length).fill(false),
 
-      start: (expertMode = false) => {
+      start: () => {
         set({
+          questions: typedQuestions.map(shuffleOptions),
           currentQuestion: 0,
           answers: new Array(typedQuestions.length).fill(null),
           isStarted: true,
           isComplete: false,
-          isExpertMode: expertMode,
           startTime: Date.now(),
           endTime: null,
           flagged: new Array(typedQuestions.length).fill(false),
-          revealed: new Array(typedQuestions.length).fill(false),
         });
       },
 
@@ -139,13 +148,6 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
         set({ flagged: newFlagged });
       },
 
-      revealAnswer: (index) => {
-        const { revealed } = get();
-        const newRevealed = [...revealed];
-        newRevealed[index] = true;
-        set({ revealed: newRevealed });
-      },
-
       complete: () => {
         set({ isComplete: true, endTime: Date.now() });
       },
@@ -156,11 +158,9 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           answers: new Array(typedQuestions.length).fill(null),
           isStarted: false,
           isComplete: false,
-          isExpertMode: false,
           startTime: null,
           endTime: null,
           flagged: new Array(typedQuestions.length).fill(false),
-          revealed: new Array(typedQuestions.length).fill(false),
         });
       },
 
@@ -175,18 +175,17 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       },
     }),
     {
-      name: 'advanced-exam-storage-v5',
+      name: 'advanced-exam-storage-v8',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
+        questions: state.questions,
         currentQuestion: state.currentQuestion,
         answers: state.answers,
         isStarted: state.isStarted,
         isComplete: state.isComplete,
-        isExpertMode: state.isExpertMode,
         startTime: state.startTime,
         endTime: state.endTime,
         flagged: state.flagged,
-        revealed: state.revealed,
       }),
     }
   )
