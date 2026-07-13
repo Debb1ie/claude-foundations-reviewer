@@ -43,21 +43,36 @@ interface AdvancedExamStore {
   getScore: () => { correct: number; total: number; pct: number };
 }
 
-export const TOTAL_SECONDS = 7200; // 2 hours
+export const TOTAL_SECONDS = 7200; // 2 hours max
 
-// Keep all 3x questions + proportional 2x to reach exactly 60 total
-const keep2xPerDomain: Record<string, number> = {
-  'agentic-architecture': 4,
-  'tool-design-mcp': 3,
-  'claude-code': 5,
-  'prompt-engineering': 3,
-  'context-management': 3,
+// Fixed per-domain question counts, summing to 60 (matches the real exam's ~2hr scope)
+const targetPerDomain: Record<string, number> = {
+  'agentic-architecture': 15,
+  'tool-design-mcp': 9,
+  'claude-code': 12,
+  'prompt-engineering': 12,
+  'context-management': 12,
 };
-const counts2x: Record<string, number> = {};
-const typedQuestions = (advancedQuestionsData as AdvancedQuestion[]).filter((q) => {
-  if (q.difficulty === '3x') return true;
-  counts2x[q.domain] = (counts2x[q.domain] || 0) + 1;
-  return counts2x[q.domain] <= (keep2xPerDomain[q.domain] ?? 0);
+
+// Evenly spaced (systematic) sample so a capped-down domain still draws from
+// across the whole pool — old and newly-added questions alike — instead of
+// truncating from one end.
+function systematicSample<T>(items: T[], n: number): T[] {
+  if (items.length <= n) return items;
+  const picked: T[] = [];
+  for (let i = 0; i < n; i++) {
+    picked.push(items[Math.floor((i * items.length) / n)]);
+  }
+  return picked;
+}
+
+const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
+const typedQuestions: AdvancedQuestion[] = Object.keys(targetPerDomain).flatMap((domain) => {
+  const target = targetPerDomain[domain];
+  const threes = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '3x');
+  const twos = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '2x');
+  if (threes.length >= target) return systematicSample(threes, target);
+  return threes.concat(systematicSample(twos, target - threes.length));
 });
 
 export const useAdvancedExamStore = create<AdvancedExamStore>()(

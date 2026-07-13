@@ -98,7 +98,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             <motion.div variants={itemVariants}>
               <Box textAlign="center" maxW="2xl" mx="auto">
                 <Heading as="h2" size="3xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-                  Claude you prove it?
+                  Claude you Ace?
                 </Heading>
                 <Text color="gray.600" fontSize="lg" lineHeight="tall">
                   Select your practice mode below to begin studying for the Claude Certified Architect Foundations exam.

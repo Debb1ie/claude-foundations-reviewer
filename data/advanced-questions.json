@@ -1518,5 +1518,765 @@
     "sourceLabel": "Claude Code Docs: Hooks Reference",
     "sourceExcerpt": "PreToolUse: Before a tool call executes. Can block it. PostToolUse: After a tool call succeeds.",
     "sourceHighlight": "Before a tool call executes. Can block it"
+  },
+  {
+    "id": "adv-081",
+    "number": 81,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "Your team needs to migrate a payments library used across 45 files, with two viable approaches (an adapter shim vs. a direct call-site rewrite) that have different infrastructure implications. Which review architecture should you select first?",
+    "options": [
+      "Plan mode — have Claude explore the codebase, weigh the adapter-shim and rewrite approaches, and propose a plan before any file is changed.",
+      "Direct execution — begin rewriting call sites immediately, since individual files can be reverted if an approach proves wrong.",
+      "A single-phase workflow that runs both approaches in parallel subagents and merges whichever finishes first.",
+      "Skip any review architecture and rely on the hooks system to block invalid edits after they are made."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Plan mode exists precisely for this scenario: large-scale changes with multiple valid approaches and architectural implications, where committing to the wrong one is costly to unwind across 45 files. Direct execution is appropriate for well-scoped single-file changes, not open architectural decisions. Running both approaches in parallel wastes effort on a decision that should be made once, deliberately. Hooks enforce rules on tool calls; they don't help choose between architectural approaches.",
+    "sourceUrl": "https://code.claude.com/docs/en/permission-modes",
+    "sourceLabel": "Claude Code Docs: Permission Modes",
+    "sourceExcerpt": "Plan mode tells Claude to research and propose changes without making them. Claude reads files, runs shell commands to explore, and writes a plan, but does not edit your source.",
+    "sourceHighlight": "writes a plan, but does not edit your source"
+  },
+  {
+    "id": "adv-082",
+    "number": 82,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A stack trace points to a single missing null-check in one function of one file. What review architecture is the best fit?",
+    "options": [
+      "Plan mode, so Claude can consider alternative places the null check could be added.",
+      "Direct execution — the fix is well-scoped and single-file, so plan mode would only add overhead.",
+      "A multi-phase workflow with a dedicated verification subagent for the one-line change.",
+      "Escalate to a human reviewer before Claude is allowed to view the stack trace."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Direct execution is intended for simple, well-understood changes with a clear scope — exactly this case. Plan mode is reserved for tasks with real architectural ambiguity; invoking it here adds a planning step with no decision to make. A full multi-phase workflow is disproportionate for a one-line fix. Escalating before Claude even reads the trace blocks a task that needs no human judgment call.",
+    "sourceUrl": "https://code.claude.com/docs/en/permission-modes",
+    "sourceLabel": "Claude Code Docs: Permission Modes",
+    "sourceExcerpt": "Plan mode tells Claude to research and propose changes without making them. Claude reads files, runs shell commands to explore, and writes a plan, but does not edit your source.",
+    "sourceHighlight": "writes a plan, but does not edit your source"
+  },
+  {
+    "id": "adv-083",
+    "number": 83,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "You need Claude to research three independent regulatory frameworks in parallel, cross-verify the findings against each other, and then have a human approve the final report before it is published externally. Which architecture fits this task?",
+    "options": [
+      "Direct execution, since each research subtask is independent and doesn't require planning.",
+      "Plan mode only, since Claude will \"plan\" the research before running it.",
+      "A multi-phase workflow: parallel research agents, then a verification/synthesis pass, then a human approval checkpoint before the report is released.",
+      "A single long-running agent session with no intermediate checkpoints, since checkpoints slow down research."
+    ],
+    "correctAnswer": 2,
+    "explanation": "This task has three properties that call for a structured multi-phase workflow: parallelizable subtasks, a need for cross-verification, and a mandatory human approval gate before an external-facing artifact ships. Plan mode only covers pre-execution planning, not the verification and approval phases. Direct execution has no mechanism for the fan-out/verify/gate structure. A single unchecked session removes the human checkpoint the scenario explicitly requires.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic: Building Effective Agents",
+    "sourceExcerpt": "Agents can then pause for human feedback at checkpoints or when encountering blockers. It's also common to include stopping conditions (such as a maximum number of iterations) to maintain control.",
+    "sourceHighlight": "pause for human feedback at checkpoints or when encountering blockers"
+  },
+  {
+    "id": "adv-084",
+    "number": 84,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "A database schema migration affects a table containing financial records and must pass explicit compliance sign-off before it runs in production. Task scope is moderate (12 files), but the risk of an unreviewed change is high. What is the most appropriate review architecture?",
+    "options": [
+      "Direct execution, since 12 files is a moderate and well-understood scope.",
+      "A fully autonomous multi-phase workflow that runs the migration and rolls back automatically if compliance tests fail after the fact.",
+      "Skip planning and rely on a PostToolUse hook to detect compliance violations after the migration has already run.",
+      "Plan mode to propose the migration, with execution gated behind explicit human approval of that plan given the compliance risk."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Risk level, not just file count, should drive the choice here: even a moderate-scope change warrants plan mode when the blast radius includes compliance-sensitive financial data and explicit sign-off is required before execution. Direct execution skips the human checkpoint the scenario demands. An autonomous rollback-on-failure workflow still lets the risky change execute before catching problems. A PostToolUse hook only reacts after the migration already ran — too late for a pre-execution compliance gate.",
+    "sourceUrl": "https://code.claude.com/docs/en/permission-modes",
+    "sourceLabel": "Claude Code Docs: Permission Modes",
+    "sourceExcerpt": "Plan mode tells Claude to research and propose changes without making them. Claude reads files, runs shell commands to explore, and writes a plan, but does not edit your source.",
+    "sourceHighlight": "writes a plan, but does not edit your source"
+  },
+  {
+    "id": "adv-085",
+    "number": 85,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "You ask Claude to normalize a dataset of informal address strings into a fixed schema, but each attempt applies a different, inconsistent interpretation of what \"normalized\" means. What is the most effective next step?",
+    "options": [
+      "Provide 2-3 concrete input/output example pairs showing the exact transformation you expect.",
+      "Repeat the same prose instruction more emphatically, adding words like \"always\" and \"consistently.\"",
+      "Lower the temperature to zero so the same prompt produces the same output every time.",
+      "Split the instruction into ten separate short sentences instead of one paragraph."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Concrete input/output examples are the most reliable way to communicate an exact transformation when prose descriptions are being interpreted inconsistently — they remove ambiguity about what \"normalized\" means in practice. Rewording the same prose more forcefully doesn't resolve the underlying ambiguity. Lowering temperature improves determinism for a given interpretation but doesn't fix which interpretation is chosen. Reformatting the same ambiguous instruction into shorter sentences doesn't add the missing information.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency. Effective examples should be relevant (mirroring your actual use case closely) and diverse (covering edge cases).",
+    "sourceHighlight": "improve accuracy and consistency"
+  },
+  {
+    "id": "adv-086",
+    "number": 86,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "You're asking Claude to implement a caching layer with specific eviction behavior under concurrent access. What is the most effective way to guide iterative improvement toward correct behavior?",
+    "options": [
+      "Describe the eviction policy in increasingly detailed prose across several follow-up messages.",
+      "Write a test suite covering expected behavior and edge cases first, then iterate by sharing the specific test failures with Claude.",
+      "Ask Claude to self-review its own implementation for correctness before presenting it to you.",
+      "Ask Claude to write the caching layer three different ways and pick whichever one looks the cleanest."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Test-driven iteration gives Claude a concrete, checkable signal — examining existing test files and matching expected behavior lets a pass/fail check drive convergence instead of relying on subjective prose descriptions. Detailed prose alone still leaves interpretation ambiguous for concurrency edge cases. Self-review suffers from the same self-assessment blind spot as any self-review without an independent check. Picking the \"cleanest\" of three variants has no correctness signal at all.",
+    "sourceUrl": "https://code.claude.com/docs/en/best-practices",
+    "sourceLabel": "Claude Code Docs: Best Practices",
+    "sourceExcerpt": "Claude examines your existing test files to match the style, frameworks, and assertion patterns already in use. Give Claude a check it can run: tests, a build, a screenshot to compare.",
+    "sourceHighlight": "examines your existing test files to match the style, frameworks, and assertion patterns"
+  },
+  {
+    "id": "adv-087",
+    "number": 87,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "A code review surfaces four findings in the same function: an off-by-one error, a race condition it interacts with, a misleading variable name, and an unrelated missing null check in a different file. How should you structure feedback to Claude for fixing these?",
+    "options": [
+      "Report all four issues as one flat list and let Claude decide the fix order.",
+      "Always fix every issue in one message regardless of whether they interact, to save round trips.",
+      "Provide the off-by-one error and the race condition together in one detailed message since they interact, and address the unrelated variable-naming and null-check issues separately.",
+      "Always fix issues one at a time in isolation, regardless of whether they interact, to avoid confusing Claude."
+    ],
+    "correctAnswer": 2,
+    "explanation": "The right granularity depends on interaction: issues that interact (the off-by-one and the race condition it feeds into) are best described together in one detailed pass — similar to a self-correction chain where each pass has a clear, scoped criterion — while independent issues (naming, an unrelated null check) are better handled separately so a fix for one doesn't get conflated with unrelated changes. A flat undifferentiated list risks Claude fixing the race condition without accounting for the off-by-one it depends on. Always batching or always separating ignores whether the issues actually interact.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "The most common chaining pattern is self-correction: generate a draft, have Claude review it against criteria, then have Claude refine based on the review, with each step being a separate API call so you can log, evaluate, or branch at any point.",
+    "sourceHighlight": "each step being a separate API call so you can log, evaluate, or branch"
+  },
+  {
+    "id": "adv-088",
+    "number": 88,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "You're configuring Claude Code to post automated review comments on pull requests. The review job must run unattended, must not be able to modify repository files, and must emit output a downstream bot can parse reliably. Which combination of configuration choices satisfies all three requirements?",
+    "options": [
+      "Run with default interactive settings and pipe the transcript to a log file for the bot to scrape.",
+      "Run in plan mode so Claude proposes changes without applying them, and let the bot parse the free-text plan.",
+      "Grant full tool access so Claude can also apply suggested fixes directly, then have the bot diff the repository afterward.",
+      "Run with -p for non-interactive execution, restrict tool access to read-only tools, and use --output-format json for machine-parseable output."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Non-interactive execution (-p) prevents the job from hanging waiting for input, read-only tool restriction satisfies \"must not modify files,\" and --output-format json gives the downstream bot a reliable, structured schema instead of free text. Scraping an interactive transcript is fragile and not machine-parseable. Plan mode still produces prose output, not structured JSON, and isn't designed for headless CI use. Granting write access directly violates the \"must not modify files\" requirement.",
+    "sourceUrl": "https://code.claude.com/docs/en/headless",
+    "sourceLabel": "Claude Code Docs: Non-Interactive Mode",
+    "sourceExcerpt": "Add the -p (or --print) flag to any claude command to run it non-interactively. All CLI options work with -p, including --continue for continuing conversations, --allowedTools for auto-approving tools, and --output-format for structured output.",
+    "sourceHighlight": "-p (or --print) flag to any claude command to run it non-interactively"
+  },
+  {
+    "id": "adv-089",
+    "number": 89,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your CI-invoked review job keeps flagging code that actually follows your team's documented style exceptions, because the review instance has no knowledge of those exceptions. What is the most direct fix?",
+    "options": [
+      "Document the accepted style exceptions in the project's CLAUDE.md so any Claude Code invocation, including CI runs, loads that context automatically.",
+      "Increase max_tokens so the model can reason longer about each finding.",
+      "Switch the review job from -p to interactive mode so a human can correct it live during every CI run.",
+      "Disable the review job's access to Grep so it can no longer find the flagged patterns."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Project-level CLAUDE.md is loaded automatically by every Claude Code invocation in that repository, including headless CI runs, making it the right place to persist accepted conventions so reviews stop re-flagging them. More reasoning tokens don't supply missing project context. Interactive mode defeats the purpose of an automated CI job. Removing Grep would break the review job's ability to find real issues too, not just false positives.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory",
+    "sourceLabel": "Claude Code Docs: Memory & CLAUDE.md",
+    "sourceExcerpt": "CLAUDE.md files can live in several locations, each with a different scope. The table below lists them in load order, from broadest scope to most specific: Managed policy, User instructions at ~/.claude/CLAUDE.md, Project instructions at ./CLAUDE.md or ./.claude/CLAUDE.md, and Local instructions at ./CLAUDE.local.md.",
+    "sourceHighlight": "in load order, from broadest scope to most specific"
+  },
+  {
+    "id": "adv-090",
+    "number": 90,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "You built a /security-review skill that should only ever read files and never edit or execute commands, even if the invoking developer's own permissions would normally allow it. How do you enforce this at the skill level?",
+    "options": [
+      "Add a warning in the skill's description telling Claude not to edit or execute anything.",
+      "Set allowed-tools in the skill's frontmatter to the read-only tool set the skill needs.",
+      "Require the developer to manually deny edit permissions in their personal settings before running the skill.",
+      "Rely on the model's general judgment that security reviews shouldn't modify code."
+    ],
+    "correctAnswer": 1,
+    "explanation": "The allowed-tools frontmatter field scopes exactly which tools are available while a skill is active — a configuration-level restriction rather than a hope that the model behaves — and it holds regardless of the invoking developer's broader permissions. A prose warning is a probabilistic constraint, not an enforced one. Requiring per-developer manual configuration is fragile and easy to forget. Relying on general judgment provides no guarantee at all.",
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills Frontmatter",
+    "sourceExcerpt": "Set to fork to run in a forked subagent context. allowed-tools: Tools Claude can use without asking permission when this skill is active. argument-hint: Hint shown during autocomplete to indicate expected arguments.",
+    "sourceHighlight": "Set to fork to run in a forked subagent context"
+  },
+  {
+    "id": "adv-091",
+    "number": 91,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "You need every Claude Code session across your organization to be structurally prevented from running `rm -rf` against any path outside a designated scratch directory — not just discouraged from it. Which configuration mechanism should enforce this?",
+    "options": [
+      "A project-level CLAUDE.md instruction telling Claude never to run destructive commands outside the scratch directory.",
+      "A Skill with an argument-hint reminding the invoking developer to double-check destructive commands.",
+      "A PreToolUse hook that inspects Bash calls and blocks the command before execution if it doesn't match the allowed pattern.",
+      "A .claude/rules/ file scoped to shell-script paths describing safe deletion practices."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Hooks provide deterministic control over Claude Code's behavior, ensuring certain actions always happen (or are always blocked) rather than depending on the model choosing to comply — exactly what \"structurally prevented\" requires. CLAUDE.md instructions, argument-hint text, and rules files are all prompt-level guidance a model could fail to follow under an unusual input; none of them can guarantee the command never executes.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks-guide",
+    "sourceLabel": "Claude Code Docs: Hooks Guide",
+    "sourceExcerpt": "Hooks are user-defined shell commands that execute at specific points in Claude Code's lifecycle. They provide deterministic control over Claude Code's behavior, ensuring certain actions always happen rather than relying on the LLM to choose to run them.",
+    "sourceHighlight": "deterministic control over Claude Code's behavior"
+  },
+  {
+    "id": "adv-092",
+    "number": 92,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your team wants a workflow for generating a standardized release changelog that is invoked deliberately by whoever is cutting a release, not applied automatically to every session. Which configuration mechanism fits best?",
+    "options": [
+      "A project-level CLAUDE.md entry describing the changelog format, since CLAUDE.md is always loaded.",
+      "A .claude/rules/ file scoped with a glob pattern matching changelog files.",
+      "A PostToolUse hook that regenerates the changelog after every file edit.",
+      "A project-scoped skill in .claude/skills/, since skills are invoked on demand rather than always-loaded."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Skills are the right mechanism for task-specific workflows invoked on demand — CLAUDE.md is for universal standards that should apply to every session, the opposite of \"invoked deliberately\" here. A glob-scoped rules file is for conventions tied to editing specific file types, not an on-demand release procedure. A hook firing after every edit would run far more often than intended, not just when cutting a release.",
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills Frontmatter",
+    "sourceExcerpt": "Set to fork to run in a forked subagent context. allowed-tools: Tools Claude can use without asking permission when this skill is active. argument-hint: Hint shown during autocomplete to indicate expected arguments.",
+    "sourceHighlight": "Set to fork to run in a forked subagent context"
+  },
+  {
+    "id": "adv-093",
+    "number": 93,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Test files are scattered throughout your codebase next to the code they test, and you want a single set of testing conventions applied automatically whenever Claude edits any test file, regardless of which directory it's in. What's the most maintainable configuration mechanism?",
+    "options": [
+      "A .claude/rules/ file with YAML frontmatter specifying a glob pattern like paths: [\"**/*.test.*\"].",
+      "A CLAUDE.md file placed in every subdirectory that happens to contain test files.",
+      "A single monolithic root CLAUDE.md with a section for testing, relying on Claude to infer when it applies.",
+      "A skill that a developer must manually invoke before editing any test file."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Path-scoped rules using YAML frontmatter with a paths glob load automatically whenever Claude is working with matching files, independent of directory location — exactly what scattered test files require. Directory-bound CLAUDE.md files can't easily cover files spread across many directories. A monolithic root file relies on inference rather than deterministic matching. A manually invoked skill isn't automatic.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory",
+    "sourceLabel": "Claude Code Docs: Path-Specific Rules",
+    "sourceExcerpt": "Rules can be scoped to specific files using YAML frontmatter with the paths field. These conditional rules only apply when Claude is working with files matching the specified patterns.",
+    "sourceHighlight": "scoped to specific files using YAML frontmatter with the paths field"
+  },
+  {
+    "id": "adv-094",
+    "number": 94,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "Security wants a non-negotiable, organization-wide rule that no Claude Code session — regardless of project or personal CLAUDE.md content — is ever allowed to invoke the Bash tool with `curl` against external hosts. Where should this restriction live?",
+    "options": [
+      "In every project's root CLAUDE.md, instructing Claude not to use curl against external hosts.",
+      "In managed/organization-level settings permission rules that deny the pattern outright, layered above any project or personal configuration.",
+      "In each developer's personal ~/.claude/CLAUDE.md, so it travels with them across projects.",
+      "In a .claude/rules/ file scoped to files that happen to contain the word \"curl.\""
+    ],
+    "correctAnswer": 1,
+    "explanation": "Permission rules in settings can pre-approve or block specific tools and are layered on top of, and enforced independently of, whatever a project's or user's CLAUDE.md says — making them the correct place for a non-negotiable, organization-wide deny rule. CLAUDE.md-based approaches are prompt-level instructions a session could still deviate from, and neither is organization-scoped by design. A rules file scoped by file content doesn't govern tool invocation at all.",
+    "sourceUrl": "https://code.claude.com/docs/en/permission-modes",
+    "sourceLabel": "Claude Code Docs: Permission Modes",
+    "sourceExcerpt": "Modes set the baseline. Layer permission rules on top to pre-approve or block specific tools.",
+    "sourceHighlight": "Layer permission rules on top to pre-approve or block specific tools"
+  },
+  {
+    "id": "adv-095",
+    "number": 95,
+    "domain": "agentic-architecture",
+    "difficulty": "3x",
+    "text": "You need comprehensive coverage of six largely independent subtopics under a broad research question, and total latency matters because the report is needed same-day. Which orchestration pattern is the best fit?",
+    "options": [
+      "A strict sequential pipeline where each subtopic is researched only after the previous one completes.",
+      "A single agent researching all six subtopics one after another within one long context.",
+      "An orchestrator-worker pattern where a lead agent delegates each independent subtopic to its own subagent running concurrently.",
+      "Six independent agents with no coordinator, each publishing directly to the final report."
+    ],
+    "correctAnswer": 2,
+    "explanation": "When subtopics are largely independent and latency matters, an orchestrator-worker pattern — a lead agent that delegates to specialized subagents operating in parallel — directly targets both goals: coverage through delegation and speed through concurrency. A strict sequential pipeline or a single long-context agent trade away the latency benefit for no coverage gain, since the subtopics don't actually depend on each other. Six uncoordinated agents lose the deduplication, routing, and error-handling benefits of a coordinator.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.",
+    "sourceHighlight": "orchestrator-worker pattern"
+  },
+  {
+    "id": "adv-096",
+    "number": 96,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A workflow requires: (1) extract structured data from a document, (2) validate that data against business rules, (3) generate a report only from validated data. Each stage strictly needs the prior stage's output. Which orchestration pattern fits, and why not parallel execution?",
+    "options": [
+      "Parallel execution, since running all three stages concurrently is always faster regardless of dependencies.",
+      "An orchestrator-worker pattern with the coordinator guessing likely outputs for stage 2 while stage 1 is still running.",
+      "A single subagent handling all three stages with no orchestration needed, since orchestration only matters for parallel work.",
+      "A sequential pipeline, because stage 2 cannot run correctly without stage 1's output, and stage 3 cannot run without stage 2's."
+    ],
+    "correctAnswer": 3,
+    "explanation": "When each stage's input is strictly the previous stage's output, a sequential pipeline is the correct pattern — the dependency chain makes parallel execution not just unhelpful but incorrect, since stage 2 would run on incomplete or absent data. Guessing outputs to unblock parallelism introduces exactly the kind of error the validation stage exists to prevent. Orchestration still matters here even without parallelism, since something still needs to sequence the handoff and pass structured output between stages.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic: Building Effective Agents",
+    "sourceExcerpt": "Whereas it's topographically similar, the key difference from parallelization is its flexibility—subtasks aren't pre-defined, but determined by the orchestrator based on the specific input.",
+    "sourceHighlight": "subtasks aren't pre-defined, but determined by the orchestrator based on the specific input"
+  },
+  {
+    "id": "adv-097",
+    "number": 97,
+    "domain": "agentic-architecture",
+    "difficulty": "3x",
+    "text": "A synthesis subagent needs to combine findings from a web-search subagent and a document-analysis subagent that ran earlier in the pipeline. What must the coordinator do when invoking the synthesis subagent?",
+    "options": [
+      "Include the prior subagents' findings and source metadata directly in the synthesis subagent's prompt, since it starts with no parent context.",
+      "Nothing extra — subagents automatically share the coordinator's full conversation history.",
+      "Instruct the synthesis subagent to re-run the web search and document analysis itself for consistency.",
+      "Reference the earlier subagents by name and trust the synthesis subagent to retrieve their outputs on its own."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Each subagent runs in its own fresh conversation with no parent context — the only channel from coordinator to subagent is the prompt itself, so any findings, source URLs, or metadata the synthesis subagent needs must be included directly in that prompt. Assuming automatic context sharing is false and will produce a synthesis with nothing to work from. Re-running the prior work duplicates effort the pipeline already paid for. Referencing prior agents by name gives the subagent nothing it can actually retrieve, since it has no access to their conversations.",
+    "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/subagents",
+    "sourceLabel": "Claude Code Docs: Subagents in the SDK",
+    "sourceExcerpt": "Each subagent runs in its own fresh conversation. Intermediate tool calls and results stay inside the subagent; only its final message returns to the parent.",
+    "sourceHighlight": "only its final message returns to the parent"
+  },
+  {
+    "id": "adv-098",
+    "number": 98,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A coordinator agent needs to spawn specialized subagents mid-task. Its own tool configuration currently does not include the tool used to invoke subagents. What happens, and what's the fix?",
+    "options": [
+      "Nothing changes — any agent can spawn subagents regardless of its own tool configuration.",
+      "The coordinator cannot invoke subagents until its allowedTools configuration includes the Agent (Task) tool.",
+      "The subagents will spawn automatically once their AgentDefinition is registered, independent of the coordinator's tools.",
+      "The coordinator needs a PostToolUse hook, not a tool permission change, to enable subagent spawning."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Subagent invocation happens through a specific tool (the Agent/Task tool), so a coordinator's allowedTools must include it before the coordinator can auto-approve and issue that invocation — registering an AgentDefinition alone doesn't grant the coordinator permission to call it. Assuming any agent can spawn subagents regardless of configuration, or that registration alone is sufficient, both skip this requirement. A hook intercepts tool calls; it doesn't grant the underlying permission.",
+    "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/subagents",
+    "sourceLabel": "Claude Code Docs: AgentDefinition Configuration",
+    "sourceExcerpt": "Define subagents directly in your code using the agents parameter. Claude invokes subagents through the Agent tool, so include Agent in allowedTools to auto-approve subagent invocations without a permission prompt.",
+    "sourceHighlight": "include Agent in allowedTools to auto-approve subagent invocations"
+  },
+  {
+    "id": "adv-099",
+    "number": 99,
+    "domain": "agentic-architecture",
+    "difficulty": "3x",
+    "text": "During multi-source research, each finding needs to retain which source it came from so the final report can attribute claims correctly. How should the document-analysis and web-search subagents structure their output for the synthesis subagent?",
+    "options": [
+      "Return a single combined prose summary of all findings, since the coordinator can figure out attribution later.",
+      "Return only the final conclusions and omit sources entirely, since the synthesis agent doesn't need them.",
+      "Return structured claim-source pairs (the claim, its source URL or document name, and relevant excerpt) rather than flattened prose.",
+      "Return raw, unprocessed search results and let the synthesis subagent re-derive which claim came from which source."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Since each subagent's output is the only channel of information the synthesis subagent receives, structuring it as explicit claim-source pairs preserves attribution through the handoff; a flattened prose summary loses exactly this mapping during compression. Omitting sources makes correct attribution impossible downstream. Handing over raw, unprocessed results pushes the parsing burden onto the synthesis subagent and risks it mis-attributing claims it has to reconstruct itself.",
+    "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/subagents",
+    "sourceLabel": "Claude Code Docs: Subagents in the SDK",
+    "sourceExcerpt": "Each subagent runs in its own fresh conversation. Intermediate tool calls and results stay inside the subagent; only its final message returns to the parent.",
+    "sourceHighlight": "only its final message returns to the parent"
+  },
+  {
+    "id": "adv-100",
+    "number": 100,
+    "domain": "agentic-architecture",
+    "difficulty": "3x",
+    "text": "A coordinator delegates \"research this topic\" to three subagents with no further detail. Two subagents end up running nearly identical searches, and a third leaves an entire subtopic uncovered. What's the most effective fix to the delegation instructions?",
+    "options": [
+      "Give each subagent a rigid, identical step-by-step search script to follow in the same order.",
+      "Reduce the number of subagents to one, since delegation is introducing duplication risk.",
+      "Tell each subagent to \"be thorough\" without further detail, since vague instructions worked for exploratory tasks before.",
+      "Give each subagent a distinct objective, expected output format, guidance on which tools/sources to use, and clear task boundaries."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Vague delegation like \"research this topic\" is exactly what causes agents to duplicate work or leave gaps; giving each subagent an objective, an output format, guidance on tools/sources, and clear task boundaries lets them adapt their search strategy while staying non-overlapping. A rigid identical script removes the adaptability that makes multi-agent research valuable and doesn't fix the topic-boundary problem. Collapsing to one agent sacrifices the coverage and latency benefits of parallelism instead of fixing the actual delegation defect. Adding \"be thorough\" is still vague and doesn't establish boundaries between subagents.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Each subagent needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries. Without detailed task descriptions, agents duplicate work, leave gaps, or fail to find necessary information.",
+    "sourceHighlight": "an objective, an output format, guidance on the tools and sources to use, and clear task boundaries"
+  },
+  {
+    "id": "adv-101",
+    "number": 101,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "In a hub-and-spoke multi-agent system, subagent A discovers information that would be useful to subagent B, which is running a different subtask. What is the correct communication path?",
+    "options": [
+      "Subagent A returns the finding to the coordinator, which decides whether and how to route it to subagent B.",
+      "Subagent A should message subagent B directly to share the finding immediately.",
+      "Subagents should share a common mutable memory store that any subagent can write to at any time.",
+      "Subagent A should ignore the finding since it's outside its assigned subtask."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Hub-and-spoke architecture routes all inter-subagent communication through the coordinator, which preserves observability, consistent error handling, and controlled information flow — the coordinator, not subagent A, decides whether the finding is relevant to B's task. Direct agent-to-agent messaging breaks isolation and coordinator visibility. A shared mutable store creates the same uncontrolled cross-talk without a coordinator's routing judgment. Discarding a potentially relevant finding risks losing information the coordinator might use elsewhere.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Our Research system uses a multi-agent architecture with an orchestrator-worker pattern, where a lead agent coordinates the process while delegating to specialized subagents that operate in parallel.",
+    "sourceHighlight": "orchestrator-worker pattern"
+  },
+  {
+    "id": "adv-102",
+    "number": 102,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A coordinator currently spawns three independent subagents one at a time across three separate response turns, waiting for each to finish before starting the next, even though the subtasks don't depend on each other. What's the most effective change to reduce latency?",
+    "options": [
+      "Merge all three subagents into a single subagent that handles all three subtasks internally.",
+      "Emit all three Task/Agent tool calls within a single coordinator response turn so the subagents run concurrently.",
+      "Increase each subagent's max_tokens so each individual run finishes faster.",
+      "Switch the three subagents from 3x difficulty to 2x difficulty tasks to reduce per-agent latency."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Independent subtasks should be dispatched as multiple tool calls within a single response turn so they execute concurrently rather than serially — this parallel fan-out is what cuts task time substantially when subagents don't depend on each other. Merging into one subagent removes the parallelism opportunity entirely. Increasing max_tokens affects output length, not concurrency. \"Difficulty\" isn't a real lever on runtime latency.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "We introduced two kinds of parallelization: the lead agent spins up 3-5 subagents in parallel rather than serially, and the subagents use 3+ tools in parallel. These changes cut research time by up to 90%.",
+    "sourceHighlight": "the lead agent spins up 3-5 subagents in parallel rather than serially"
+  },
+  {
+    "id": "adv-103",
+    "number": 103,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "During a long customer support session, you periodically summarize the conversation to save context. After several rounds of summarization, the agent quotes the wrong refund amount — a number that was correct several turns earlier. What is the most likely cause, and the fix?",
+    "options": [
+      "The model is hallucinating regardless of what's in context; summarization is unrelated to the error.",
+      "The context window is too small for any customer support session; the fix is to reduce the number of turns allowed.",
+      "Progressive summarization condensed the specific dollar amount into vague language across rounds; the fix is to extract transactional facts into a persistent structured block outside the summarized history.",
+      "The support agent should stop summarizing entirely and instead truncate the oldest messages outright."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Everything in a request — every prior message including tool results — competes for space in the context window, and progressive summarization is a common way transactional facts like exact dollar amounts, dates, and order numbers get quietly condensed into vague language across rounds. The fix is a persistent \"case facts\" block holding exact figures, kept outside the summarized narrative. Blaming pure hallucination ignores that the correct number existed earlier in context and was specifically lost through compression. Reducing turns or blind truncation don't address the actual failure mode — lossy compression of specific values, not context size alone.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Everything%20in%20the%20request%20counts%20toward%20the%20context%20window",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Everything in the request counts toward the context window: the system prompt, every message in messages (including tool results, images, and documents), and your tool definitions. The output Claude generates for the turn, including its extended thinking, counts too.",
+    "sourceHighlight": "Everything in the request counts toward the context window"
+  },
+  {
+    "id": "adv-104",
+    "number": 104,
+    "domain": "context-management",
+    "difficulty": "3x",
+    "text": "A long-running multi-agent codebase exploration crashes partway through. On restart, you want the coordinator to resume without re-exploring everything from scratch. What's the most reliable design?",
+    "options": [
+      "Restart entirely from the beginning each time, since re-exploration guarantees fresh, accurate findings.",
+      "Rely on --resume alone with no structured state, since resuming a named session restores everything automatically.",
+      "Keep all state only in the crashed process's memory and manually retype the findings after restart.",
+      "Have each agent export its state to a structured location as it works, and have the coordinator load a manifest of that state on resume, injecting it into the new session."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Structured state persistence — each agent exporting findings to a known location, with the coordinator loading a manifest of that state on resume — is the reliable pattern for crash recovery, since it survives the crash independent of any single process's memory. Full re-exploration is exactly the wasted, repeated work this design avoids. Session resumption alone helps when prior context is still valid but doesn't substitute for structured state when the session itself crashed. Manually retyping findings is not a reliable or scalable recovery mechanism.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Compaction%20automatically%20summarizes%20earlier%20parts%20of%20the%20conversation%20on%20the%20server",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Compaction automatically summarizes earlier parts of the conversation on the server, so the conversation can continue past the context window limit.",
+    "sourceHighlight": "automatically summarizes earlier parts of the conversation"
+  },
+  {
+    "id": "adv-105",
+    "number": 105,
+    "domain": "context-management",
+    "difficulty": "3x",
+    "text": "You're deep into a long Claude Code session and context is filling with verbose exploration output, but the key findings so far are still accurate and relevant. What's the appropriate way to reclaim context budget without losing that work?",
+    "options": [
+      "Use /compact to summarize the conversation so far on the server, freeing context space while preserving the important information.",
+      "Start an entirely new session with no summary, since a clean context is always more reliable than a compacted one.",
+      "Manually delete the oldest half of the messages regardless of what they contain.",
+      "Keep working in the same session and let the context window overflow silently."
+    ],
+    "correctAnswer": 0,
+    "explanation": "/compact is designed for exactly this situation: it frees up context space by summarizing the conversation so far, letting you continue without losing important information — preferable to a full restart when the accumulated findings are still valid and worth preserving. Starting completely fresh with nothing carried over throws away accurate, still-relevant work. Deleting the oldest messages indiscriminately risks removing important findings rather than compressible detail. Letting the window overflow risks losing content non-deliberately rather than compressing it deliberately.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=Compaction%20automatically%20summarizes%20earlier%20parts%20of%20the%20conversation%20on%20the%20server",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "Compaction automatically summarizes earlier parts of the conversation on the server, so the conversation can continue past the context window limit.",
+    "sourceHighlight": "automatically summarizes earlier parts of the conversation"
+  },
+  {
+    "id": "adv-106",
+    "number": 106,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An order-lookup tool returns 40+ fields per call, but only 5 are ever relevant to the refund-processing task the agent is performing. Over a multi-issue session, these tool results accumulate and crowd out other context. What's the most effective fix?",
+    "options": [
+      "Increase the model's context window so all 40+ fields always fit regardless of relevance.",
+      "Trim each tool result to only the fields relevant to the current task before it's added to context.",
+      "Stop calling the order-lookup tool altogether to avoid the accumulation problem.",
+      "Summarize the entire conversation after every single tool call to keep it short."
+    ],
+    "correctAnswer": 1,
+    "explanation": "As token count grows, accuracy and recall degrade, making it important to curate what's actually in context rather than just how much space is available — trimming verbose tool output down to the fields the task actually needs directly reduces irrelevant accumulation without losing needed information. A bigger context window doesn't fix the signal-to-noise problem, it just delays it. Not calling the tool removes needed information along with the noise. Summarizing after every call is far more aggressive and costly than simply filtering fields at the source.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/context-windows#:~:text=As%20token%20count%20grows%2C%20accuracy%20and%20recall%20degrade%2C%20a%20phenomenon%20known%20as%20context%20rot.",
+    "sourceLabel": "Claude Docs: Context Windows",
+    "sourceExcerpt": "As token count grows, accuracy and recall degrade, a phenomenon known as context rot. This makes curating what's in context just as important as how much space is available.",
+    "sourceHighlight": "accuracy and recall degrade, a phenomenon known as context rot"
+  },
+  {
+    "id": "adv-107",
+    "number": 107,
+    "domain": "context-management",
+    "difficulty": "3x",
+    "text": "You're deciding how to allocate limited human-reviewer capacity across a large stream of automated extractions. Which routing strategy best uses that capacity?",
+    "options": [
+      "Route a fixed random 5% sample of all extractions to human review regardless of confidence or content.",
+      "Route only extractions the model explicitly flags as low-confidence in its own free-text commentary, with no other signal.",
+      "Route extractions based on field-level confidence scores, document characteristics, and detected field-level ambiguity, prioritizing the cases most likely to be wrong.",
+      "Route extractions alphabetically by document name until reviewer capacity for the day is exhausted."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Confidence- and characteristic-based routing directs limited reviewer attention to the cases most likely to contain errors — ambiguous fields, unusual document types, low model confidence — rather than spending that capacity uniformly. Pure random sampling is useful for measuring aggregate error rates but wastes reviewer time on cases the model already handles reliably. Relying solely on unstructured free-text self-reported confidence is a much weaker and less calibrated signal than field-level confidence scores. Alphabetical routing has no relationship to actual error likelihood at all.",
+    "sourceUrl": "https://code.claude.com/docs/en/best-practices",
+    "sourceLabel": "Claude Code Docs: Best Practices (Verification Strategies)",
+    "sourceExcerpt": "A verification subagent or a dynamic workflow that checks its own findings has a fresh model try to refute the result, so the agent doing the work isn't the one grading it.",
+    "sourceHighlight": "so the agent doing the work isn't the one grading it"
+  },
+  {
+    "id": "adv-108",
+    "number": 108,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "Your extraction pipeline reports 97% overall accuracy, so you stop reviewing high-confidence extractions entirely. Months later you discover one document type has been silently failing at a much higher rate the whole time. What should have been in place to catch this earlier?",
+    "options": [
+      "A higher overall accuracy threshold before automating away human review, such as 99% instead of 97%.",
+      "A single monthly spot-check of five arbitrary extractions, regardless of document type.",
+      "Removing human review from the pipeline entirely once the aggregate score first crosses 95%.",
+      "Stratified random sampling of high-confidence extractions, broken out by document type and field, to detect novel error patterns hidden inside an aggregate metric."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Aggregate accuracy can mask poor performance on specific document types or fields, so ongoing stratified sampling — deliberately measuring error rates broken out by segment — is what surfaces a silently-failing document type that a single overall percentage would hide. A stricter overall threshold doesn't fix the aggregation problem; a bad segment could still be masked by good segments even at 99%. An arbitrary unstratified spot-check has no guarantee of ever touching the failing document type. Removing review entirely removes the only signal that could have caught the failure.",
+    "sourceUrl": "https://code.claude.com/docs/en/best-practices",
+    "sourceLabel": "Claude Code Docs: Best Practices (Verification Strategies)",
+    "sourceExcerpt": "A verification subagent or a dynamic workflow that checks its own findings has a fresh model try to refute the result, so the agent doing the work isn't the one grading it.",
+    "sourceHighlight": "so the agent doing the work isn't the one grading it"
+  },
+  {
+    "id": "adv-109",
+    "number": 109,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An extraction tool returns two conflicting values for the same field because the source document itself contains contradictory numbers on different pages. How should this case be routed?",
+    "options": [
+      "Route the extraction to human review, since the ambiguity originates in the source document itself, not in model uncertainty about a clear document.",
+      "Have the model silently pick whichever value appears first in the document and proceed without flagging anything.",
+      "Discard the field entirely and mark it as successfully extracted with a null value.",
+      "Automatically average the two conflicting numeric values and use that as the final answer."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Ambiguous or contradictory source documents are exactly the kind of case that should route to human review rather than being resolved silently, since no amount of model confidence calibration fixes a genuinely contradictory source. Silently picking the first value, or averaging the two, both fabricate a resolution the source doesn't actually support. Marking it null without flagging the underlying contradiction discards information a reviewer would need to resolve the conflict correctly.",
+    "sourceUrl": "https://code.claude.com/docs/en/best-practices",
+    "sourceLabel": "Claude Code Docs: Best Practices (Verification Strategies)",
+    "sourceExcerpt": "A verification subagent or a dynamic workflow that checks its own findings has a fresh model try to refute the result, so the agent doing the work isn't the one grading it.",
+    "sourceHighlight": "so the agent doing the work isn't the one grading it"
+  },
+  {
+    "id": "adv-110",
+    "number": 110,
+    "domain": "context-management",
+    "difficulty": "3x",
+    "text": "Your extraction model outputs a confidence score with every field, but you're not sure what threshold should trigger human review. What's the correct way to calibrate that threshold?",
+    "options": [
+      "Pick a round-number threshold like 0.8 based on intuition and apply it uniformly across all fields and document types.",
+      "Use a labeled validation set to measure actual error rates at different confidence levels, and calibrate the review threshold against that measured relationship.",
+      "Skip calibration entirely and route every extraction with any confidence score below 1.0 to human review.",
+      "Ask the model what threshold it thinks is appropriate and use that value directly."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A model's raw confidence score isn't inherently meaningful until it's calibrated against measured outcomes — a labeled validation set lets you determine, empirically, what error rate actually corresponds to a given confidence level, and set the review threshold accordingly. An intuition-based round number has no empirical grounding and may not match the model's real error distribution. Routing everything below 1.0 would send nearly all extractions to review, defeating the purpose of confidence-based triage. Asking the model to self-select its own threshold has the same self-assessment weakness as any unvalidated self-report.",
+    "sourceUrl": "https://code.claude.com/docs/en/best-practices",
+    "sourceLabel": "Claude Code Docs: Best Practices (Verification Strategies)",
+    "sourceExcerpt": "A verification subagent or a dynamic workflow that checks its own findings has a fresh model try to refute the result, so the agent doing the work isn't the one grading it.",
+    "sourceHighlight": "so the agent doing the work isn't the one grading it"
+  },
+  {
+    "id": "adv-111",
+    "number": 111,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "You need to generate a technical-debt summary across 500 repositories once per night; nobody is waiting on the result in real time, and it just needs to be ready by morning. Which API mode fits, and why?",
+    "options": [
+      "The synchronous Messages API, called 500 times back-to-back, since synchronous calls are always faster per-request.",
+      "The synchronous Messages API with all 500 requests fired concurrently from a thread pool, to force lower latency.",
+      "The Message Batches API, since the workload is non-blocking and latency-tolerant, and batch processing offers a substantial cost discount for exactly this pattern.",
+      "Neither API is appropriate; this workload should be done by a human instead."
+    ],
+    "correctAnswer": 2,
+    "explanation": "The Message Batches API exists specifically for large-volume, non-urgent requests where results aren't needed immediately — it processes asynchronously at a meaningful cost discount, which fits an overnight, non-blocking report perfectly. Calling the synchronous API 500 times, sequentially or concurrently, works but pays full synchronous pricing and adds operational complexity for a workload that doesn't need real-time results at all. Ruling out an LLM approach entirely ignores that this is exactly the batch workload the API targets.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "sourceLabel": "Claude API Docs: Batch Processing",
+    "sourceExcerpt": "The Message Batches API is a powerful, cost-effective way to asynchronously process large volumes of Messages requests. This approach is well-suited to tasks that do not require immediate responses, with most batches finishing in less than 1 hour while reducing costs by 50%.",
+    "sourceHighlight": "asynchronously process large volumes of Messages requests"
+  },
+  {
+    "id": "adv-112",
+    "number": 112,
+    "domain": "prompt-engineering",
+    "difficulty": "3x",
+    "text": "Your team commits to a 30-hour SLA for a nightly analysis report, and you use the Message Batches API, which can take up to 24 hours to complete a batch. How should you schedule submissions to reliably meet the SLA?",
+    "options": [
+      "Submit one batch per day at a fixed time and hope the 24-hour ceiling leaves enough margin.",
+      "Submit as many overlapping batches as possible simultaneously to guarantee at least one finishes quickly.",
+      "Switch to the synchronous API entirely, since only synchronous calls can guarantee any SLA.",
+      "Submit batches on a schedule with enough buffer below the 24-hour ceiling — e.g., every few hours — so that even a worst-case processing time still lands within the 30-hour SLA window."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Since batch processing has no guaranteed latency SLA and can take up to 24 hours, meeting a 30-hour end-to-end SLA requires submitting on a schedule with enough buffer that even a worst-case 24-hour batch still completes with room to spare — a single fixed daily submission leaves no margin if that particular batch runs long. Submitting many redundant overlapping batches wastes cost without improving the guarantee, since any individual batch can still take up to 24 hours. Abandoning batch processing for the synchronous API throws away the cost savings that make batch processing worthwhile for a latency-tolerant workload like this.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "sourceLabel": "Claude API Docs: Batch Processing",
+    "sourceExcerpt": "The Message Batches API is a powerful, cost-effective way to asynchronously process large volumes of Messages requests. This approach is well-suited to tasks that do not require immediate responses, with most batches finishing in less than 1 hour while reducing costs by 50%.",
+    "sourceHighlight": "asynchronously process large volumes of Messages requests"
+  },
+  {
+    "id": "adv-113",
+    "number": 113,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A batch of 2,000 document-extraction requests completes, but 30 of them failed — some because a document exceeded context limits, others due to transient errors. What's the correct way to handle the failures?",
+    "options": [
+      "Identify the 30 failed requests by their custom_id, apply targeted fixes (e.g., chunking oversized documents), and resubmit only those.",
+      "Resubmit the entire 2,000-request batch from scratch to be safe.",
+      "Discard the 30 failed documents permanently since a 98.5% success rate is already high.",
+      "Manually process the 30 failures one at a time through the developer console with no changes to the input."
+    ],
+    "correctAnswer": 0,
+    "explanation": "custom_id fields exist to correlate batch request/response pairs, letting you isolate exactly which requests failed and why, then resubmit only those — with modifications like chunking for the ones that failed due to context limits — rather than reprocessing everything. Resubmitting the full 2,000 wastes cost re-running 1,970 requests that already succeeded. Discarding the failures outright silently drops real data rather than fixing the underlying issue. Manually reprocessing with no changes will simply reproduce the same context-limit failures for documents that were too large to begin with.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "sourceLabel": "Claude API Docs: Batch Processing",
+    "sourceExcerpt": "The Message Batches API is a powerful, cost-effective way to asynchronously process large volumes of Messages requests. This approach is well-suited to tasks that do not require immediate responses, with most batches finishing in less than 1 hour while reducing costs by 50%.",
+    "sourceHighlight": "asynchronously process large volumes of Messages requests"
+  },
+  {
+    "id": "adv-114",
+    "number": 114,
+    "domain": "prompt-engineering",
+    "difficulty": "3x",
+    "text": "A structured extraction pipeline must always run a metadata-extraction tool before any of several enrichment tools are allowed to run, but the model sometimes calls an enrichment tool first when given a free choice. How do you guarantee the correct order?",
+    "options": [
+      "Add a strongly worded instruction in the system prompt telling the model to always call metadata extraction first.",
+      "Force tool selection with tool_choice specifying the metadata-extraction tool by name for the first turn, then allow the enrichment tools in subsequent turns.",
+      "Set tool_choice to \"auto\" so the model has maximum flexibility to decide the right order itself.",
+      "Combine all the enrichment tools and the metadata tool into one single mega-tool so ordering no longer matters."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Forcing a specific named tool via tool_choice guarantees that exact tool is called on that turn, which is the reliable way to enforce a required first step before allowing other tools in later turns. A prompt-level instruction is probabilistic — it's the exact failure mode described in the scenario, since the model sometimes ignores it already. tool_choice: \"auto\" is precisely what allows the out-of-order behavior in the first place, since the model retains free choice. Merging all tools into one removes the composability the pipeline needs and doesn't actually address sequencing so much as sidestep the tool architecture entirely.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use",
+    "sourceLabel": "Claude Docs: Strict Tool Use",
+    "sourceExcerpt": "Setting strict: true on a tool definition guarantees Claude’s tool inputs match your JSON Schema. Combining tool_choice: {\"type\": \"any\"} with strict tool use guarantees both that one of your tools will be called AND that the tool inputs strictly follow your schema.",
+    "sourceHighlight": "guarantees both that one of your tools will be called AND that the tool inputs strictly follow your schema"
+  },
+  {
+    "id": "adv-115",
+    "number": 115,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A document could be one of several types, each requiring a different extraction schema, and the pipeline cannot tolerate the model responding with plain conversational text instead of calling one of the extraction tools. What tool_choice configuration guarantees a tool is called?",
+    "options": [
+      "tool_choice: \"auto\", since it gives the model full discretion to decide what's best.",
+      "tool_choice forced to a single specific tool name, even though the document type is unknown in advance.",
+      "tool_choice: {\"type\": \"any\"}, since it forces the model to call some tool while still letting it pick which one fits the document.",
+      "No tool_choice configuration at all, relying on the system prompt to request tool use."
+    ],
+    "correctAnswer": 2,
+    "explanation": "tool_choice: {\"type\": \"any\"} guarantees the model calls one of the available tools rather than returning conversational text, while still letting it select which tool matches the actual document type — exactly the flexibility this ambiguous-type scenario needs. \"auto\" permits a plain-text response, which is the failure mode the pipeline can't tolerate. Forcing one specific tool name is wrong when the document type is genuinely unknown in advance and might not match that tool at all. Omitting tool_choice and hoping the system prompt is enough reintroduces the same unreliability \"any\" is designed to eliminate.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use",
+    "sourceLabel": "Claude Docs: Strict Tool Use",
+    "sourceExcerpt": "Setting strict: true on a tool definition guarantees Claude’s tool inputs match your JSON Schema. Combining tool_choice: {\"type\": \"any\"} with strict tool use guarantees both that one of your tools will be called AND that the tool inputs strictly follow your schema.",
+    "sourceHighlight": "guarantees both that one of your tools will be called AND that the tool inputs strictly follow your schema"
+  },
+  {
+    "id": "adv-116",
+    "number": 116,
+    "domain": "prompt-engineering",
+    "difficulty": "3x",
+    "text": "Your automated review prompt defines severity levels (critical/major/minor) in prose, but findings are classified inconsistently — the same class of bug gets labeled critical in one file and minor in another. What is the most effective fix?",
+    "options": [
+      "Remove severity levels entirely and report every finding as the same priority.",
+      "Instruct the model to \"use your best judgment\" about severity without further detail.",
+      "Increase the number of prose adjectives describing each severity level (e.g., \"very critical\" vs. \"extremely critical\").",
+      "Add few-shot examples pairing concrete code snippets with their correct severity label and a short rationale for each level."
+    ],
+    "correctAnswer": 3,
+    "explanation": "Few-shot examples pairing real code with the correct severity label and rationale give the model concrete anchors for a judgment call that prose definitions alone leave too open to interpretation, directly targeting consistency across similar cases. Removing severity entirely discards useful information rather than fixing the inconsistency. Telling the model to use its best judgment is the same underspecified instruction already producing inconsistent results. Piling on more prose adjectives doesn't supply the concrete grounding examples provide.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "sourceLabel": "Claude Docs: Prompting Best Practices",
+    "sourceExcerpt": "Few well-crafted examples (known as few-shot or multishot prompting) improve accuracy and consistency. Effective examples should be relevant (mirroring your actual use case closely) and diverse (covering edge cases).",
+    "sourceHighlight": "improve accuracy and consistency"
+  },
+  {
+    "id": "adv-117",
+    "number": 117,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "You need to find every file in a large repository whose name matches the pattern `**/*.test.tsx`, without regard to what's inside those files. Which built-in tool is the right choice?",
+    "options": [
+      "Glob, since it matches files by name/path pattern rather than by content.",
+      "Grep, since it searches broadly across the codebase.",
+      "Read, since it's needed to inspect file contents for matches.",
+      "Bash, since a shell command is required for any file-pattern search."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Glob is built specifically for file path pattern matching — finding files by name or extension pattern — which is exactly this task, since the question is about which files exist, not what's inside them. Grep searches file contents for patterns, which isn't needed here since no content matching is required. Read loads full file contents, which is unnecessary and wasteful for a pure name-matching task. Reaching for Bash works but bypasses the purpose-built tool without any benefit.",
+    "sourceUrl": "https://code.claude.com/docs/en/tools-reference",
+    "sourceLabel": "Claude Code Docs: Tools Reference",
+    "sourceExcerpt": "Read reads the contents of files. Glob finds files based on pattern matching. Grep searches for patterns in file contents. Bash executes shell commands in your environment.",
+    "sourceHighlight": "Glob finds files based on pattern matching"
+  },
+  {
+    "id": "adv-118",
+    "number": 118,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "You need to find every place in the codebase that calls a specific function by name, regardless of which files it appears in. Which built-in tool should you use first?",
+    "options": [
+      "Glob, since it's the tool for finding things across a codebase.",
+      "Grep, since it searches file contents for patterns like function names.",
+      "Read, applied to every file in the repository one at a time.",
+      "Bash, using a custom find command instead of the built-in search tools."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Grep searches file contents for patterns — function names, error messages, import statements — making it the right first tool when the task is about what's inside files rather than which files exist. Glob matches file names/paths, not file contents, so it wouldn't find the function calls themselves. Reading every file one at a time is far less efficient than a targeted content search. Reaching for a custom Bash find command duplicates functionality Grep already provides.",
+    "sourceUrl": "https://code.claude.com/docs/en/tools-reference",
+    "sourceLabel": "Claude Code Docs: Tools Reference",
+    "sourceExcerpt": "Read reads the contents of files. Glob finds files based on pattern matching. Grep searches for patterns in file contents. Bash executes shell commands in your environment.",
+    "sourceHighlight": "Grep searches for patterns in file contents"
+  },
+  {
+    "id": "adv-119",
+    "number": 119,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "You're exploring an unfamiliar codebase to understand how a legacy authentication flow works, and the codebase is far too large to read in full. What is the most effective exploration strategy?",
+    "options": [
+      "Read every file in the repository sequentially until the full picture emerges.",
+      "Use only Glob to list every file with \"auth\" in its name and stop once the list is generated.",
+      "Start with Grep to locate the authentication entry points, then use Read to follow the specific imports and trace the flow from there, building understanding incrementally.",
+      "Ask a fresh agent to reimplement authentication from scratch instead of tracing the existing flow."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Systematic exploration starts with a targeted content search (Grep) to find entry points, then uses Read to follow imports and trace flows from there — building incremental understanding while managing context, rather than reading everything upfront. Reading the entire repository sequentially wastes context on irrelevant files and doesn't scale on a large codebase. Glob alone only produces a file list by name; it doesn't reveal how the flow actually works. Reimplementing from scratch doesn't achieve the stated goal of understanding the existing flow.",
+    "sourceUrl": "https://code.claude.com/docs/en/tools-reference",
+    "sourceLabel": "Claude Code Docs: Tools Reference",
+    "sourceExcerpt": "Read reads the contents of files. Glob finds files based on pattern matching. Grep searches for patterns in file contents. Bash executes shell commands in your environment.",
+    "sourceHighlight": "Read reads the contents of files"
+  },
+  {
+    "id": "adv-120",
+    "number": 120,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "Your agent repeatedly makes exploratory tool calls just to list which issues exist in a connected issue tracker before doing any real work on a specific one. How should this catalog of available issues be exposed to reduce that overhead?",
+    "options": [
+      "As an MCP tool that must be called every time the agent needs to check what issues exist.",
+      "As a hardcoded list in the system prompt that is manually updated whenever an issue is opened or closed.",
+      "By instructing the agent to cache its own memory of the issue list between sessions.",
+      "As an MCP resource exposing the issue catalog as content the agent can reference directly, reducing repeated exploratory tool calls."
+    ],
+    "correctAnswer": 3,
+    "explanation": "MCP resources are meant for exposing content catalogs — like an issue tracker's summaries — as data the agent can reference, which is precisely the mechanism for reducing exploratory tool calls compared to treating the same catalog as an action-oriented tool the agent has to invoke repeatedly. Modeling it purely as a callable tool keeps the exploratory-call overhead the scenario is trying to eliminate. A manually maintained system-prompt list goes stale and doesn't scale. Relying on the agent's own session memory doesn't help across a single session where the repeated calls are already happening, and isn't reliable across agent restarts.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "MCP servers give Claude Code access to your tools, databases, and APIs. Connect a server when you find yourself copying data into chat from another tool, like an issue tracker or a monitoring dashboard.",
+    "sourceHighlight": "Connect a server when you find yourself copying data into chat"
   }
 ]
