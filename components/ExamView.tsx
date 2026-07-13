@@ -18,6 +18,7 @@ import {
   DialogBody,
   DialogFooter,
   DialogTitle,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
@@ -874,61 +875,110 @@ export function ExamView() {
         {dialogOpen && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.6)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(10,14,40,0.72)',
               backdropFilter: 'blur(8px)',
-              padding: '16px'
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '24px',
             }}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 16 }}
+              transition={{ duration: 0.22 }}
+              style={{ width: '100%', maxWidth: '420px' }}
             >
               <Box
-                bg="rgba(255, 255, 255, 0.88)"
-                backdropFilter="blur(20px)"
-                _dark={{
-                  bg: "rgba(15, 23, 42, 0.88)",
-                  borderColor: "rgba(255, 255, 255, 0.12)"
-                }}
-                w="100%"
-                maxW="500px"
+                bg="rgba(255,255,255,0.97)"
+                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
                 borderRadius="2xl"
-                border="1px solid"
-                borderColor="rgba(255, 255, 255, 0.45)"
-                boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
-                p={[6, 8]}
-                position="relative"
+                border="1px solid rgba(255,255,255,0.35)"
+                boxShadow="0 24px 64px rgba(10,14,40,0.35)"
+                overflow="hidden"
               >
-                <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: "brand.200" }} mb={4}>
-                  {isTimed ? 'Pause practice exam?' : 'Exit simulator?'}
-                </Heading>
-                <Text fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight="tall" mb={6}>
-                  {isTimed
-                    ? 'Your practice exam timer is paused. Click Resume to continue, or Exit to reset all your progress.'
-                    : 'Are you sure you want to exit? All current progress will be lost.'}
-                </Text>
-                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
-                  <Button variant="outline" size="sm" onClick={handleResume} fontWeight={600} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
-                    {isTimed ? 'Resume' : 'Cancel'}
+                <Box px={6} pt={7} pb={5} textAlign="center">
+                  <Box
+                    display="inline-flex" alignItems="center" justifyContent="center"
+                    w={14} h={14} borderRadius="full"
+                    bg={isTimed ? "rgba(57,73,171,0.08)" : "rgba(239,68,68,0.08)"} mb={4}
+                    border="2px solid" borderColor={isTimed ? "rgba(57,73,171,0.15)" : "rgba(239,68,68,0.15)"}
+                  >
+                    <Text fontSize="2xl">{isTimed ? '⏸' : '🚪'}</Text>
+                  </Box>
+                  <Heading size="lg" fontWeight={800} color="brand.700" mb={1}
+                    _dark={{ color: 'gray.100' }}>
+                    {isTimed ? 'Exam Paused' : 'Exit Simulator?'}
+                  </Heading>
+                  <Text fontSize="sm" color="gray.500">
+                    {isTimed ? 'Your progress is saved automatically.' : 'Are you sure you want to exit? All current progress will be lost.'}
+                  </Text>
+                </Box>
+
+                <Box mx={6} mb={5} p={4} borderRadius="xl"
+                  bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
+                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
+                  <SimpleGrid columns={3} gap={3}>
+                    {[
+                      { label: 'Answered', value: `${answeredCount}/${questions.length}` },
+                      { label: 'Remaining', value: `${questions.length - answeredCount}` },
+                      { label: 'Flagged', value: `${flagged.filter(Boolean).length}` },
+                    ].map((s) => (
+                      <Box key={s.label} textAlign="center">
+                        <Text fontSize="lg" fontWeight={800} color="brand.700"
+                          _dark={{ color: 'brand.200' }}>{s.value}</Text>
+                        <Text fontSize="2xs" color="gray.500" fontWeight={600}>{s.label}</Text>
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+
+                <VStack gap={2.5} px={6} pb={7}>
+                  <Button
+                    w="full" size="lg"
+                    bg="brand.600" color="white"
+                    fontWeight={700} borderRadius="xl"
+                    boxShadow="0 4px 14px rgba(57,73,171,0.35)"
+                    _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
+                    transition="all 0.2s"
+                    onClick={isTimed ? handleResume : () => setDialogOpen(false)}
+                  >
+                    {isTimed ? '▶ Resume Exam' : 'Cancel'}
                   </Button>
-                  <Button bg="red.600" color="white" _hover={{ bg: 'red.700' }} size="sm" onClick={handleExit} fontWeight={700}>
-                    {isTimed ? 'Exit Practice' : 'Exit Simulator'}
+                  {isTimed && (
+                    <Button
+                      w="full" size="md"
+                      bg={(questions.length - answeredCount) === 0 ? 'green.500' : 'rgba(239,68,68,0.08)'}
+                      color={(questions.length - answeredCount) === 0 ? 'white' : 'red.500'}
+                      border="1px solid"
+                      borderColor={(questions.length - answeredCount) === 0 ? 'transparent' : 'rgba(239,68,68,0.25)'}
+                      fontWeight={700} borderRadius="xl"
+                      _hover={{
+                        bg: (questions.length - answeredCount) === 0 ? 'green.600' : 'rgba(239,68,68,0.14)',
+                        transform: 'translateY(-1px)',
+                      }}
+                      transition="all 0.2s"
+                      onClick={() => { setDialogOpen(false); handleFinishClick(); }}
+                    >
+                      {(questions.length - answeredCount) === 0 ? '✓ Submit Exam' : `Submit Early (${questions.length - answeredCount} unanswered)`}
+                    </Button>
+                  )}
+                  <Button
+                    w="full" size="sm"
+                    variant="ghost"
+                    color={isTimed ? "gray.500" : "red.500"}
+                    fontWeight={600}
+                    borderRadius="xl"
+                    _hover={{ color: isTimed ? 'brand.600' : 'red.600', bg: isTimed ? 'rgba(57,73,171,0.06)' : 'rgba(239,68,68,0.06)' }}
+                    onClick={handleExit}
+                  >
+                    ← {isTimed ? 'Exit to Configuration' : 'Exit and Lose Progress'}
                   </Button>
-                </HStack>
+                </VStack>
               </Box>
             </motion.div>
           </motion.div>

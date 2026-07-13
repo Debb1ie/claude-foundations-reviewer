@@ -25,12 +25,13 @@ interface AdvancedExamStore {
   answers: (number | null)[];
   isStarted: boolean;
   isComplete: boolean;
+  isExpertMode: boolean;
   startTime: number | null;
   endTime: number | null;
   flagged: boolean[];
   revealed: boolean[];
 
-  start: () => void;
+  start: (expertMode?: boolean) => void;
   setAnswer: (answer: number) => void;
   goToQuestion: (index: number) => void;
   nextQuestion: () => void;
@@ -83,17 +84,19 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       answers: new Array(typedQuestions.length).fill(null),
       isStarted: false,
       isComplete: false,
+      isExpertMode: false,
       startTime: null,
       endTime: null,
       flagged: new Array(typedQuestions.length).fill(false),
       revealed: new Array(typedQuestions.length).fill(false),
 
-      start: () => {
+      start: (expertMode = false) => {
         set({
           currentQuestion: 0,
           answers: new Array(typedQuestions.length).fill(null),
           isStarted: true,
           isComplete: false,
+          isExpertMode: expertMode,
           startTime: Date.now(),
           endTime: null,
           flagged: new Array(typedQuestions.length).fill(false),
@@ -153,6 +156,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           answers: new Array(typedQuestions.length).fill(null),
           isStarted: false,
           isComplete: false,
+          isExpertMode: false,
           startTime: null,
           endTime: null,
           flagged: new Array(typedQuestions.length).fill(false),
@@ -178,6 +182,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
         answers: state.answers,
         isStarted: state.isStarted,
         isComplete: state.isComplete,
+        isExpertMode: state.isExpertMode,
         startTime: state.startTime,
         endTime: state.endTime,
         flagged: state.flagged,
