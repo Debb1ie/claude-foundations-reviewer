@@ -52,16 +52,14 @@ const targetPerDomain: Record<string, number> = {
   'context-management': 12,
 };
 
-// Evenly spaced (systematic) sample so a capped-down domain still draws from
-// across the whole pool — old and newly-added questions alike — instead of
-// truncating from one end.
-function systematicSample<T>(items: T[], n: number): T[] {
-  if (items.length <= n) return items;
-  const picked: T[] = [];
-  for (let i = 0; i < n; i++) {
-    picked.push(items[Math.floor((i * items.length) / n)]);
+// Fisher-Yates, generic.
+function shuffleArray<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return picked;
+  return arr;
 }
 
 // Fisher-Yates. Re-run per attempt so the correct answer's position (and any
@@ -80,36 +78,44 @@ function shuffleOptions(q: AdvancedQuestion): AdvancedQuestion {
 }
 
 const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
-const typedQuestions: AdvancedQuestion[] = Object.keys(targetPerDomain).flatMap((domain) => {
-  const target = targetPerDomain[domain];
-  const threes = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '3x');
-  const twos = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '2x');
-  if (threes.length >= target) return systematicSample(threes, target);
-  return threes.concat(systematicSample(twos, target - threes.length));
-});
+export const TOTAL_QUESTIONS = Object.values(targetPerDomain).reduce((a, b) => a + b, 0);
+
+// Re-run per attempt: both WHICH questions get drawn per domain and the final
+// question order are randomized, so no two sessions show the same exam in the
+// same sequence — a fixed pool + fixed order is trivially memorizable otherwise.
+function buildSession(): AdvancedQuestion[] {
+  const perDomain = Object.keys(targetPerDomain).flatMap((domain) => {
+    const target = targetPerDomain[domain];
+    const threes = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '3x');
+    const twos = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '2x');
+    if (threes.length >= target) return shuffleArray(threes).slice(0, target);
+    return shuffleArray(threes).concat(shuffleArray(twos).slice(0, target - threes.length));
+  });
+  return shuffleArray(perDomain).map(shuffleOptions);
+}
 
 export const useAdvancedExamStore = create<AdvancedExamStore>()(
   persist(
     (set, get) => ({
-      questions: typedQuestions,
+      questions: [],
       currentQuestion: 0,
-      answers: new Array(typedQuestions.length).fill(null),
+      answers: new Array(TOTAL_QUESTIONS).fill(null),
       isStarted: false,
       isComplete: false,
       startTime: null,
       endTime: null,
-      flagged: new Array(typedQuestions.length).fill(false),
+      flagged: new Array(TOTAL_QUESTIONS).fill(false),
 
       start: () => {
         set({
-          questions: typedQuestions.map(shuffleOptions),
+          questions: buildSession(),
           currentQuestion: 0,
-          answers: new Array(typedQuestions.length).fill(null),
+          answers: new Array(TOTAL_QUESTIONS).fill(null),
           isStarted: true,
           isComplete: false,
           startTime: Date.now(),
           endTime: null,
-          flagged: new Array(typedQuestions.length).fill(false),
+          flagged: new Array(TOTAL_QUESTIONS).fill(false),
         });
       },
 
@@ -155,12 +161,12 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       reset: () => {
         set({
           currentQuestion: 0,
-          answers: new Array(typedQuestions.length).fill(null),
+          answers: new Array(TOTAL_QUESTIONS).fill(null),
           isStarted: false,
           isComplete: false,
           startTime: null,
           endTime: null,
-          flagged: new Array(typedQuestions.length).fill(false),
+          flagged: new Array(TOTAL_QUESTIONS).fill(false),
         });
       },
 
