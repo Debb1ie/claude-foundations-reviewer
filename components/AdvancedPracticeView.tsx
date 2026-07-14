@@ -747,7 +747,16 @@ function QuestionView() {
   );
 
   return (
-    <Box minH="100vh" bg="transparent" display="flex" flexDirection="column">
+    <Box
+      minH="100vh"
+      bg="transparent"
+      display="flex"
+      flexDirection="column"
+      userSelect="none"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
+    >
       {/* Pause overlay */}
       <AnimatePresence>
         {isPaused && (
