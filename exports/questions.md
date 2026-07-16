@@ -1,6 +1,6 @@
 # CCA-F Question Bank
 > Claude Certified Architect — Foundations Exam
-> Exported on 2026-06-05
+> Exported on 2026-07-16
 > Total Questions: 125
 
 ---
@@ -15,19 +15,19 @@
 
 **Options:**
 
-A. **[✓]** Check stop_reason after each API response, continue on tool_use, and terminate on end_turn with each tool result appended between iterations
+A. Pre-configure a fixed sequential tool chain so verification, refund, and notification always execute unconditionally in a deterministic order
 
-B. Enforce a fixed minimum of three tool-use iterations before the agent is permitted to present any final response to the customer
+B. Parse assistant message text for completion keywords like resolved or finished to infer when the workflow has reached its terminal state
 
-C. Parse the assistant natural language output for completion phrases like the issue is resolved to determine when the task is finished
+C. **[✓]** Check stop_reason after each API response, continue looping on tool_use, terminate on end_turn, and append each tool result in the user turn
 
-D. Pre-configure a deterministic tool sequence that runs verification refund and notification tools in a fixed order on every request
+D. Enforce a minimum of three agentic iterations before allowing a final response, resetting the counter on any end_turn signal received
 
-**Correct Answer:** A
+**Correct Answer:** C
 
 **Explanation:** The correct approach is to check the stop_reason field in the API response. When stop_reason is end_turn, the model has finished and is not requesting any tool calls. When it is tool_use, the model is requesting to call a tool and the loop should continue. Fixed iteration counts or content length heuristics are brittle and do not reflect the model's actual state.
 
-**Source:** Exam Guide Ã‚Â§Task 1.1
+**Source:** Exam Guide §Task 1.1
 
 ---
 
@@ -39,19 +39,19 @@ D. Pre-configure a deterministic tool sequence that runs verification refund and
 
 **Options:**
 
-A. Append the tool result as a new user message with a returned prefix
+A. **[✓]** Append the tool result as a tool_result content block within the user turn following the assistant message that issued the tool_use block
 
-B. **[✓]** Append the tool result as a tool_result block within the same assistant turn
+B. Attach the tool result as a metadata field on the original tool_use block so the model can reference it in place during processing
 
-C. Create a new system message that contains the complete tool output data
+C. Append the tool result as a new user message with a tool_result prefix to clearly label it in the conversation history for the model
 
-D. Attach the tool result as metadata outside the standard messages array entirely
+D. Inject the tool result into the existing system message so the model treats it as persistent context available for all subsequent turns
 
-**Correct Answer:** B
+**Correct Answer:** A
 
-**Explanation:** Tool results must be appended as a tool_result content block within the same turn as the assistant message that issued the tool_use. This maintains the correct turn structure and allows the model to correlate the result with the specific tool call. Appending as user messages breaks the conversation structure and can confuse the model's understanding of who said what.
+**Explanation:** Tool results must be appended as a tool_result content block within the user turn that follows the assistant message that issued the tool_use. This maintains the correct turn structure and allows the model to correlate the result with the specific tool call via its tool_use_id. Labeling it as an ad-hoc text-prefixed message instead of a proper tool_result block (as in the other options) breaks this structure and can confuse the model's understanding of who said what.
 
-**Source:** Exam Guide Ã‚Â§Task 1.2
+**Source:** Exam Guide §Task 1.2
 
 ---
 
@@ -63,19 +63,19 @@ D. Attach the tool result as metadata outside the standard messages array entire
 
 **Options:**
 
-A. Execute all tasks sequentially in a single loop for context coherence
+A. **[✓]** Issue multiple Task tool calls within a single coordinator response so each research concern runs as a concurrent independent subagent
 
-B. Spawn an additional supervisor agent to coordinate the three subagents
+B. Route all three research concerns to a single multifunctional subagent that handles each domain in sequence within one extended session
 
-C. Use a single subagent that handles all three research concerns sequentially
+C. Spawn a dedicated supervisor subagent whose sole responsibility is coordinating the three domain-specific research subagents below it
 
-D. **[✓]** Issue multiple Task tool calls within a single coordinator response
+D. Execute all three research tasks sequentially inside a single agentic loop to preserve shared context coherence across the entire investigation
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** Parallel subagent execution is achieved by issuing multiple Task tool calls in a single coordinator response. Each Task invocation spawns an independent subagent that runs concurrently. This is far more efficient than sequential execution when tasks have no dependencies. The coordinator should then collect and synthesize results after all parallel tasks complete.
 
-**Source:** Exam Guide Ã‚Â§Task 1.3
+**Source:** Exam Guide §Task 1.3
 
 ---
 
@@ -87,19 +87,19 @@ D. **[✓]** Issue multiple Task tool calls within a single coordinator response
 
 **Options:**
 
-A. Reliance on too many specialist agents creates unnecessary system complexity
+A. The system uses too many specialist agents for the volume of requests, creating coordination overhead that exceeds the efficiency benefit
 
-B. Merge the billing agent functionality directly into the triage agent instead
+B. A single generalist agent should handle both triage and resolution to eliminate the overhead introduced by the multi-agent architecture
 
-C. **[✓]** Forcing every request through the full pipeline adds latency and token waste
+C. **[✓]** Routing all requests through the billing agent first before other specialists adds unnecessary latency and consumes tokens for irrelevant tasks
 
-D. A single monolithic agent should handle routing instead of multiple specialists
+D. Unconditional sequential routing through all specialists regardless of request type adds latency and wastes tokens on irrelevant processing
 
 **Correct Answer:** C
 
-**Explanation:** The anti-pattern is unconditionally routing through the full pipeline. A coordinator should use classification to direct requests only to relevant agents. Forcing every request through every specialist creates unnecessary latency, token consumption, and potential error surface area. The correct approach is intent-based routing where the coordinator classifies the request and dispatches only to relevant agents.
+**Explanation:** The anti-pattern is unconditionally routing every request through the billing agent first, regardless of what the request is actually about. A coordinator should use classification to direct requests only to relevant agents. Forcing every request through the billing agent as a mandatory first step creates unnecessary latency, token consumption, and potential error surface area for the 75% of requests that have nothing to do with billing. The correct approach is intent-based routing where the coordinator classifies the request and dispatches only to relevant agents.
 
-**Source:** Exam Guide Ã‚Â§Task 1.4
+**Source:** Exam Guide §Task 1.4
 
 ---
 
@@ -111,19 +111,19 @@ D. A single monolithic agent should handle routing instead of multiple specialis
 
 **Options:**
 
-A. Give the synthesis agent access to the full conversation history of all research agents
+A. **[✓]** Have the coordinator explicitly pass relevant research findings to the synthesis agent as part of the task specification or input parameters
 
-B. Let the synthesis agent call back to research agents on demand when it needs data
+B. Provision a shared read-write state store that all agents can access freely to read and update findings throughout the workflow execution
 
-C. **[✓]** Have the coordinator explicitly pass relevant findings to the synthesis agent in the task description
+C. Allow the synthesis agent to issue callback requests to research agents on demand whenever it needs clarification on specific data points
 
-D. Store all findings in a shared database that all agents can read at any time
+D. Grant the synthesis agent direct read access to the full conversation history of each research agent so it can trace findings back to source
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** Context isolation between subagents is critical. The coordinator should explicitly pass relevant findings to the synthesis agent via the task description or tool call parameters. This maintains clean separation of concerns, prevents context pollution, and ensures each agent receives only the information it needs. Direct access to other agents' histories or shared mutable state creates coupling and can lead to context degradation.
 
-**Source:** Exam Guide Ã‚Â§Task 1.5
+**Source:** Exam Guide §Task 1.5
 
 ---
 
@@ -135,19 +135,19 @@ D. Store all findings in a shared database that all agents can read at any time
 
 **Options:**
 
-A. The subagents lack sufficient system prompt instructions for their tasks
+A. The organization's API subscription tier does not include permissions required for multi-agent orchestration workflow execution
 
-B. The API key does not have permissions for multi-agent workflow types
+B. Subagents must be pre-registered and declared in a manifest configuration file before the coordinator can successfully delegate to them
 
-C. **[✓]** The Task tool is not listed in the coordinator allowed tools configuration
+C. Each subagent's system prompt lacks sufficiently detailed instructions about its domain responsibilities and expected output format
 
-D. The subagents must be registered in a separate configuration file
+D. **[✓]** The Task tool is absent from the coordinator's allowed tools list, so its delegation requests are silently rejected without spawning agents
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** For a coordinator to spawn subagents using the Task tool, that tool must be explicitly listed in the coordinator's allowedTools configuration. Without this, the coordinator's request to delegate is silently ignored or rejected. This is a common misconfiguration. The solution is to ensure the coordinator's tool configuration includes the Task tool.
 
-**Source:** Exam Guide Ã‚Â§Task 1.6
+**Source:** Exam Guide §Task 1.6
 
 ---
 
@@ -159,19 +159,19 @@ D. The subagents must be registered in a separate configuration file
 
 **Options:**
 
-A. **[✓]** Implement a programmatic prerequisite gate that blocks process_refund until get_customer has returned a verified customer identifier
+A. Provide multi-turn few-shot examples in the prompt that consistently demonstrate get_customer being called before process_refund each time
 
-B. Add a system prompt instruction stating that customer verification must occur before any refund operation is executed
+B. Configure an intent-classification router that analyzes each incoming request and enables only the subset of tools appropriate for that category
 
-C. Include few-shot examples showing the agent always calling get_customer before process_refund in every case
+C. Add a detailed system prompt instruction explicitly requiring that customer identity verification must precede every refund tool invocation
 
-D. Configure a routing classifier that analyzes each request type and enables only the tools appropriate for that request category
+D. **[✓]** Implement a programmatic PreToolUse gate that intercepts process_refund calls and blocks execution until get_customer has returned a verified ID
 
-**Correct Answer:** A
+**Correct Answer:** D
 
 **Explanation:** A programmatic prerequisite gate (via a PreToolUse hook or validation layer) that checks compliance conditions before allowing financial operations is essential for PCI compliance. Relying solely on model instructions is insufficient for regulatory requirements. The gate should verify conditions like identity verification, amount limits, and audit logging requirements before allowing any financial tool execution.
 
-**Source:** Exam Guide Ã‚Â§Task 1.7
+**Source:** Exam Guide §Task 1.7
 
 ---
 
@@ -183,19 +183,19 @@ D. Configure a routing classifier that analyzes each request type and enables on
 
 **Options:**
 
-A. Only the case identifier and the main reason for escalation
+A. **[✓]** Provide customer identity, root cause analysis, actions already taken, and all commitments made to the customer during prior interactions
 
-B. The complete raw conversation history for the senior team to read
+B. Include only the case identifier and the primary escalation reason so the senior team can quickly triage without being overwhelmed by details
 
-C. **[✓]** Customer details, root cause, actions taken, and commitments made
+C. Summarize the customer name and the disputed financial amount as the minimum information required to initiate senior team review
 
-D. Just the customer name and the disputed financial amount
+D. Transfer the complete unprocessed conversation transcript so the senior team has access to every statement made during the interaction
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** A proper handoff summary must include: customer details (identity, account info), root cause (what led to the issue), actions taken (what has already been attempted or resolved), and commitments made (any promises or expectations set with the customer). This ensures the receiving team has full context without needing to re-read raw conversation logs, enabling efficient case continuation.
 
-**Source:** Exam Guide Ã‚Â§Task 1.8
+**Source:** Exam Guide §Task 1.8
 
 ---
 
@@ -207,19 +207,19 @@ D. Just the customer name and the disputed financial amount
 
 **Options:**
 
-A. Document the required format in the project README and have developers comply manually
+A. **[✓]** Implement a PostToolUse hook that intercepts all tool results and normalizes timestamps to the standard format before they reach the model
 
-B. **[✓]** Use a PostToolUse hook to normalize all timestamps to a standard format after execution
+B. Accept heterogeneous timestamp formats throughout the pipeline and perform a single normalization pass only at the final presentation layer
 
-C. Have the coordinator agent reformat timestamps in natural language after receiving results
+C. Instruct the coordinator agent to detect and reformat inconsistent timestamps in natural language before passing data to downstream agents
 
-D. Accept all formats and convert everything at the presentation layer only for display
+D. Document the required ISO 8601 timestamp format in the project README and rely on developers to enforce it when building new subagent tools
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** A PostToolUse hook is the correct mechanism for transforming tool results after execution. By normalizing timestamps in this hook, you ensure consistent formatting before results reach the model or downstream agents. This keeps formatting logic centralized and maintainable, rather than relying on individual agents to comply or performing ad-hoc conversions.
 
-**Source:** Exam Guide Ã‚Â§Task 1.9
+**Source:** Exam Guide §Task 1.9
 
 ---
 
@@ -231,19 +231,19 @@ D. Accept all formats and convert everything at the presentation layer only for 
 
 **Options:**
 
-A. **[✓]** Implement a PreToolUse hook that intercepts calls and blocks refunds over five hundred dollars while redirecting to an escalation workflow
+A. Create a manager_approval tool that the model must explicitly invoke before calling process_refund whenever the requested amount is large
 
-B. Add a post-processing audit step that reviews all refunds after execution and flags unauthorized transactions for manual follow-up
+B. Modify the process_refund tool to cap its accepted amount parameter and require a separate elevated-permission tool for higher-value refunds
 
-C. Create a separate manager_approval tool that the agent must call before process_refund for any amount exceeding the threshold
+C. **[✓]** Implement a PreToolUse hook that inspects refund amount parameters, blocks calls exceeding five hundred dollars, and routes them for approval
 
-D. Reduce the refund limit parameter in the process_refund tool and require a separate tool for amounts that exceed that limit
+D. Add a PostToolUse audit step that flags unauthorized refunds after execution and queues them for manual review by a compliance officer
 
-**Correct Answer:** A
+**Correct Answer:** C
 
 **Explanation:** A PreToolUse hook is the correct interception mechanism. It runs before the tool executes, can inspect the tool parameters (like refund amount), and can block the call, redirect to an approval flow, or log the attempt. This provides a programmatic guard that cannot be bypassed by the model, unlike prompt instructions which the model might ignore or misinterpret.
 
-**Source:** Exam Guide Ã‚Â§Task 1.10
+**Source:** Exam Guide §Task 1.10
 
 ---
 
@@ -255,19 +255,19 @@ D. Reduce the refund limit parameter in the process_refund tool and require a se
 
 **Options:**
 
-A. Ask the user for clarification before proceeding with any investigation action
+A. **[✓]** Use dynamic decomposition to autonomously break the vague request into discrete, actionable sub-tasks with defined scope and success criteria
 
-B. Run a broad analysis of all available performance metrics simultaneously
+B. Launch a broad parallel scan across all available performance metrics simultaneously to maximize the coverage of the initial analysis phase
 
-C. **[✓]** Use dynamic decomposition to break the investigation into concrete sub-tasks
+C. Pause all investigation activity and ask the user to specify concrete metrics, time ranges, and system boundaries before any tool is called
 
-D. Request a structured investigation plan from the user including specific metrics and systems to examine
+D. Request that the user submit a structured investigation brief that specifies target systems, relevant metrics, and acceptable remediation options
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** Dynamic decomposition is the correct pattern for open-ended investigation tasks. The agent should autonomously break down the vague request into concrete, actionable sub-tasks (e.g., 'check CPU usage', 'analyze query latency', 'review error rates'). This demonstrates proactive architectural judgment rather than requiring human clarification at every step. The decomposition should be explicit in the agent's reasoning so the user can see and validate the plan.
 
-**Source:** Exam Guide Ã‚Â§Task 1.11
+**Source:** Exam Guide §Task 1.11
 
 ---
 
@@ -279,19 +279,19 @@ D. Request a structured investigation plan from the user including specific metr
 
 **Options:**
 
-A. Feed all files into a single large context window at once
+A. Load all two hundred or more files into one large context window simultaneously so the model can reason about the codebase holistically
 
-B. Analyze files in random order and gather findings as they appear
+B. Restrict the review only to files most recently modified by the triggering commit to focus effort on the highest-risk changed surface area
 
-C. **[✓]** Use per-file local analysis then aggregate findings in a cross-file pass
+C. Analyze files in the order they are discovered in the directory tree and aggregate all findings without a structured cross-file integration pass
 
-D. Only review files that have the most recent git changes applied
+D. **[✓]** Apply per-file local analysis for individual-file issues and then conduct a separate cross-file pass to identify system-level patterns and gaps
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** The correct pattern is per-file local analysis (examining each file individually for issues) followed by cross-file integration (identifying patterns, inconsistencies, and architectural concerns across files). This two-pass approach avoids context window overflow while still capturing system-level issues. Single-pass approaches lose cross-file context, and random sampling risks missing critical issues.
 
-**Source:** Exam Guide Ã‚Â§Task 1.12
+**Source:** Exam Guide §Task 1.12
 
 ---
 
@@ -303,19 +303,19 @@ D. Only review files that have the most recent git changes applied
 
 **Options:**
 
-A. Start a brand new session entirely and re-enter all of the context manually
+A. Rely on the running session to automatically detect external file modifications and reload the changed configuration without explicit prompting
 
-B. Append all the changes to the conversation history as a new user message
+B. **[✓]** Use the resume flag to restore the previous session context and then explicitly inform the agent that the configuration file was modified
 
-C. The running session automatically detects file changes and reloads the configuration
+C. Start a completely fresh session and manually re-enter all prior context so the agent begins with an accurate picture of the current state
 
-D. **[✓]** Use the resume flag to inform the agent the file was changed
+D. Append a description of the configuration changes as a new user message within the existing session so the agent is aware of the update
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** Using --resume restores the previous session context, but the developer should explicitly inform the agent that the configuration file has changed. The agent can then re-read the file and adapt its understanding. Automatic detection of external file changes is not guaranteed, and starting a new session loses all progress. Explicit communication about changes is essential.
 
-**Source:** Exam Guide Ã‚Â§Task 1.13
+**Source:** Exam Guide §Task 1.13
 
 ---
 
@@ -327,19 +327,19 @@ D. **[✓]** Use the resume flag to inform the agent the file was changed
 
 **Options:**
 
-A. Modify the original codebase directly and use git branches to track all changes
+A. **[✓]** Use fork_session to create independent session branches from the shared baseline so both approaches can diverge without affecting each other
 
-B. **[✓]** Use fork_session to create independent exploration branches from the same baseline
+B. Edit the original shared codebase directly and rely on standard git branching to track differences between each architectural approach explored
 
-C. Build both alternatives in separate directories from scratch manually for comparison
+C. Ask the agent to describe both architectural approaches in detail and defer any actual implementation until one approach is selected and approved
 
-D. Ask the agent to describe both approaches without writing any actual code
+D. Manually recreate both architectural alternatives from scratch in separate project directories before running a structured side-by-side comparison
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** fork_session is designed for exploring divergent approaches from the same baseline. It creates independent session branches that share the initial context but can diverge in different directions. This is ideal for architectural exploration where you want to compare multiple approaches without affecting the original session or losing the baseline context. Git branches alone do not capture the conversational context.
 
-**Source:** Exam Guide Ã‚Â§Task 1.14
+**Source:** Exam Guide §Task 1.14
 
 ---
 
@@ -351,19 +351,19 @@ D. Ask the agent to describe both approaches without writing any actual code
 
 **Options:**
 
-A. Handle all three concerns sequentially in a single session for context coherence
+A. **[✓]** Decompose the request into parallel investigations per concern, allowing each to run independently, then synthesize results into a unified plan
 
-B. **[✓]** Decompose the request into parallel investigations focused on each concern then synthesize
+B. Merge all three concerns into a single unified implementation attempt to reduce coordination overhead and minimize total changes needed
 
-C. Respond to just the first concern and ask for separate requests for the others
+C. Address all three concerns sequentially in a single uninterrupted session to preserve end-to-end context coherence across all changes made
 
-D. Combine all three changes into a single unified approach to reduce complexity
+D. Respond to only the first concern identified in the request and ask the user to submit the remaining concerns as separate follow-up requests
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Multi-concern requests should be decomposed into parallel investigations. Each concern (styling, rate limiting, connection pooling) can be investigated independently by separate subagents or focused analysis passes. After parallel investigation, the coordinator synthesizes findings into a unified implementation plan. This is far more efficient than sequential processing and reduces total time.
 
-**Source:** Exam Guide Ã‚Â§Task 1.15
+**Source:** Exam Guide §Task 1.15
 
 ---
 
@@ -375,19 +375,19 @@ D. Combine all three changes into a single unified approach to reduce complexity
 
 **Options:**
 
-A. Proceed directly into the deep-dive investigation on all potential issues that are found
+A. Proceed directly into the full deep-dive investigation on all fifteen identified vulnerabilities to maximize coverage and minimize elapsed time
 
-B. **[✓]** Present a structured summary of findings and a proposed deep-dive plan before proceeding
+B. Return to the user for explicit individual sign-off on each of the fifteen discovered vulnerabilities before investigating any of them further
 
-C. Go back to the user for individual approval on each of the discovered items
+C. Randomly select a representative sample of the discovered items for deep investigation to stay within acceptable time and token constraints
 
-D. Randomly select a few items for the deep-dive to stay within time constraints
+D. **[✓]** Present a structured discovery summary and a proposed prioritized deep-dive plan, then await user review and approval before proceeding further
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Phase transition summarization is the correct pattern. Between major phases (discovery to deep-dive), the agent should produce a structured summary of findings and a clear plan for the next phase. This provides a checkpoint for the user to review, approve, or redirect before significant additional work begins. It balances autonomy with appropriate human oversight.
 
-**Source:** Exam Guide Ã‚Â§Task 1.16
+**Source:** Exam Guide §Task 1.16
 
 ---
 
@@ -399,19 +399,19 @@ D. Randomly select a few items for the deep-dive to stay within time constraints
 
 **Options:**
 
-A. It permits agents to communicate directly with each other for faster information sharing
+A. **[✓]** It provides a single control point for routing, centralized context synthesis, and prevents uncoordinated agent-to-agent communication patterns
 
-B. **[✓]** It provides a single control point for routing and context and prevents unconstrained agent communication
+B. It minimizes the total number of API calls required to complete a task by consolidating multiple subagent interactions into fewer round trips
 
-C. It reduces the total number of API calls that are needed to complete any task
+C. It eliminates the need to define separate tool schemas for individual subagents because the coordinator handles all tool resolution centrally
 
-D. It eliminates the need for separate tool definitions since the coordinator handles everything
+D. It allows subagents to communicate directly with each other for faster peer-to-peer information exchange without routing through the coordinator
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** A hub-and-spoke architecture with a central coordinator provides controlled routing, centralized context management, and organized result synthesis. The key benefit is preventing unconstrained agent-to-agent communication, which can lead to context pollution, runaway conversations, and unpredictable behavior. The coordinator acts as a controlled gateway and synthesis point.
 
-**Source:** Exam Guide Ã‚Â§Task 1.17
+**Source:** Exam Guide §Task 1.17
 
 ---
 
@@ -423,19 +423,19 @@ D. It eliminates the need for separate tool definitions since the coordinator ha
 
 **Options:**
 
-A. Embed custom logging statements inside each individual tool for audit tracking purposes
+A. Embed custom logging and validation code directly inside each individual tool implementation to capture parameters at the point of execution
 
-B. **[✓]** Implement a PreToolUse hook that runs before every tool execution to log and validate
+B. Create a dedicated internal audit tool that the model calls voluntarily at the start of each turn to self-report its planned tool invocations
 
-C. Ask the model to log its own tool calls through a special purpose tool
+C. Deploy a reverse proxy layer between the API gateway and the agent runtime to intercept and inspect all outbound tool request payloads
 
-D. Use a proxy server between the API and agent to intercept all requests
+D. **[✓]** Implement a PreToolUse hook that runs before every tool execution, enabling centralized logging, input validation, and conditional blocking
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** A PreToolUse hook is the centralized mechanism for intercepting tool calls before execution. It runs automatically on every tool invocation, can log parameters, perform validation, and block or modify the call if needed. This provides a consistent audit trail without modifying individual tools and cannot be bypassed by the model.
 
-**Source:** Exam Guide Ã‚Â§Task 1.18
+**Source:** Exam Guide §Task 1.18
 
 ---
 
@@ -447,19 +447,19 @@ D. Use a proxy server between the API and agent to intercept all requests
 
 **Options:**
 
-A. Execute all subtasks simultaneously without coordination and combine results at the end
+A. Delegate the decomposition responsibility to each subagent individually so they can define their own subtask scope without coordinator input
 
-B. Ask the subagents to handle the decomposition themselves without coordinator input
+B. **[✓]** Analyze the complex request, decompose it into well-specified subtasks, assign each to the appropriate subagent, then synthesize all results
 
-C. **[✓]** Analyze the request decompose into subtasks assign to subagents and synthesize results
+C. Perform the entire complex task within the coordinator itself without spawning subagents to eliminate the coordination overhead introduced
 
-D. Have the coordinator do all the work itself without using any subagents
+D. Spawn all subtasks simultaneously in parallel without upfront decomposition and then aggregate whatever results are returned by each subagent
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** Task decomposition follows a structured sequence: (1) analyze the complex request to understand its components, (2) decompose into well-defined, independent subtasks with clear specifications and acceptance criteria, (3) assign each subtask to the appropriate subagent via the Task tool, and (4) synthesize individual results into a coherent final output. This pattern maximizes parallelism while maintaining quality control.
 
-**Source:** Exam Guide Ã‚Â§Task 1.19
+**Source:** Exam Guide §Task 1.19
 
 ---
 
@@ -471,19 +471,19 @@ D. Have the coordinator do all the work itself without using any subagents
 
 **Options:**
 
-A. Rely on the model to remember all context across different CLI sessions
+A. Rely on the model's inherent conversational memory to retain all context across separate CLI process invocations automatically between sessions
 
-B. **[✓]** Use named sessions that can be saved and resumed across CLI restarts
+B. **[✓]** Use named sessions that persist conversation state and allow the investigation to be resumed across separate CLI restarts without context loss
 
-C. Take screenshots of the CLI output and re-enter context manually each time
+C. Write a shell script that re-executes all previous commands from scratch at each session start to reproduce the investigation context
 
-D. Write a shell script that re-runs the entire investigation from scratch
+D. Capture screenshots of terminal output after each work session and manually re-enter the key context at the start of each new session
 
 **Correct Answer:** B
 
 **Explanation:** Named sessions provide the ability to save conversation state and resume across CLI sessions. This is essential for long-running investigations where the work naturally spans multiple sessions. Named sessions persist the entire conversation context, including tool results and the model's reasoning state, enabling interruption-free resumption.
 
-**Source:** Exam Guide Ã‚Â§Task 1.20
+**Source:** Exam Guide §Task 1.20
 
 ---
 
@@ -495,19 +495,19 @@ D. Write a shell script that re-runs the entire investigation from scratch
 
 **Options:**
 
-A. Crash the system when a subagent fails to ensure no issues slip through
+A. Halt the entire multi-agent system when any subagent fails to ensure that no investigation proceeds on the basis of incomplete information
 
-B. **[✓]** Catch subagent failures gracefully log the error and continue processing other tasks
+B. Restart any failed subagent indefinitely in an automated retry loop until it produces a successful result or the overall session times out
 
-C. Ignore subagent failures entirely and use whatever partial results are available
+C. **[✓]** Catch subagent failures gracefully, log the error with full context, continue processing unaffected subagents, and surface the failure clearly
 
-D. Restart failed subagents in an infinite loop repeatedly until they succeed
+D. Silently discard subagent failures and proceed with synthesis using only the partial results returned by the subagents that completed successfully
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** The correct error handling pattern is to catch subagent failures gracefully: log the error with full context, allow other independent subagents to continue processing, and report the failure to the user with sufficient context for resolution. This avoids both the extreme of crashing the entire system and the opposite extreme of silently ignoring failures.
 
-**Source:** Exam Guide Ã‚Â§Task 1.21
+**Source:** Exam Guide §Task 1.21
 
 ---
 
@@ -519,19 +519,19 @@ D. Restart failed subagents in an infinite loop repeatedly until they succeed
 
 **Options:**
 
-A. Set a low token limit to force the agent to respond much sooner
+A. Reduce the number of tools available to the agent so there are fewer callable options and thus fewer opportunities for loop behavior to occur
 
-B. **[✓]** Configure max_tool_rounds in the agent SDK configuration to cap consecutive tool calls
+B. **[✓]** Configure max_tool_rounds in the agent SDK to set a hard programmatic cap on consecutive tool calls before a response must be generated
 
-C. Remove tools from the agent so it has many fewer options to call
+C. Add a system prompt instruction asking the agent to self-limit its tool usage and avoid making more than a reasonable number of calls
 
-D. Add a system prompt instruction that says limit your tool calls please
+D. Set a low token limit on the agent to force it to produce a final response sooner and reduce the window for excessive tool call accumulation
 
 **Correct Answer:** B
 
 **Explanation:** The agent SDK configuration includes settings like max_tool_rounds or max_consecutive_tool_calls that set a hard limit on how many sequential tool calls an agent can make without producing a text response. This is a safety guard against runaway tool usage and token waste. It is enforced programmatically, unlike prompt instructions which are advisory.
 
-**Source:** Exam Guide Ã‚Â§Task 1.22
+**Source:** Exam Guide §Task 1.22
 
 ---
 
@@ -543,19 +543,19 @@ D. Add a system prompt instruction that says limit your tool calls please
 
 **Options:**
 
-A. Delete the oldest messages in the conversation when approaching the context limit
+A. Discard the oldest messages from the conversation history when nearing the context window limit to make room for new turns and tool results
 
-B. **[✓]** Summarize older turns prune irrelevant tool results and maintain structured facts for critical data
+B. Request a larger context window tier from the API provider to accommodate the full conversation history without requiring any content reduction
 
-C. Increase the model context window size to accommodate the full conversation history
+C. **[✓]** Summarize aging turns, prune verbose tool results that have served their purpose, and maintain a structured facts block for critical information
 
-D. End the conversation and start a completely new session when the window gets full
+D. Terminate the current session proactively when the context window fills and initiate a new session for the customer to restart the interaction
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Conversation history management requires a thoughtful strategy: (1) summarize older turns that are no longer immediately relevant, (2) prune verbose tool results that have served their purpose, (3) maintain a structured facts block for critical information that must persist, and (4) use sliding window approaches where appropriate. Simple deletion of oldest messages risks losing important context.
 
-**Source:** Exam Guide Ã‚Â§Task 1.23
+**Source:** Exam Guide §Task 1.23
 
 ---
 
@@ -567,19 +567,19 @@ D. End the conversation and start a completely new session when the window gets 
 
 **Options:**
 
-A. Start a completely new session from scratch when switching between different agents
+A. Terminate the current session and create a completely new session for the billing specialist with no reference to the prior triage interaction
 
-B. Have both agents work independently and present separate results to the customer
+B. **[✓]** Execute a structured handoff where the triage agent passes a comprehensive contextual summary to the billing specialist before disengaging
 
-C. **[✓]** Use a structured agent handoff where the triage agent passes a summary to billing
+C. Allow both agents to proceed independently in parallel sessions and present their separate findings directly to the customer simultaneously
 
-D. Have the customer repeat all of the information to the billing specialist
+D. Ask the customer to re-explain their complete issue to the billing specialist so the specialist receives information directly from the source
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** The correct pattern is a structured agent handoff where the triage agent passes a comprehensive summary to the billing specialist. This summary should include: findings from the technical investigation, customer details, actions already taken, commitments made, and the specific billing issue that needs resolution. This ensures continuity without requiring the customer to repeat information or losing context.
 
-**Source:** Exam Guide Ã‚Â§Task 1.24
+**Source:** Exam Guide §Task 1.24
 
 ---
 
@@ -591,19 +591,19 @@ D. Have the customer repeat all of the information to the billing specialist
 
 **Options:**
 
-A. Lose the state and ask the customer to start over from the very beginning
+A. **[✓]** Persist the transaction state to external storage after each step so that a resumed session can restore context and continue safely from the checkpoint
 
-B. **[✓]** Persist the transaction state to external storage and provide it to the resumed session
+B. Accept the state loss as an inherent limitation of the interruption and ask the customer to restart the multi-step transaction from the beginning
 
-C. Restart the session and let the model re-collect all information naturally again
+C. Persist only the final completion status of each step and discard intermediate collected data to minimize the storage footprint required
 
-D. Store only the final result of each step without any intermediate state
+D. Resume the session after restart and allow the model to reconstruct the prior state naturally by re-running through the same workflow steps
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** State persistence involves saving the current transaction state to external storage so it can be restored after interruption. This includes: which steps have been completed, what data was collected, and what the next action should be. Upon resumption, this state is loaded and provided to the model. For multi-step transactions, especially those involving financial operations, losing state is unacceptable.
 
-**Source:** Exam Guide Ã‚Â§Task 1.25
+**Source:** Exam Guide §Task 1.25
 
 ---
 
@@ -615,19 +615,19 @@ D. Store only the final result of each step without any intermediate state
 
 **Options:**
 
-A. Add console log statements in every tool implementation across all agents
+A. Configure each agent to generate a structured narrative summary report after every interaction turn describing its decisions and tool choices
 
-B. Monitor only the API response times and error codes for the system
+B. **[✓]** Implement structured logging at the agent SDK level to capture decisions, tool usage, error context, and timing centrally across all agents
 
-C. Ask every agent to write a summary report after each interaction turn
+C. Insert console.log statements at key execution points within each individual tool implementation across all agents in the distributed system
 
-D. **[✓]** Implement structured logging at the agent SDK level capturing decisions and errors
+D. Monitor only top-level API response time percentiles and HTTP error rate aggregates as proxy signals for overall system health and reliability
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** Agent observability should be implemented at the agent SDK or framework level, providing centralized structured logging of: agent decisions (what the model chose and why), tool usage patterns (which tools, how often, success/failure), error rates, and timing information. This is far more maintainable than adding logging to individual tools and provides consistent, searchable output for debugging and analysis.
 
-**Source:** Exam Guide Ã‚Â§Task 1.26
+**Source:** Exam Guide §Task 1.26
 
 ---
 
@@ -639,19 +639,19 @@ D. **[✓]** Implement structured logging at the agent SDK level capturing decis
 
 **Options:**
 
-A. The total number of subagents in the workflow is more than three
+A. **[✓]** Sequential execution is required when the workflow contains dependency chains where a downstream subagent needs a prior subagent's output as input
 
-B. **[✓]** Sequential execution is required when subagent tasks have dependency chains between them
+B. Parallel execution always produces better throughput regardless of how tasks relate to each other and should always be the default choice
 
-C. Parallel execution is always superior regardless of the task dependencies
+C. The total count of subagents in the workflow exceeds three, which typically indicates a need for sequential coordination rather than parallel dispatch
 
-D. The model performs significantly better when tasks are done sequentially
+D. The model produces significantly more accurate results on sequential workflows because it processes one task at a time without context switching
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** The determining factor is task dependencies. When subagents have dependent chains (B needs A's output, C needs B's output), sequential execution is required. Parallel execution is only appropriate for truly independent tasks. Forcing parallel execution on dependent tasks leads to coordination problems and rework. The architect must analyze the dependency graph before deciding.
 
-**Source:** Exam Guide Ã‚Â§Task 1.27
+**Source:** Exam Guide §Task 1.27
 
 ---
 
@@ -663,19 +663,19 @@ D. The model performs significantly better when tasks are done sequentially
 
 **Options:**
 
-A. Always allocate the same set of subagents regardless of the query complexity
+A. Allocate the same fixed set of subagents to every incoming query to maintain consistency and avoid conditional logic in the coordinator layer
 
-B. **[✓]** Use dynamic subagent selection where the coordinator determines query complexity and allocates appropriately
+B. Process all queries directly within the coordinator without ever spawning subagents to eliminate orchestration latency from the system entirely
 
-C. Never use subagents for any query type no matter the complexity involved
+C. Always provision the maximum available number of subagents for every query to ensure the most thorough and comprehensive response possible
 
-D. Always allocate all available subagents to ensure the maximum thoroughness possible
+D. **[✓]** Apply dynamic subagent selection where the coordinator classifies query complexity and allocates only the appropriate agents for each request
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Dynamic subagent selection based on query complexity is the correct pattern. Simple queries should be handled directly by the coordinator without spawning subagents (avoiding overhead). Complex queries should trigger appropriate subagent allocation. This balances efficiency with thoroughness and avoids the waste of over-engineering simple requests or under-resourcing complex ones.
 
-**Source:** Exam Guide Ã‚Â§Task 1.28
+**Source:** Exam Guide §Task 1.28
 
 ---
 
@@ -687,19 +687,19 @@ D. Always allocate all available subagents to ensure the maximum thoroughness po
 
 **Options:**
 
-A. Rely on the model ability to remember everything from the conversation history
+A. **[✓]** Use structured facts blocks within context for active data and write detailed findings to external scratchpad files as a persistent memory layer
 
-B. Write all of the relevant information to a database and query it when needed
+B. Trust the model's in-context memory to reliably retain all investigation details across the full duration of a long multi-hour agentic session
 
-C. Only keep the most recent ten messages in context and archive all the rest
+C. Retain only the most recent ten messages in the active context window and compress all earlier content into a compact archive for reference
 
-D. **[✓]** Use structured facts blocks in context and external scratchpad files for critical information
+D. Store all findings to a relational database and issue structured queries against it whenever the agent needs to retrieve previously gathered data
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** Agent memory and context retention requires a defense-in-depth approach: (1) maintain a structured facts block within the current context for active information, (2) write detailed findings to external scratchpad files periodically, and (3) use summarization to compress older turns while preserving key data. Redundancy is important because context management mechanisms may lose information.
 
-**Source:** Exam Guide Ã‚Â§Task 1.29
+**Source:** Exam Guide §Task 1.29
 
 ---
 
@@ -711,19 +711,19 @@ D. **[✓]** Use structured facts blocks in context and external scratchpad file
 
 **Options:**
 
-A. Ask each developer to manually format their own tool output consistently
+A. Rely on the model to detect format inconsistencies in tool outputs and reformat them correctly within its natural language reasoning process
 
-B. **[✓]** Implement a PostToolUse hook to transform tool results into the standard structure
+B. **[✓]** Implement a PostToolUse hook to intercept and transform tool results into the standardized finding structure before they reach the model
 
-C. Have the model reformat the outputs in its natural language response
+C. Accept heterogeneous tool output formats throughout the agent pipeline and normalize everything during the final report rendering phase only
 
-D. Store raw tool outputs and format them at the presentation layer only
+D. Establish a developer convention requiring all team members to manually format their individual tool outputs to match the required structure
 
 **Correct Answer:** B
 
 **Explanation:** A PostToolUse hook is the correct mechanism for transforming tool results after execution but before they reach the model. It normalizes results into a consistent structure regardless of the source tool. This ensures the model always receives data in the expected format and keeps transformation logic centralized rather than distributed across tool implementations.
 
-**Source:** Exam Guide Ã‚Â§Task 1.30
+**Source:** Exam Guide §Task 1.30
 
 ---
 
@@ -735,19 +735,19 @@ D. Store raw tool outputs and format them at the presentation layer only
 
 **Options:**
 
-A. Ask the model to limit its tool calls in the system prompt only
+A. **[✓]** Configure a maximum tool call limit in the agent SDK settings to terminate the session programmatically when the specified threshold is reached
 
-B. **[✓]** Configure a maximum tool call limit in the agent SDK to terminate the session
+B. Specify the session tool call limit in the system prompt as an instruction and ask the model to self-monitor its own cumulative tool usage
 
-C. Monitor tool calls externally and manually kill the process when it is needed
+C. Monitor tool call counts via an external observer process and terminate the running agent process manually when the threshold is exceeded
 
-D. Reduce the number of available tools significantly to limit the options when needed
+D. Remove low-priority tools from the available configuration so that the agent has fewer options and naturally makes fewer total tool invocations
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Agentic loop safety guards should be configured in the agent SDK settings. This includes maximum tool call limits per session, maximum consecutive tool calls, and maximum token usage. These are programmatic limits enforced by the SDK, not advisory instructions. When exceeded, the session terminates gracefully with a clear reason.
 
-**Source:** Exam Guide Ã‚Â§Task 1.31
+**Source:** Exam Guide §Task 1.31
 
 ---
 
@@ -759,19 +759,19 @@ D. Reduce the number of available tools significantly to limit the options when 
 
 **Options:**
 
-A. Trust that the model will detect and reject injection attempts on its own
+A. Remove all string-type parameters from tool definitions entirely to eliminate the surface area available for parameter-based injection attacks
 
-B. **[✓]** Use a PreToolUse hook to validate and sanitize tool call parameters before execution
+B. **[✓]** Implement a PreToolUse hook that validates and sanitizes incoming tool call parameters before they are executed against the target system
 
-C. Remove all the parameters from the tool to completely prevent injection
+C. Use only tools that include built-in input sanitization and injection detection mechanisms implemented within their own execution logic
 
-D. Only use tools that have built-in injection protection mechanisms for safety
+D. Rely on the model's training to detect and reject prompt injection attempts embedded in tool parameter values without additional intervention
 
 **Correct Answer:** B
 
 **Explanation:** Tool call interception via PreToolUse hooks is the appropriate mechanism for security validation. The hook runs before the tool executes and can inspect parameters for injection patterns, block suspicious calls, sanitize inputs, or log the attempt. Programmatic validation in the hook layer is more reliable than relying on the model to detect injection attempts.
 
-**Source:** Exam Guide Ã‚Â§Task 1.32
+**Source:** Exam Guide §Task 1.32
 
 ---
 
@@ -783,19 +783,19 @@ D. Only use tools that have built-in injection protection mechanisms for safety
 
 **Options:**
 
-A. **[✓]** Subagents should receive only the context and tools relevant to their specific investigation task
+A. **[✓]** Each subagent should maintain strict context isolation from other subagents to prevent information leakage and cross-agent context pollution
 
-B. The coordinator should pass the full conversation history of the entire system to each subagent
+B. The coordinator should pass the complete multi-agent system conversation history to each subagent for full situational awareness during analysis
 
-C. **[✓]** Each subagent should maintain context isolation from other subagents to prevent pollution
+C. **[✓]** Each subagent should receive only the context and tools directly relevant to its specific assigned investigation task to minimize distraction
 
-D. All subagents should share a common tool pool to maximize flexibility and coverage
+D. All subagents should share access to a common centralized tool pool to maximize operational flexibility and coverage across all agent roles
 
 **Correct Answers:** A, C
 
-**Explanation:** The correct principles are context isolation and least-privilege tool assignment. Each subagent should receive only the context and tools relevant to its task (option 0) to prevent distraction and reduce token costs. Subagents must maintain context isolation from each other (option 2) to avoid information leakage and context pollution. Passing full conversation history (option 1) would dilute focus and waste tokens. A shared tool pool (option 3) violates least-privilege principles.
+**Explanation:** The correct principles are context isolation and least-privilege tool assignment. Each subagent should receive only the context and tools relevant to its task (option 2) to prevent distraction and reduce token costs. Subagents must maintain context isolation from each other (option 0) to avoid information leakage and context pollution. Passing full conversation history (option 1) would dilute focus and waste tokens. A shared tool pool (option 3) violates least-privilege principles.
 
-**Source:** Exam Guide Ã‚Â§Task 1.13
+**Source:** Exam Guide §Task 1.13
 
 ---
 
@@ -809,19 +809,19 @@ D. All subagents should share a common tool pool to maximize flexibility and cov
 
 **Options:**
 
-A. **[✓]** Expand each tool description with explicit usage examples input formats and clear differentiation from similar tool alternatives
+A. Add a request pre-processing classifier that programmatically analyzes each query and injects the selected tool name before model inference begins
 
-B. Combine all three tools into a single unified tool that accepts any query type and internally routes to the appropriate engine
+B. **[✓]** Expand each tool's description to include explicit usage scenarios, example inputs, expected outputs, and clear differentiation from similar tools
 
-C. Add a pre-processing classifier that analyzes each user request and programmatically selects the correct tool before execution
+C. Consolidate all three tools into a single unified tool with an internal routing engine that selects the correct backend implementation automatically
 
-D. Reduce the number of available tools by removing overlapping functionality and consolidating capabilities into fewer options
+D. Reduce the total number of tools available to the model by consolidating overlapping capabilities into a smaller set of broader-purpose tools
 
-**Correct Answer:** A
+**Correct Answer:** B
 
 **Explanation:** The key is to expand tool descriptions to include detailed guidance on when and when not to use each tool. Descriptions should include concrete usage examples, clear differentiation from similar tools, and explicit exclusion criteria. Simply renaming tools does not help the model distinguish between them. Good descriptions act as documentation embedded in the tool definition.
 
-**Source:** Exam Guide Ã‚Â§Task 2.1
+**Source:** Exam Guide §Task 2.1
 
 ---
 
@@ -833,19 +833,19 @@ D. Reduce the number of available tools by removing overlapping functionality an
 
 **Options:**
 
-A. Give all five available tools to every subagent to maximize flexibility
+A. Expose all tools through a shared MCP server accessible equally by every subagent, allowing any agent to call any tool when needed
 
-B. **[✓]** Give each subagent only the specific domain tools it needs scoped per agent
+B. **[✓]** Grant each subagent only the specific domain tools relevant to its assigned task, scoping access strictly to its area of responsibility
 
-C. Create one uber-agent with all tools and have it delegate work internally
+C. Consolidate all five specialist roles into a single highly capable agent that possesses all tools and delegates work to itself internally
 
-D. Put all tools on a shared MCP server accessible to all agents equally
+D. Provide all five tools to every subagent to ensure maximum operational flexibility and avoid situations where a subagent lacks a needed capability
 
 **Correct Answer:** B
 
 **Explanation:** Each subagent should receive only the tools scoped to its specific domain. Scoped tool access per subagent prevents confusion, reduces the chance of calling the wrong tool, and keeps each agent focused on its responsibility. Giving every tool to every agent increases the cognitive load on the model and raises the risk of inappropriate tool selection.
 
-**Source:** Exam Guide Ã‚Â§Task 2.2
+**Source:** Exam Guide §Task 2.2
 
 ---
 
@@ -857,19 +857,19 @@ D. Put all tools on a shared MCP server accessible to all agents equally
 
 **Options:**
 
-A. Return all errors as generic operation failed messages to keep responses simple
+A. Return a generic operation failed message for all error conditions to keep response structures simple and consistent across all failure types
 
-B. Have the tool raise exceptions that crash the agent to make the error obvious
+B. Allow the payment tool to raise unhandled exceptions that crash the agent process so that errors are immediately visible and unmistakable
 
-C. Log the specific error internally but always tell the coordinator to retry
+C. **[✓]** Return a structured error response with an errorCategory field that classifies failures so the coordinator can apply the correct recovery action
 
-D. **[✓]** Return structured error responses with an errorCategory field indicating the failure type
+D. Log the specific error details internally and instruct the coordinator to always retry the same operation regardless of the failure reason
 
-**Correct Answer:** D
+**Correct Answer:** C
 
 **Explanation:** Structured error responses with an errorCategory field enable the coordinator to apply appropriate recovery strategies: transient errors should be retried with backoff, validation errors should fix the input, and business errors should escalate to a human. Generic error messages deprive the coordinator of the context needed for intelligent recovery.
 
-**Source:** Exam Guide Ã‚Â§Task 2.3
+**Source:** Exam Guide §Task 2.3
 
 ---
 
@@ -881,19 +881,19 @@ D. **[✓]** Return structured error responses with an errorCategory field indic
 
 **Options:**
 
-A. Retry immediately up to ten times in rapid succession without delay
+A. Retry immediately up to ten consecutive times as fast as possible without any delay to recover from the transient failure as quickly as possible
 
-B. **[✓]** Use exponential backoff with a reasonable max delay and retry limit
+B. Attempt the operation once immediately and then escalate directly to an automated monitoring alert on the very next consecutive failure
 
-C. Retry immediately once, then escalate to a monitoring alert on the second consecutive failure
+C. **[✓]** Use exponential backoff with increasing delays between attempts, a jitter factor, and a bounded maximum retry count before giving up
 
-D. Retry exactly one time after a fixed thirty second delay period
+D. Wait a fixed thirty-second delay before performing a single retry attempt, then escalate to an error queue if the second attempt also fails
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Exponential backoff with a reasonable maximum delay and retry count is the standard pattern for transient errors. It starts with short delays and increases exponentially (e.g., 1s, 2s, 4s, 8s), giving the system time to recover while not overwhelming it with retries. Immediate retries in a tight loop can exacerbate the problem, and a single fixed-delay retry may not be sufficient.
 
-**Source:** Exam Guide Ã‚Â§Task 2.4
+**Source:** Exam Guide §Task 2.4
 
 ---
 
@@ -905,19 +905,19 @@ D. Retry exactly one time after a fixed thirty second delay period
 
 **Options:**
 
-A. Grant the synthesis agent all the same tools the research agents have for flexibility
+A. Grant the synthesis agent the same complete tool set as the research agents to ensure it can independently verify any claim it encounters
 
-B. Have the synthesis agent ask the coordinator to verify facts on its behalf
+B. **[✓]** Create a scoped verify_fact tool available exclusively to the synthesis agent, providing targeted cross-reference capability without full tool access
 
-C. **[✓]** Create a scoped verify_fact tool only for the synthesis agent against the shared knowledge base
+C. Prohibit the synthesis agent from performing any verification, requiring it to accept all research agent findings as authoritative without checking
 
-D. Prevent the synthesis agent from having any verification capability at any given point
+D. Require the synthesis agent to route all verification requests through the coordinator, which then delegates back to appropriate research agents
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** A scoped cross-role tool (verify_fact) that is available only to the synthesis agent provides the precise capability needed without exposing unnecessary tools. This follows the principle of least privilege: each agent gets only the tools it needs. The synthesis agent needs verification ability but does not need raw search or analysis tools.
 
-**Source:** Exam Guide Ã‚Â§Task 2.5
+**Source:** Exam Guide §Task 2.5
 
 ---
 
@@ -929,19 +929,19 @@ D. Prevent the synthesis agent from having any verification capability at any gi
 
 **Options:**
 
-A. Put all configuration in a single shared file for developers to edit locally
+A. Store team-wide MCP configuration in CLAUDE.md and individual developer additions in a separate local .env file committed to the repository
 
-B. Put team configuration in CLAUDE.md and personal config in a separate .env file
+B. **[✓]** Use .mcp.json at the project root for team-shared configuration and ~/.claude.json for personal additions that remain outside version control
 
-C. **[✓]** Use .mcp.json at the project root for shared config and ~/.claude.json for personal additions
+C. Duplicate the entire team configuration into each individual developer's local workspace directory to avoid any shared file dependency conflicts
 
-D. Duplicate the entire configuration in each developer personal workspace directory by itself
+D. Maintain a single shared configuration file that all team members edit locally in their clones to keep team and personal settings together
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** MCP server configuration follows a layering strategy: .mcp.json at the project root is shared via version control for team-wide tools, while ~/.claude.json (or ~/.claude/settings.json) contains personal additions. Settings are merged with project-level settings taking priority for shared config and user-level settings for personal additions.
 
-**Source:** Exam Guide Ã‚Â§Task 2.6
+**Source:** Exam Guide §Task 2.6
 
 ---
 
@@ -953,19 +953,19 @@ D. Duplicate the entire configuration in each developer personal workspace direc
 
 **Options:**
 
-A. Remove the built-in Read and Grep tools from the available tools list entirely
+A. **[✓]** Enhance the MCP tool description to clearly articulate its advantages over built-in alternatives and specify the scenarios where it should be preferred
 
-B. Reduce the number of built-in tools by disabling them in configuration settings
+B. Rename the MCP tool to begin with read or grep so the model's name-matching heuristics cause it to prefer the custom tool over the built-in
 
-C. Rename the MCP tool to start with read or grep for model preference
+C. Disable built-in tools selectively in the configuration settings to reduce the option space and steer the model toward custom MCP tool usage
 
-D. **[✓]** Enhance the MCP tool description to articulate its advantages over built-in alternatives
+D. Remove the built-in Read and Grep tools from the active configuration entirely so the model has no alternative but to use the MCP tool instead
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** To compete effectively with built-in tools, the MCP tool description must be enhanced to clearly articulate its advantages. Explain what it does better, what additional analysis it provides, and in what scenarios it should be preferred. The model selects tools based on descriptions, so a more informative description directly influences selection behavior.
 
-**Source:** Exam Guide Ã‚Â§Task 2.7
+**Source:** Exam Guide §Task 2.7
 
 ---
 
@@ -977,19 +977,19 @@ D. **[✓]** Enhance the MCP tool description to articulate its advantages over 
 
 **Options:**
 
-A. Read each individual file one by one using the Read tool itself
+A. **[✓]** Use the Grep tool to perform a regex pattern search across all files in the codebase and return every matching occurrence with file and line context
 
-B. Use the Glob tool to find files matching a pattern then search manually
+B. Deploy a custom MCP tool built specifically for this codebase's architecture and symbol naming conventions to locate the deprecated function usage
 
-C. **[✓]** Use the Grep tool to search for the pattern across all codebase files
+C. Open each file individually using the Read tool and scan its contents manually to locate all occurrences of the deprecated function call
 
-D. Use a custom MCP tool that was specifically built for this codebase
+D. Use the Glob tool to retrieve all file paths matching a source-file pattern and then inspect each returned file for the deprecated function name
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** The Grep tool is designed for searching file contents across a codebase. It performs regex pattern matching across files, which is exactly what this scenario requires. Glob matches file paths, not contents. Read can only handle individual files and would be extremely inefficient for a codebase of this size.
 
-**Source:** Exam Guide Ã‚Â§Task 2.8
+**Source:** Exam Guide §Task 2.8
 
 ---
 
@@ -1001,19 +1001,19 @@ D. Use a custom MCP tool that was specifically built for this codebase
 
 **Options:**
 
-A. Use the Grep tool to search each directory for matching test file names
+A. Traverse the directory tree recursively using Read, collect all file paths returned, and then manually filter the results for matching extensions
 
-B. List the directory recursively with Read and filter the results manually
+B. **[✓]** Use the Glob tool with a pattern like **/*.{test,spec}.ts to efficiently match all test and spec files regardless of their nesting depth
 
-C. **[✓]** Use the Glob tool with a pattern like '**/*.{test,spec}.ts' to match file names
+C. Execute a shell command using the Bash tool to find all test files matching the naming convention throughout the project directory tree
 
-D. Use a shell command to find all matching test files in the project
+D. Use the Grep tool to recursively search each subdirectory for filenames that match the test or spec naming patterns across the project structure
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** The Glob tool is designed specifically for file path pattern matching. A glob pattern like **/*.{test,spec}.ts will efficiently match all test and spec files regardless of directory depth. Grep searches file contents, not paths, making it unsuitable for this task.
 
-**Source:** Exam Guide Ã‚Â§Task 2.9
+**Source:** Exam Guide §Task 2.9
 
 ---
 
@@ -1025,19 +1025,19 @@ D. Use a shell command to find all matching test files in the project
 
 **Options:**
 
-A. Re-run the Edit tool with the exact same input hoping for a different result
+A. Switch to an external IDE editor to perform the targeted single-line change manually outside of the Claude Code session environment
 
-B. Change all fifty occurrences at once and revert the incorrect changes manually
+B. Apply the replacement to all fifty matching occurrences simultaneously and then manually identify and revert the unintended changes afterward
 
-C. **[✓]** Read the specific region then Write the entire file with the single change applied
+C. **[✓]** Use Read to retrieve the specific file region containing the target line and use Write to rewrite the file with the precise change incorporated
 
-D. Switch to a different code editor entirely to make the targeted change
+D. Resubmit the identical Edit tool call with the same search string to attempt a second match, hoping the tool resolves ambiguity on retry
 
 **Correct Answer:** C
 
 **Explanation:** When Edit cannot find a unique match, the correct fallback is to use Read to read the portion of the file containing the target line, then use Write to rewrite the file with the change incorporated (or use Edit with expanded surrounding context to disambiguate). Write with the full file content ensures the change is made precisely where needed.
 
-**Source:** Exam Guide Ã‚Â§Task 2.10
+**Source:** Exam Guide §Task 2.10
 
 ---
 
@@ -1049,19 +1049,19 @@ D. Switch to a different code editor entirely to make the targeted change
 
 **Options:**
 
-A. Ask the developer to modify the database schema to have fewer total columns
+A. Request that the database team restructure the schema to remove non-essential columns and reduce the default row width for all query results
 
-B. Tell the model to simply ignore the extra columns present during its analysis
+B. **[✓]** Implement a PostToolUse hook that intercepts the query result and filters it down to only the three columns needed before it reaches the model
 
-C. **[✓]** Use a PostToolUse hook to filter tool results to only the columns needed
+C. Instruct the model via the system prompt to disregard irrelevant columns present in the tool output when performing its downstream analysis
 
-D. Use a different tool that queries a denormalized view of the same data
+D. Replace the current query tool with an alternative tool that reads from a pre-aggregated denormalized view containing only the essential columns
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** A PostToolUse hook can intercept tool results and filter excessive fields before the result is added to the conversation. This preserves context window space by eliminating irrelevant data. The hook runs after the tool executes but before the result is presented to the model, making it transparent and efficient.
 
-**Source:** Exam Guide Ã‚Â§Task 2.11
+**Source:** Exam Guide §Task 2.11
 
 ---
 
@@ -1073,19 +1073,19 @@ D. Use a different tool that queries a denormalized view of the same data
 
 **Options:**
 
-A. stdio transport is always the simpler option and should be preferred in all cases
+A. stdio transport should always be preferred over SSE because it is simpler to configure and requires no HTTP infrastructure to operate
 
-B. **[✓]** SSE transport is preferred when the server needs to be accessible over a network
+B. **[✓]** SSE transport is the correct choice when the MCP server must be accessible to multiple clients over a network rather than as a local subprocess
 
-C. SSE is only for web browsers and cannot be used for MCP at all
+C. SSE transport is exclusively designed for browser-based clients and cannot be used for CLI-based MCP server deployments in backend systems
 
-D. stdio transport only works for local processes and cannot support remote connections
+D. stdio transport is only suitable for single-process local communication and cannot support any form of multi-client or remote access pattern
 
 **Correct Answer:** B
 
 **Explanation:** SSE (Server-Sent Events) transport is the appropriate choice when the MCP server needs to be accessible over a network, serving multiple clients remotely. stdio transport is limited to local processes where the client spawns the server as a subprocess. SSE enables client-server communication over HTTP, which is necessary for remote and multi-client scenarios.
 
-**Source:** Exam Guide Ã‚Â§Task 2.12
+**Source:** Exam Guide §Task 2.12
 
 ---
 
@@ -1097,19 +1097,19 @@ D. stdio transport only works for local processes and cannot support remote conn
 
 **Options:**
 
-A. Put every tool in a single MCP server for maximum simplicity
+A. Distribute tools randomly across multiple servers to balance the load and avoid any single MCP server becoming a performance bottleneck
 
-B. **[✓]** Distribute tools across MCP servers by domain grouping related tools together
+B. Create a dedicated MCP server per individual tool to maximize isolation, independent deployability, and fine-grained access control per tool
 
-C. Create one MCP server for each tool for maximum granularity
+C. Place every available tool in a single monolithic MCP server to minimize configuration overhead and simplify client connection management
 
-D. Randomly distribute tools across all servers to balance the load
+D. **[✓]** Distribute tools across MCP servers by domain, grouping related tools that are commonly used together into the same server for cohesion
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Tools should be distributed across MCP servers by domain, grouping related tools together. This follows the principle of cohesion: tools that are often used together should be in the same server for efficient discovery and configuration. Overly granular servers (one per tool) create configuration overhead, while monolithic servers mix unrelated concerns.
 
-**Source:** Exam Guide Ã‚Â§Task 2.13
+**Source:** Exam Guide §Task 2.13
 
 ---
 
@@ -1121,19 +1121,19 @@ D. Randomly distribute tools across all servers to balance the load
 
 **Options:**
 
-A. The names are perfectly fine since they describe different retrieval methods
+A. All retrieval tools should share identical names and rely on parameter differences alone to communicate their distinct behavioral characteristics
 
-B. **[✓]** Tool names should follow consistent conventions with clear differentiation between them
+B. Tool names should be kept as short as possible, ideally single characters or abbreviations, to minimize token consumption in every API call
 
-C. All tools should have the same name with completely different parameters
+C. The naming scheme is well-designed because each synonym accurately conveys a distinct retrieval mechanism that the model can differentiate
 
-D. Tool names should be kept short and cryptic to save on tokens used
+D. **[✓]** Tool names should use consistent conventions with clear semantic differentiation between tools performing similar but distinct operations
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Tool names should follow consistent naming conventions that make their purpose and differentiation clear. Using prefixes or namespaces (e.g., user:get_profile vs user:get_orders) and avoiding synonyms (get, fetch, retrieve) reduces confusion. Consistent naming improves discoverability for both human developers and the model, which selects tools based on names and descriptions.
 
-**Source:** Exam Guide Ã‚Â§Task 2.14
+**Source:** Exam Guide §Task 2.14
 
 ---
 
@@ -1145,19 +1145,19 @@ D. Tool names should be kept short and cryptic to save on tokens used
 
 **Options:**
 
-A. No security is needed since MCP servers are only accessible locally
+A. No security controls are needed since MCP servers communicate over loopback interfaces and are therefore inaccessible to external attackers
 
-B. **[✓]** Implement authentication validate authorized agents and follow least-privilege access
+B. **[✓]** Implement client authentication, authorize each agent's tool access scope, enforce least privilege, and audit all tool invocations thoroughly
 
-C. Rely on network security alone to protect the MCP server
+C. Encrypting all data in transit is the only required security control since confidentiality is the primary concern for internal API access
 
-D. Encrypt all data in transit but do not add authentication
+D. Network-level perimeter controls like VPN and firewall rules are sufficient and eliminate the need for application-layer authentication entirely
 
 **Correct Answer:** B
 
 **Explanation:** MCP authentication and security requires: (1) authentication to verify the identity of the calling client, (2) authorization to ensure the caller has permission for the specific tool, (3) least-privilege access where each agent only gets the tools it needs, and (4) audit logging of all tool invocations. MCP servers that access sensitive data must not assume network-level security is sufficient.
 
-**Source:** Exam Guide Ã‚Â§Task 2.15
+**Source:** Exam Guide §Task 2.15
 
 ---
 
@@ -1169,19 +1169,19 @@ D. Encrypt all data in transit but do not add authentication
 
 **Options:**
 
-A. Built-in tools have no limitations and should always be the preferred choice
+A. Custom MCP tools consistently exhibit higher latency than built-in alternatives and therefore degrade overall agent session responsiveness
 
-B. Custom MCP tools are always slower than comparable built-in tools usually
+B. Built-in tools have no meaningful limitations and should always be the first choice over custom MCP tools for any code modification task
 
-C. Built-in tools cannot be practically used in multi-agent systems at all
+C. **[✓]** Built-in tools like Edit can fail on ambiguous matches and lack domain-specific validation logic that custom MCP tools can provide
 
-D. **[✓]** Built-in tools like Edit can struggle with ambiguous matches and lack domain-specific logic
+D. Built-in tools are incompatible with multi-agent architectures and cannot be reliably used by subagents within coordinator-spawned sessions
 
-**Correct Answer:** D
+**Correct Answer:** C
 
 **Explanation:** Built-in tools like Edit are general-purpose and can struggle with ambiguous matches (e.g., many similar lines, complex replacements). They lack domain-specific logic. Custom MCP tools can provide more targeted functionality with application-specific validation and error handling. The architect should use built-in tools for general operations and custom tools for domain-specific needs.
 
-**Source:** Exam Guide Ã‚Â§Task 2.16
+**Source:** Exam Guide §Task 2.16
 
 ---
 
@@ -1193,19 +1193,19 @@ D. **[✓]** Built-in tools like Edit can struggle with ambiguous matches and la
 
 **Options:**
 
-A. Accept the large results and let the model handle the context pressure itself
+A. Reduce the total number of database queries executed per session to lower the aggregate data volume ingested into the context window
 
-B. **[✓]** Implement result pagination at the tool level and use a PostToolUse hook to summarize
+B. Replace the current query tool with a different tool configured to return fewer rows per response to avoid large result set accumulation
 
-C. Reduce the total number of queries to limit the total data volume
+C. **[✓]** Implement result pagination at the tool level and use a PostToolUse hook to summarize large result sets into concise statistics for the model
 
-D. Switch to a completely different tool that returns less data during usage naturally
+D. Accept the full 500KB result payloads from the tool and allow the model to manage context pressure by deprioritizing verbose data naturally
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Tool result size management requires a multi-layered approach: (1) implement pagination at the tool level so the model can request data in manageable chunks, (2) use a PostToolUse hook to summarize or transform verbose results into concise statistics, and (3) design tools that return only the data the model needs, not raw unprocessed datasets.
 
-**Source:** Exam Guide Ã‚Â§Task 2.17
+**Source:** Exam Guide §Task 2.17
 
 ---
 
@@ -1217,19 +1217,19 @@ D. Switch to a completely different tool that returns less data during usage nat
 
 **Options:**
 
-A. There are too many tools and the model cannot handle all of them
+A. Tool names are the primary signal the model uses for selection, so renaming tools would resolve most of the observed mis-selection behavior
 
-B. The model needs additional fine-tuning to understand these particular tools better
+B. The model is overloaded by twenty-five available tools and cannot reliably distinguish between them when so many options are presented at once
 
-C. Tool names are the real problem not the brief descriptions given
+C. Fine-tuning the model on these specific tool definitions would enable it to internalize the correct selection logic for this particular domain
 
-D. **[✓]** Tool descriptions are too brief lacking detail usage scenarios and differentiation
+D. **[✓]** Tool descriptions are too brief, omitting usage scenarios, input/output context, and differentiation from functionally similar alternative tools
 
 **Correct Answer:** D
 
 **Explanation:** Tool description writing best practices require: detailed descriptions including usage scenarios (when to use this tool), input/output descriptions (what parameters are needed and what the result looks like), and differentiation hints (how this tool differs from similar ones). Brief descriptions like 'Finds files' do not give the model enough information to make accurate selections.
 
-**Source:** Exam Guide Ã‚Â§Task 2.18
+**Source:** Exam Guide §Task 2.18
 
 ---
 
@@ -1241,19 +1241,19 @@ D. **[✓]** Tool descriptions are too brief lacking detail usage scenarios and 
 
 **Options:**
 
-A. Crash the MCP server process so the error is clearly obvious
+A. Forward the raw low-level database exception message directly to the calling agent as the complete error response without any abstraction
 
-B. **[✓]** Return a structured error response with error code category and description
+B. Terminate the MCP server process immediately upon encountering any tool error so that the failure is unambiguous and immediately visible
 
-C. Log the error internally and return a generic ok response to the client
+C. Log the error internally only and return a successful acknowledgment response to the client to maintain session stability during transient issues
 
-D. Return the raw database error message verbatim to the calling agent
+D. **[✓]** Return a structured error response that includes an error code, a failure category, and a human-readable description of the problem encountered
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Error propagation from MCP servers should use the MCP protocol's structured error response format. The response should include an error code, a category (transient, validation, or internal), and a human-readable description. This allows the calling agent to determine the appropriate recovery action. Crashing the server or hiding errors are both inappropriate.
 
-**Source:** Exam Guide Ã‚Â§Task 2.19
+**Source:** Exam Guide §Task 2.19
 
 ---
 
@@ -1265,19 +1265,19 @@ D. Return the raw database error message verbatim to the calling agent
 
 **Options:**
 
-A. Stop the server and update and restart and hope clients reconnect
+A. **[✓]** Implement a versioned MCP server lifecycle with backward-compatible interface design, graceful rollout, and deprecation management for old versions
 
-B. Deploy a completely new MCP server on a different port for each update
+B. Deploy each server update on a new network port and update all client configurations to point to the new endpoint for each release cycle
 
-C. **[✓]** Implement versioned MCP server lifecycle with fully backward compatible endpoint design
+C. Stop the running server, deploy the updated version, restart the service, and accept that connected clients will need to reconnect and reconfigure
 
-D. Do not update the server once deployed to avoid breaking client configurations
+D. Freeze the MCP server at its initial deployed state and avoid all post-deployment updates to ensure no disruption to existing client integrations
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** MCP server lifecycle management requires: (1) versioned endpoints to avoid breaking existing clients, (2) backward compatibility for tool interfaces, (3) graceful shutdown that lets in-flight requests complete, (4) startup health checks, and (5) possibly a discovery mechanism so clients can learn about server availability. Production MCP servers cannot be treated as ad-hoc processes.
 
-**Source:** Exam Guide Ã‚Â§Task 2.20
+**Source:** Exam Guide §Task 2.20
 
 ---
 
@@ -1289,19 +1289,19 @@ D. Do not update the server once deployed to avoid breaking client configuration
 
 **Options:**
 
-A. Change the parameter to be required thus breaking all existing callers
+A. Deprecate the current tool immediately and inform all dependent teams they must update their tool call implementations within a fixed deadline
 
-B. Create an entirely new tool version for the new behavior needs
+B. Change the recursive parameter to required so callers are forced to explicitly opt in or out, making the new behavior contract explicit
 
-C. **[✓]** Add the new parameter as optional with a default to maintain backward compatibility
+C. Release an entirely new tool version with a different name to avoid any risk of breaking callers that depend on the original tool interface
 
-D. Remove the old tool and deploy the new version asking teams to update
+D. **[✓]** Add the recursive parameter as optional with a default value matching the existing behavior so current callers continue working unchanged
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Tool versioning should follow the principle of forward and backward compatibility. New parameters should be added as optional with sensible defaults so existing callers continue to work unchanged. The tool description should be updated to document the new capability. Creating entirely new tools for every change leads to proliferation and confusion.
 
-**Source:** Exam Guide Ã‚Â§Task 2.21
+**Source:** Exam Guide §Task 2.21
 
 ---
 
@@ -1313,19 +1313,19 @@ D. Remove the old tool and deploy the new version asking teams to update
 
 **Options:**
 
-A. The client guesses tool names based on documentation and calls them directly
+A. Clients discover available tools by studying the server's source code or API documentation and then hardcode the tool names they intend to call
 
-B. **[✓]** The MCP protocol uses capability negotiation where servers advertise tools for clients to call
+B. The server broadcasts tool results to all connected clients on a fixed interval without waiting for explicit tool invocation requests from clients
 
-C. The client reads the server source code to discover what tools are available
+C. Clients guess available tool names based on naming convention patterns and probe the server to confirm which guessed names resolve successfully
 
-D. The server sends all tool results periodically without being asked by the client
+D. **[✓]** The MCP protocol uses initialization-time capability negotiation where the server advertises its available tools for the client to discover and call
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** The MCP protocol message format follows a request-response pattern: (1) initialization and capabilities negotiation, where the server advertises its tools, (2) tool call requests from the client with parameters, and (3) tool result responses from the server with structured data or error messages. This follows JSON-RPC conventions with specific MCP-defined message types for tool discovery and invocation.
 
-**Source:** Exam Guide Ã‚Â§Task 2.22
+**Source:** Exam Guide §Task 2.22
 
 ---
 
@@ -1337,19 +1337,19 @@ D. The server sends all tool results periodically without being asked by the cli
 
 **Options:**
 
-A. **[✓]** Use SSE transport to enable network-accessible client-server communication
+A. Disable all authentication since MCP servers only ever communicate over local loopback interfaces inaccessible from external network locations
 
-B. Use stdio transport since MCP servers must always run as local subprocesses
+B. Use stdio transport since all MCP server deployments must run as local subprocess children of the calling client process architecture
 
-C. **[✓]** Implement authentication and authorization for all MCP tool invocations
+C. **[✓]** Implement authentication and authorization mechanisms to verify client identities and scope each agent's access to only its required tools
 
-D. Disable all security since MCP servers only communicate over localhost connections
+D. **[✓]** Use SSE transport to enable the MCP server to communicate with clients over HTTP across different network segments and machines
 
-**Correct Answers:** A, C
+**Correct Answers:** C, D
 
-**Explanation:** For remote MCP deployments, SSE (Server-Sent Events) transport is appropriate (option 0) because it enables client-server communication over HTTP across network segments. Authentication and authorization are essential (option 2) when MCP servers access sensitive resources, including identity verification, least-privilege tool scoping, and audit logging. stdio transport (option 1) only works for local subprocesses. Disabling security (option 3) is never acceptable for production systems.
+**Explanation:** For remote MCP deployments, SSE (Server-Sent Events) transport is appropriate (option 3) because it enables client-server communication over HTTP across network segments. Authentication and authorization are essential (option 2) when MCP servers access sensitive resources, including identity verification, least-privilege tool scoping, and audit logging. stdio transport (option 1) only works for local subprocesses. Disabling security (option 0) is never acceptable for production systems.
 
-**Source:** Exam Guide Ã‚Â§Task 2.10
+**Source:** Exam Guide §Task 2.10
 
 ---
 
@@ -1363,19 +1363,19 @@ D. Disable all security since MCP servers only communicate over localhost connec
 
 **Options:**
 
-A. **[✓]** The instructions exist only in user-level configuration not shared via version control and no project-level file was ever committed
+A. **[✓]** The instructions were placed in user-level configuration that is not version-controlled and therefore was never shared with the new developer
 
-B. The instructions use the import syntax for referencing external files which fails silently during initialization on the new machine
+B. The instructions were placed in a subdirectory-level CLAUDE.md file, which limits their scope only to files within that specific directory
 
-C. The new team member has a conflicting user-level configuration file that takes precedence over the project-level hierarchy
+C. The new developer has conflicting preferences in their own user-level CLAUDE.md that override the project-level configuration hierarchy
 
-D. The instructions were placed in a subdirectory CLAUDE.md file that limits their application only to files within that directory
+D. The instructions use the @import syntax to reference external files, and that import resolution fails silently on the new developer's machine
 
 **Correct Answer:** A
 
 **Explanation:** The user-level CLAUDE.md (typically at ~/.claude/CLAUDE.md) is not version-controlled and is intended for personal preferences. Team conventions belong in the project-level CLAUDE.md which is checked into version control. This layering allows individual customization without affecting the team standard.
 
-**Source:** Exam Guide Ã‚Â§Task 3.1
+**Source:** Exam Guide §Task 3.1
 
 ---
 
@@ -1387,19 +1387,19 @@ D. The instructions were placed in a subdirectory CLAUDE.md file that limits the
 
 **Options:**
 
-A. Move all content to a separate wiki page and reference it in CLAUDE.md
+A. Retain the entire file as-is but add clearly labeled section headers and inline comments to help contributors navigate the large document
 
-B. Keep everything in one file but add section headers with descriptive comments
+B. Create separate CLAUDE.md files in each major project subdirectory so each team can own and maintain their own section independently
 
-C. **[✓]** Use the import syntax to compose separate files into the main CLAUDE.md file
+C. **[✓]** Use the @import syntax to compose multiple focused, independently-maintained files into the main CLAUDE.md through modular file references
 
-D. Create a separate CLAUDE.md file in each subdirectory of the project
+D. Move all CLAUDE.md content to a team wiki and add a single reference link in the root CLAUDE.md pointing developers to the external documentation
 
 **Correct Answer:** C
 
 **Explanation:** The @import syntax allows modular CLAUDE.md configuration by importing content from separate files (e.g., @import ./style-guide.md). This enables teams to maintain focused, independently-editable files that are composed together at load time. This improves maintainability, reduces merge conflicts, and follows good software modularity principles.
 
-**Source:** Exam Guide Ã‚Â§Task 3.2
+**Source:** Exam Guide §Task 3.2
 
 ---
 
@@ -1411,19 +1411,19 @@ D. Create a separate CLAUDE.md file in each subdirectory of the project
 
 **Options:**
 
-A. Add shell aliases to each individual developer bashrc configuration file directly
+A. **[✓]** Place executable command scripts in the project's .claude/commands/ directory so they become version-controlled reusable Claude Code commands
 
-B. **[✓]** Place executable scripts in the project claude commands directory for reuse
+B. Add a dedicated commands section to the root CLAUDE.md file that lists each workflow with its full invocation syntax for the model to reference
 
-C. Document the commands in a README and ask developers to run them manually
+C. Document all standard workflow commands in the project README and ask developers to copy and run them manually during their sessions
 
-D. Create a CLAUDE.md section that lists the commands for the model
+D. Add shell aliases for each workflow command to every developer's personal .bashrc or .zshrc file to make them available in terminal sessions
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Project-scoped commands should be placed in the .claude/commands/ directory. Commands placed there become available to Claude Code within that project context. They can be invoked by name and support structured execution with defined inputs and outputs, making them more reliable than prompt-based command execution.
 
-**Source:** Exam Guide Ã‚Â§Task 3.3
+**Source:** Exam Guide §Task 3.3
 
 ---
 
@@ -1435,19 +1435,19 @@ D. Create a CLAUDE.md section that lists the commands for the model
 
 **Options:**
 
-A. Include instructions in the skill description telling users to clear the context manually
+A. Deploy the skill as an independently running MCP server process so it maintains no shared state with the primary Claude Code session context
 
-B. Design the skill to run as a completely separate MCP server process
+B. Prepend a system prompt section to the skill that explicitly resets all tracking variables and clears accumulated state at invocation start
 
-C. **[✓]** Configure context fork in the skill frontmatter to isolate each invocation session
+C. Add a user-facing instruction in the skill description telling users to manually clear their session context between consecutive skill invocations
 
-D. Add a system prompt that resets all variables at the start of each invocation
+D. **[✓]** Configure context: fork in the skill's YAML frontmatter to create an isolated session for each invocation that cannot pollute the parent context
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** The context: fork frontmatter directive in a skill's configuration ensures each invocation creates an isolated session fork. This prevents context leakage between invocations, ensures clean state for each use, and maintains the main session's context uncontaminated by skill operations. It is the proper mechanism for output isolation.
 
-**Source:** Exam Guide Ã‚Â§Task 3.4
+**Source:** Exam Guide §Task 3.4
 
 ---
 
@@ -1459,19 +1459,19 @@ D. Add a system prompt that resets all variables at the start of each invocation
 
 **Options:**
 
-A. Put all rules in a single CLAUDE.md with conditional phrasing about the frontend
+A. Create a separate CLAUDE.md file at the root of each area so that each directory's rules automatically override the parent-level configuration
 
-B. **[✓]** Use claude rules with YAML frontmatter containing path patterns for conditional activation
+B. Consolidate all conditional rules into the .claude/settings.json configuration file and use flag-based conditions to enable each rule selectively
 
-C. Create separate CLAUDE.md files in each directory and let them override one another
+C. **[✓]** Define rules as individual files in .claude/rules/ using YAML frontmatter with path-pattern matchers for conditional, context-aware activation
 
-D. Define all the rules in the project settings file with appropriate conditional flags
+D. Include all rules in a single root CLAUDE.md and add conditional if-frontend language to each rule to indicate its applicable scope
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** The .claude/rules/ directory supports files with YAML frontmatter that specify path patterns. Rules are conditionally applied when the current file matches the specified paths. This is the correct mechanism for context-sensitive, conditional rules that activate only when relevant to the current task.
 
-**Source:** Exam Guide Ã‚Â§Task 3.5
+**Source:** Exam Guide §Task 3.5
 
 ---
 
@@ -1483,19 +1483,19 @@ D. Define all the rules in the project settings file with appropriate conditiona
 
 **Options:**
 
-A. Use Plan mode to analyze the impact before making any changes at all
+A. Open Plan mode first to perform a full impact analysis of the renaming before authorizing the agent to apply even this minimal change
 
-B. Use batch processing to handle the change as part of a larger batch
+B. Queue the rename as part of a larger batch refactoring task so it can be processed together with related changes for efficiency
 
-C. Create a new session fork to explore the change approach first
+C. Create a session fork before making the change so the original state is preserved and the rename approach can be verified safely first
 
-D. **[✓]** Use direct execution mode to make the change immediately without separate planning
+D. **[✓]** Use direct execution mode to apply the straightforward single-file rename immediately without the overhead of a separate planning phase
 
 **Correct Answer:** D
 
 **Explanation:** For simple, single-file changes with clearly bounded impact, direct execution is the most appropriate mode. Plan mode adds unnecessary overhead for trivial changes that do not require architectural analysis. The developer should match the execution mode to the complexity of the task.
 
-**Source:** Exam Guide Ã‚Â§Task 3.6
+**Source:** Exam Guide §Task 3.6
 
 ---
 
@@ -1507,19 +1507,19 @@ D. **[✓]** Use direct execution mode to make the change immediately without se
 
 **Options:**
 
-A. Execute all changes directly in one session since the developer knows what to do
+A. Submit all changes as a single non-blocking batch request so the restructuring can be processed asynchronously without holding up the developer
 
-B. Use batch mode to submit all changes as a single non-blocking batch request
+B. Proceed directly with execution across all forty files in a single session since the developer already understands the target architecture well
 
-C. Make changes file by file without a global plan letting the model adapt as needed
+C. Refactor files incrementally without a global dependency plan, allowing the model to adapt its approach organically as each change is applied
 
-D. **[✓]** Use Plan mode to analyze the architecture and design the target structure before execution
+D. **[✓]** Engage Plan mode to analyze the current architecture, design the target structure, and produce an approved dependency plan before any execution
 
 **Correct Answer:** D
 
 **Explanation:** Plan mode is the correct choice for large-scale multi-file restructuring. It allows the agent to first analyze the current architecture, design the target structure, identify dependencies, and present a plan to the developer. After plan approval, execution can proceed with confidence. Direct execution on complex restructurings risks incomplete or inconsistent changes.
 
-**Source:** Exam Guide Ã‚Â§Task 3.7
+**Source:** Exam Guide §Task 3.7
 
 ---
 
@@ -1531,19 +1531,19 @@ D. **[✓]** Use Plan mode to analyze the architecture and design the target str
 
 **Options:**
 
-A. Add stricter instructions in the system prompt telling the model to follow the format
+A. Strengthen the system prompt formatting instructions with more precise and detailed language to reduce the remaining fifteen percent deviation rate
 
-B. Remove all strict formatting requirements and accept whatever format the model produces
+B. Eliminate all strict formatting requirements and accept whatever structure the model naturally produces to reduce the burden on prompt engineering
 
-C. **[✓]** Provide concrete before and after examples in the prompt showing correct formatting
+C. **[✓]** Provide concrete before-and-after formatting examples in the prompt that anchor the model's output to the expected structure across all scenarios
 
-D. Ask developers to manually fix the formatting issues during their review process
+D. Require developers to post-process all model-generated reports through a manual reformatting step before they enter the downstream pipeline
 
 **Correct Answer:** C
 
 **Explanation:** Concrete before/after examples are more effective than abstract formatting instructions. Showing the model examples of what correct output looks like for different scenarios anchors its understanding. This is particularly important for structured output where the model needs to map abstract rules to concrete formats consistently.
 
-**Source:** Exam Guide Ã‚Â§Task 3.8
+**Source:** Exam Guide §Task 3.8
 
 ---
 
@@ -1555,19 +1555,19 @@ D. Ask developers to manually fix the formatting issues during their review proc
 
 **Options:**
 
-A. Proceed directly to the implementation since the request seems quite straightforward overall
+A. Proceed directly to implementation since most account deletion edge cases are easily addressed with standard error handling in the application layer
 
-B. Create a comprehensive implementation that handles all possible edge cases up front
+B. Start with a minimal working implementation and rely on iterative testing and bug reports to surface and resolve edge cases over time
 
-C. Build a basic implementation and test it iteratively as issues are discovered
+C. Build a comprehensive implementation upfront that attempts to handle all foreseeable edge cases in a single non-iterative development pass
 
-D. **[✓]** Use the interview pattern to ask targeted questions about edge cases before coding
+D. **[✓]** Use the interview pattern to ask targeted questions about constraints and edge cases upfront and clarify all requirements before writing any code
 
 **Correct Answer:** D
 
 **Explanation:** The interview pattern involves asking targeted questions about edge cases, constraints, and business rules before any coding begins. This surfaces requirements that the developer may not have explicitly stated (like 'what happens to subscriptions on account deletion?'). It prevents wasted effort on implementations that miss critical requirements and is more efficient than iterative refinement.
 
-**Source:** Exam Guide Ã‚Â§Task 3.9
+**Source:** Exam Guide §Task 3.9
 
 ---
 
@@ -1579,19 +1579,19 @@ D. **[✓]** Use the interview pattern to ask targeted questions about edge case
 
 **Options:**
 
-A. Use the interactive flag to keep the session open for debugging purposes
+A. Pass the interactive flag to maintain an open session that pauses at each step, allowing the pipeline to debug or intervene during execution
 
-B. **[✓]** Use the print flag for non-interactive mode suitable for CI/CD pipelines
+B. **[✓]** Pass the print flag to run Claude Code in non-interactive mode, reading from stdin and writing to stdout without entering an interactive loop
 
-C. Use the verbose flag to get detailed output from the session
+C. Pass the verbose flag to enable detailed diagnostic output that the pipeline can parse and monitor for completion and error conditions
 
-D. Use the resume flag to continue a previous session from before
+D. Pass the resume flag to reconnect to a previous session state rather than starting a new session from scratch on each pipeline invocation
 
 **Correct Answer:** B
 
 **Explanation:** The -p or --print flag runs Claude Code in non-interactive mode, which reads input from stdin and prints output to stdout without entering an interactive loop. This is designed for CI/CD pipelines and automated workflows where no human interaction is available.
 
-**Source:** Exam Guide Ã‚Â§Task 3.10
+**Source:** Exam Guide §Task 3.10
 
 ---
 
@@ -1603,19 +1603,19 @@ D. Use the resume flag to continue a previous session from before
 
 **Options:**
 
-A. Accept that repeated findings are expected and ask developers to ignore already fixed items
+A. Reduce the total review scope to only the highest-severity issue categories to limit the volume of potentially repeated finding reports
 
-B. **[✓]** Include prior review findings in the context so the agent can skip already addressed issues
+B. **[✓]** Include the prior review's findings in the input context so the agent can detect and skip issues that have already been reported or resolved
 
-C. Run the review only on the diff between the current commit and the previous one
+C. Scope each review strictly to the diff between the current and previous commit so only newly introduced changes are analyzed each time
 
-D. Reduce the scope of the review to focus only on the most critical issues
+D. Accept that some repeated findings are an inherent limitation of automated review and ask developers to dismiss previously acknowledged items
 
 **Correct Answer:** B
 
 **Explanation:** Including prior review findings in the context enables the agent to perform deduplication. By knowing what was previously reported, the agent can skip already-fixed issues and focus only on new or remaining concerns. This requires passing the previous review output as part of the input context for the re-run.
 
-**Source:** Exam Guide Ã‚Â§Task 3.11
+**Source:** Exam Guide §Task 3.11
 
 ---
 
@@ -1627,19 +1627,19 @@ D. Reduce the scope of the review to focus only on the most critical issues
 
 **Options:**
 
-A. Use synchronous API calls for each individual task in sequence
+A. Use synchronous API calls for each analysis task in sequence, waiting for each response before submitting the next task in the pipeline
 
-B. **[✓]** Use the Message Batches API for non-blocking submission with deferred collection
+B. Open multiple simultaneous streaming connections, one per analysis task, and process each stream in parallel to minimize wall-clock latency
 
-C. Use streaming API with parallel connections for each separate task
+C. **[✓]** Use the Message Batches API to submit all independent tasks non-interactively and collect results asynchronously within the SLA window
 
-D. Use a single synchronous call that combines all the analyses together
+D. Bundle all four analysis concerns into a single large synchronous API call with a combined prompt covering all required analysis dimensions
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** The Message Batches API is designed for non-blocking workflows where results can be collected later. It accepts batch submissions and processes them asynchronously, which is ideal for tasks with flexible SLAs. Synchronous APIs would block the main workflow, and streaming does not inherently support deferred collection.
 
-**Source:** Exam Guide Ã‚Â§Task 3.12
+**Source:** Exam Guide §Task 3.12
 
 ---
 
@@ -1651,19 +1651,19 @@ D. Use a single synchronous call that combines all the analyses together
 
 **Options:**
 
-A. All levels are ignored and only the system default configuration applies
+A. When all configuration levels conflict, the system ignores all of them and falls back to the default configuration values defined by Claude Code
 
-B. Project-level configuration always takes priority since it represents team standards
+B. **[✓]** Directory-level configuration takes the highest precedence, overriding project-level, which in turn overrides user-level configuration settings
 
-C. User-level configuration always takes priority since it represents developer preference
+C. User-level configuration always takes the highest precedence because individual developer preferences supersede all shared team configuration
 
-D. **[✓]** The directory level takes highest priority over project and user level settings
+D. Project-level configuration always wins over both user-level and directory-level settings because it represents the authoritative team standard
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** The CLAUDE.md hierarchy follows a specificity-based priority: directory-level overrides project-level, which overrides user-level. This allows teams to set base conventions at the project level while allowing more specific overrides in subdirectories. User-level settings are the baseline and are overridden by more specific project or directory settings.
 
-**Source:** Exam Guide Ã‚Â§Task 3.1
+**Source:** Exam Guide §Task 3.1
 
 ---
 
@@ -1675,19 +1675,19 @@ D. **[✓]** The directory level takes highest priority over project and user le
 
 **Options:**
 
-A. Document the workflows in a wiki page and have developers type them manually
+A. Write up each workflow in a team wiki with detailed usage instructions and have developers manually invoke the steps during their sessions
 
-B. **[✓]** Create command scripts in the project claude commands directory for version-controlled sharing
+B. **[✓]** Create command scripts in the project's .claude/commands/ directory so they become version-controlled, shared, and invocable slash commands
 
-C. Create shell aliases in each developer shell configuration file directly for consistency
+C. Embed all workflow definitions directly in the team's shared system prompt so the agent can execute them as part of its default behavior
 
-D. Hard-code the workflows into the agent system prompt for easy reuse later
+D. Configure shell aliases for each workflow command in every developer's personal shell profile file to make them available in terminal sessions
 
 **Correct Answer:** B
 
 **Explanation:** Custom slash command creation and sharing is done through the .claude/commands/ directory at the project level. These command scripts are version-controlled, making them shareable with the entire team through the repository. They support structured inputs and outputs, making them more powerful and reliable than prompt-based workflows or shell aliases.
 
-**Source:** Exam Guide Ã‚Â§Task 3.2
+**Source:** Exam Guide §Task 3.2
 
 ---
 
@@ -1699,19 +1699,19 @@ D. Hard-code the workflows into the agent system prompt for easy reuse later
 
 **Options:**
 
-A. Add all instructions to the CLAUDE.md file at the project root
+A. **[✓]** Define the skill using a SKILL.md file with YAML frontmatter that includes context: fork to isolate each invocation from the parent session
 
-B. **[✓]** Create a skill with a SKILL.md file using context fork for instruction isolation
+B. Create a separate subdirectory-level CLAUDE.md that contains only the coverage analysis instructions scoped to the test directory location
 
-C. Put the instructions in the system prompt each time the skill is invoked
+C. Inject all skill-specific instructions directly into the system prompt at the beginning of each session where the skill might be invoked
 
-D. Create a separate CLAUDE.md file for the skill instructions instead of this
+D. Add all coverage analysis instructions and format specifications to the root CLAUDE.md file so they apply globally across all project tasks
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Skill development uses SKILL.md with YAML frontmatter that defines the skill's metadata, including context: fork for isolation. The skill body contains specialized instructions. When invoked, the skill runs in its own forked context, keeping the main session uncontaminated. This is the proper mechanism for creating reusable, isolated capabilities.
 
-**Source:** Exam Guide Ã‚Â§Task 3.3
+**Source:** Exam Guide §Task 3.3
 
 ---
 
@@ -1723,19 +1723,19 @@ D. Create a separate CLAUDE.md file for the skill instructions instead of this
 
 **Options:**
 
-A. Process all fifty files one after another sequentially in a single session
+A. Transform the files manually using a desktop spreadsheet application to apply the required cleaning and validation rules to each file in turn
 
-B. **[✓]** Use batch processing with parallel task execution using the Task tool for concurrency
+B. Process one file per session in strict sequence, restarting the agent after each successful completion before proceeding to the next file
 
-C. Process all the files manually using a spreadsheet application one by one
+C. **[✓]** Use the Task tool to spawn parallel subagent tasks for each file, enabling concurrent independent processing across all fifty files simultaneously
 
-D. Process one file at a time and manually restart for each file
+D. Process all fifty CSV files one at a time in sequence within a single extended session to maintain a consistent shared transformation context
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Batch processing with parallel Task tool invocations is the correct approach for independent file transformations. Multiple files can be processed concurrently by spawning parallel subagent tasks, dramatically reducing total wall-clock time. Sequential processing would take 100 minutes, while 10 parallel tasks could complete in approximately 10 minutes.
 
-**Source:** Exam Guide Ã‚Â§Task 3.6
+**Source:** Exam Guide §Task 3.6
 
 ---
 
@@ -1747,19 +1747,19 @@ D. Process one file at a time and manually restart for each file
 
 **Options:**
 
-A. Use a single global CLAUDE.md with all rules and let the model decide
+A. Place a separate CLAUDE.md in each package directory and replicate all shared base conventions within each file to ensure complete coverage
 
-B. **[✓]** Use directory-level claude configurations with path-pattern frontmatter for package-specific conditional rules
+B. Maintain a single root-level CLAUDE.md with all rules listed together and rely on the model to infer which rules apply to the current file
 
-C. Create a separate CLAUDE.md in each package directory that duplicates common rules
+C. **[✓]** Apply directory-level configuration and conditional rules via .claude/rules/ files with path-pattern frontmatter for package-specific activation
 
-D. Put all the rules in the claude settings file with conditional logic applied
+D. Define all conditional rules within .claude/settings.json using a flag-based mechanism to selectively activate rules for each project area
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** For monorepos, use directory-level configuration and conditional rules via .claude/rules/ with path-pattern frontmatter. This allows each package to have its own conventions, tools, and rules that activate only when working within that package. Duplicating rules in separate CLAUDE.md files creates maintenance burden, and a single global configuration is too coarse.
 
-**Source:** Exam Guide Ã‚Â§Task 3.7
+**Source:** Exam Guide §Task 3.7
 
 ---
 
@@ -1771,19 +1771,19 @@ D. Put all the rules in the claude settings file with conditional logic applied
 
 **Options:**
 
-A. Add the settings to each project claude directory separately as needed
+A. Add the desired global settings to each individual project's .claude/ directory so every project inherits the configuration independently
 
-B. **[✓]** Use claude settings at the user level for global configuration across all projects
+B. **[✓]** Configure global behavior preferences in the user-level settings file at ~/.claude/settings.json so they apply across all projects automatically
 
-C. Set specific environment variables for your Claude Code configuration file preferences
+C. Set global configuration through environment variable exports in the shell profile so Claude Code reads them at runtime from the environment
 
-D. Configure the settings in the IDE extension settings panel for Claude
+D. Apply global preferences through the IDE extension's settings panel so they persist across workspaces within that specific editor environment
 
 **Correct Answer:** B
 
 **Explanation:** The .claude/settings.json file at the user level (typically ~/.claude/settings.json) contains global configuration that applies across all projects. This is the correct location for user-wide preferences like default model selection, temperature settings, and output preferences. Project-level settings override user-level settings for project-specific configuration.
 
-**Source:** Exam Guide Ã‚Â§Task 3.8
+**Source:** Exam Guide §Task 3.8
 
 ---
 
@@ -1795,19 +1795,19 @@ D. Configure the settings in the IDE extension settings panel for Claude
 
 **Options:**
 
-A. Use the same configuration for both since the SDK handles optimization automatically
+A. Apply the SDK's default preset configuration uniformly to both use cases since defaults are engineered for broad applicability across scenarios
 
-B. **[✓]** Configure the agent SDK with different settings per use case for optimal performance
+B. Use identical SDK configuration for both use cases since the agent SDK automatically detects and optimizes settings for each runtime context
 
-C. Only use the agent SDK for the chat assistant and build the batch manually
+C. Apply the SDK only to the real-time chat assistant and implement the batch analysis pipeline using direct API calls with custom configuration
 
-D. Use the default configuration for everything since defaults are optimized for all cases
+D. **[✓]** Configure the agent SDK differently per use case, tuning settings like streaming, parallelism, and model selection to match each requirement
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Agent SDK configuration should be tailored to each use case. The chat assistant needs: lower temperature for consistency, streaming for real-time responses, and potentially a faster but less capable model. The batch system needs: higher parallelism for throughput, non-streaming for efficiency, and batch processing capabilities. One-size-fits-all configuration does not optimize for different requirements.
 
-**Source:** Exam Guide Ã‚Â§Task 3.9
+**Source:** Exam Guide §Task 3.9
 
 ---
 
@@ -1819,19 +1819,19 @@ D. Use the default configuration for everything since defaults are optimized for
 
 **Options:**
 
-A. Hard-code the API key in each project CLAUDE.md for developer convenience
+A. Store the API key in each project's CLAUDE.md or configuration file so developers have seamless access when they clone and open the project
 
-B. Embed the API key in the project package.json as a script configuration
+B. Embed the API key in the project's package.json scripts section so it is automatically available when developers run project-defined commands
 
-C. Share a single API key among all developers in a shared configuration file
+C. **[✓]** Store API keys in environment variables or a secrets manager, keeping them entirely out of all version-controlled files and shared configurations
 
-D. **[✓]** Use environment variables for API keys keeping them out of version-controlled files
+D. Create a single shared API key stored in a team-accessible configuration repository that all twenty developers use for their Claude Code sessions
 
-**Correct Answer:** D
+**Correct Answer:** C
 
 **Explanation:** Claude Code authentication and API key management should use environment variables (like ANTHROPIC_API_KEY) or the Claude Code settings system. API keys must never be committed to version control or stored in project configuration files that are shared. Each developer should have their own key or keys should be managed through a secure secrets manager.
 
-**Source:** Exam Guide Ã‚Â§Task 3.10
+**Source:** Exam Guide §Task 3.10
 
 ---
 
@@ -1843,19 +1843,19 @@ D. **[✓]** Use environment variables for API keys keeping them out of version-
 
 **Options:**
 
-A. Accept all changes blindly since the agent was told to do the right thing
+A. Accept all agent-generated changes without review since the model was given accurate instructions and the task specification was sufficiently clear
 
-B. **[✓]** Use the diff view to review each change and selectively accept or modify before finalizing
+B. Reject all generated changes and redo the refactoring manually to ensure every modification meets the developer's personal quality standards
 
-C. Reject all of the changes and completely redo the work manually from scratch
+C. Accept all changes as long as the automated test suite passes without failures, treating green tests as sufficient validation for all modifications
 
-D. Only check if the tests pass and accept regardless of what the diff shows
+D. **[✓]** Use the diff view to examine each change, verify correctness, request clarifications on specific modifications, and selectively accept or adjust
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** File change management and diff handling should follow a structured review process: (1) review the diff for each file to understand what changed and why, (2) ask for explanations of specific modifications if needed, (3) request modifications for changes that look incorrect or suboptimal, and (4) selectively accept changes. Blind acceptance is risky; blanket rejection wastes effort.
 
-**Source:** Exam Guide Ã‚Â§Task 3.11
+**Source:** Exam Guide §Task 3.11
 
 ---
 
@@ -1867,19 +1867,19 @@ D. Only check if the tests pass and accept regardless of what the diff shows
 
 **Options:**
 
-A. Give Claude Code full access to all repository secrets and credentials available
+A. Allow Claude Code direct write access to the production deployment environment so it can verify that suggested fixes work in the live system
 
-B. Grant Claude Code write access to the production environment directly without review
+B. Host the Claude Code execution environment on a dedicated unrestricted server to ensure maximum capability and performance on every review run
 
-C. Run Claude Code on a separate secured server with unlimited access permissions
+C. **[✓]** Run Claude Code with minimal file system permissions scoped to the repository, avoid exposing secrets, and prevent access to production systems
 
-D. **[✓]** Run Claude Code with minimal permissions restrict file access and avoid exposing secrets
+D. Grant Claude Code access to all available repository secrets and deployment credentials so it can perform a fully comprehensive analysis of the PR
 
-**Correct Answer:** D
+**Correct Answer:** C
 
 **Explanation:** Claude Code in CI/CD pipelines requires strict security: (1) use the -p flag for non-interactive mode, (2) grant minimal permissions needed for the task, (3) restrict file system access to the repository, (4) never expose secrets to the agent's context, and (5) ensure the agent cannot access production environments. CI/CD is a high-risk environment for agent execution.
 
-**Source:** Exam Guide Ã‚Â§Task 3.12
+**Source:** Exam Guide §Task 3.12
 
 ---
 
@@ -1891,19 +1891,19 @@ D. **[✓]** Run Claude Code with minimal permissions restrict file access and a
 
 **Options:**
 
-A. Trust the model not to access the sensitive files at all
+A. Rely on the model's instruction-following behavior to naturally avoid reading files that have been indicated as sensitive in the system prompt
 
-B. Move sensitive files to a completely separate directory location instead
+B. Encrypt all sensitive configuration files so that the model's Read tool retrieves only ciphertext that it cannot interpret or extract secrets from
 
-C. **[✓]** Configure allow and deny lists for file access in the security settings
+C. Relocate all sensitive configuration files to a completely separate directory tree outside the project root to physically separate them from source
 
-D. Encrypt sensitive files so the model cannot successfully read them
+D. **[✓]** Configure explicit allow lists and deny lists for file system access in Claude Code's security settings to programmatically enforce access boundaries
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Claude Code permissions and security settings support configuring file system access controls, including allow lists and deny lists. This programmatically prevents the agent from reading or writing specific files or directories. This is essential for projects containing secrets, configuration files, or other sensitive data that should not be exposed to the agent.
 
-**Source:** Exam Guide Ã‚Â§Task 3.13
+**Source:** Exam Guide §Task 3.13
 
 ---
 
@@ -1915,19 +1915,19 @@ D. Encrypt sensitive files so the model cannot successfully read them
 
 **Options:**
 
-A. Implement this custom logic in each individual tool implementation process manually
+A. Require developers to manually log their tool usage to a shared spreadsheet at the end of each working day for centralized tracking purposes
 
-B. Ask the developers to manually log their tool usage and activity each day
+B. **[✓]** Use the PreToolUse and PostToolUse hooks provided by the agent SDK to register centralized custom logic that runs around all tool executions
 
-C. **[✓]** Use the hooks system provided by the agent SDK for custom event handlers
+C. Route all tool invocations through an external network proxy that intercepts requests and injects the required logging and validation behavior
 
-D. Use a network proxy to intercept all tool calls externally from the system
+D. Embed the required custom logic directly into each individual tool's implementation so it executes naturally as part of each tool's behavior
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** Custom hooks and event handlers provided by the agent SDK (PreToolUse, PostToolUse) are the correct mechanism for running logic before and after tool executions. These hooks are centralized, apply to all tools automatically, and cannot be bypassed. They support logging, validation, transformation, and interception use cases without modifying individual tool implementations.
 
-**Source:** Exam Guide Ã‚Â§Task 3.14
+**Source:** Exam Guide §Task 3.14
 
 ---
 
@@ -1941,19 +1941,19 @@ D. Use a network proxy to intercept all tool calls externally from the system
 
 **Options:**
 
-A. Tell the agent to reduce the number of comments without any specific guidance
+A. Retire the AI-assisted review workflow entirely and revert to fully manual code review by human developers to eliminate the noise problem
 
-B. Limit the review to a maximum of five comments total per pull request
+B. Instruct the agent to produce fewer total comments per review without providing categorical guidance on which finding types to prioritize
 
-C. **[✓]** Define explicit categorical criteria listing what to report and what to skip for quality
+C. **[✓]** Define explicit categorical criteria that specify which issue types to always report and which types to consistently skip in every review
 
-D. Remove the PR review capability entirely and rely on manual reviews instead
+D. Impose a hard maximum of five comments per pull request regardless of the number or severity of issues discovered in the changed code
 
 **Correct Answer:** C
 
 **Explanation:** Explicit categorical criteria are essential for effective PR reviews. The criteria should list what to report (functional bugs, security vulnerabilities, API compatibility breaks, performance issues) and what to skip (formatting preferences, naming style choices, minor refactoring suggestions). This focuses the review on high-value findings and reduces noise that causes review fatigue.
 
-**Source:** Exam Guide Ã‚Â§Task 4.1
+**Source:** Exam Guide §Task 4.1
 
 ---
 
@@ -1965,19 +1965,19 @@ D. Remove the PR review capability entirely and rely on manual reviews instead
 
 **Options:**
 
-A. The model is not intelligent enough to understand what edge cases fully are
+A. **[✓]** The prompt's vague language fails to enumerate specific edge case categories, so boundary conditions fall outside what the agent checks for
 
-B. **[✓]** The prompt uses vague language instead of listing explicit criteria like verify boundary values
+B. The agent requires a larger, more capable model to handle the full range of edge case identification across diverse data processing scenarios
 
-C. The agent needs a much larger model to handle effective edge case detection
+C. The underlying model lacks sufficient capability to generalize the concept of edge cases to domain-specific data processing validation scenarios
 
-D. Edge case detection requires a separate fine-tuned model for this specific task
+D. Effective edge case detection inherently requires a domain-specific fine-tuned model rather than a general-purpose instruction-following model
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** The vague instruction 'check for edge cases' should be replaced with explicit criteria. For example, specify 'check for contradiction between source and target fields' or 'verify values at minimum and maximum numeric boundaries'. The model performs better with specific, actionable instructions than with abstract concepts that may have ambiguous interpretations.
 
-**Source:** Exam Guide Ã‚Â§Task 4.2
+**Source:** Exam Guide §Task 4.2
 
 ---
 
@@ -1989,19 +1989,19 @@ D. Edge case detection requires a separate fine-tuned model for this specific ta
 
 **Options:**
 
-A. Accept the eighty five percent success rate and fix remaining cases manually
+A. Simplify the report structure by reducing the number of required fields to lower the structural complexity and minimize formatting deviations
 
-B. **[✓]** Add few-shot examples of correctly formatted reports to the prompt as reference patterns
+B. Accept the eighty-five percent compliance rate as adequate and allocate developer time to manually correcting the remaining format deviations
 
-C. Simplify the report format to reduce the overall chance of format deviation
+C. Raise the model temperature setting to increase the diversity of generated outputs and encourage more varied attempts at correct formatting
 
-D. Increase the model temperature to encourage more careful output generation behavior
+D. **[✓]** Supplement the prompt with two to three concrete examples of correctly formatted reports to anchor the model to the required output pattern
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** When instructions alone fail to produce consistent output, few-shot examples are the most effective solution. Providing 2-3 concrete examples of correctly formatted reports anchors the model's output to the expected pattern. Examples work better than additional instructions because they demonstrate rather than describe the expected format.
 
-**Source:** Exam Guide Ã‚Â§Task 4.3
+**Source:** Exam Guide §Task 4.3
 
 ---
 
@@ -2013,19 +2013,19 @@ D. Increase the model temperature to encourage more careful output generation be
 
 **Options:**
 
-A. **[✓]** Make the purchase order number field nullable with schema description guidance to return null when the field is absent
+A. Remove the purchase order number field entirely from the extraction schema and retrieve it through a separate targeted follow-up pass if needed
 
-B. Remove the purchase order number field from the schema entirely and extract it through a separate validation pass if needed
+B. Mark the purchase order number as required with a predefined null literal default value to signal the model to return null for absent data
 
-C. Add enum validation to the purchase order number field restricting values to patterns matching valid purchase order formats
+C. Add enum validation to the purchase order number field restricting accepted values to patterns that match known valid purchase order formats
 
-D. Set the purchase order number field as required with a null default value to enforce null returns when the information is absent
+D. **[✓]** Define the purchase order number field as nullable with schema description guidance directing the model to return null when the field is absent
 
-**Correct Answer:** A
+**Correct Answer:** D
 
 **Explanation:** Schema fields should be designed as nullable when source documents may not contain the information, preventing the model from fabricating values to satisfy required fields. Making the purchase order number field explicitly nullable in the schema definition with clear description guidance tells the model that null is an acceptable and expected value when the information is absent from the source document.
 
-**Source:** Exam Guide Ã‚Â§Task 4.4
+**Source:** Exam Guide §Task 4.4
 
 ---
 
@@ -2037,19 +2037,19 @@ D. Set the purchase order number field as required with a null default value to 
 
 **Options:**
 
-A. Schema enforcement always guarantees both syntactic validity and semantic correctness of data
+A. Schema enforcement verifies only that the JSON can be parsed without errors and makes no guarantees about field presence or data type compliance
 
-B. **[✓]** Schema enforcement prevents syntax errors but does not prevent semantic data errors
+B. **[✓]** Schema enforcement prevents structural syntax errors but does not prevent semantic errors such as incorrect values that satisfy type constraints
 
-C. Schema enforcement only guarantees the JSON is valid not that fields are correct
+C. Schema enforcement guarantees both syntactic validity and semantic accuracy simultaneously, ensuring all extracted values are factually correct
 
-D. Schema enforcement is redundant because the model always produces correct output
+D. Schema enforcement is unnecessary because language models consistently produce correctly structured output without additional constraint mechanisms
 
 **Correct Answer:** B
 
 **Explanation:** Schema enforcement prevents syntax errors (invalid JSON, wrong types, missing required fields) but does not prevent semantic errors. The model could return the correct structure with incorrect values: a wrong invoice number, an incorrectly calculated total, or a date that does not match the document. Semantic validation requires additional verification steps beyond schema checking.
 
-**Source:** Exam Guide Ã‚Â§Task 4.5
+**Source:** Exam Guide §Task 4.5
 
 ---
 
@@ -2061,19 +2061,19 @@ D. Schema enforcement is redundant because the model always produces correct out
 
 **Options:**
 
-A. Add a system prompt instruction telling the model to always use the specific tool
+A. **[✓]** Set tool_choice to type: tool with name: extract_invoice to programmatically enforce that the model must call that specific tool on every turn
 
-B. Remove all other tools from the configuration so the model has no alternative
+B. Add a system prompt instruction explicitly directing the model to always invoke the extract_invoice tool rather than returning data as plain text
 
-C. **[✓]** Use tool_choice with type tool and name extract_invoice to force that specific tool
+C. Implement post-processing logic that detects free-text JSON in assistant responses and converts it into the tool call format before downstream use
 
-D. Process both text responses and tool call outputs as equally valid results
+D. Remove all other tools from the configuration so the extract_invoice tool is the only callable option available to the agent during extraction
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** Forced tool selection via tool_choice: {type: 'tool', name: 'extract_invoice'} ensures the model must call the specified tool. This overrides the model's default behavior and guarantees structured output through the tool. Prompt instructions alone can be ignored by the model, but tool_choice with 'tool' type is programmatic and cannot be bypassed.
 
-**Source:** Exam Guide Ã‚Â§Task 4.6
+**Source:** Exam Guide §Task 4.6
 
 ---
 
@@ -2085,19 +2085,19 @@ D. Process both text responses and tool call outputs as equally valid results
 
 **Options:**
 
-A. Accept the failed extractions and log them for manual processing later
+A. Log malformed extraction outputs to a queue and route them to a manual processing workflow for human correction and re-entry downstream
 
-B. **[✓]** Retry the extraction with malformed output included as error feedback for correction
+B. Switch to a rule-based extraction fallback that uses regex parsing rather than model-generated output for all future attempts on this document
 
-C. Ignore the format errors since the data set is probably still usable
+C. Treat malformed JSON as acceptable partial output and pass it downstream with a flag indicating that format validation was not fully satisfied
 
-D. Switch to a completely different extraction approach for this scenario
+D. **[✓]** Retry the extraction including the malformed output and a specific description of the syntax error as feedback for the model to correct
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** When format errors occur, the agent should retry with error feedback. Include the malformed output and a description of the error (e.g., 'The JSON had a trailing comma after the last array element. Please fix and retry.'). The model can typically correct its output when given specific error feedback. This recovery loop is more efficient than manual reprocessing.
 
-**Source:** Exam Guide Ã‚Â§Task 4.7
+**Source:** Exam Guide §Task 4.7
 
 ---
 
@@ -2109,19 +2109,19 @@ D. Switch to a completely different extraction approach for this scenario
 
 **Options:**
 
-A. The model is not capable of finding tax identifiers in this format
+A. **[✓]** Retries with error feedback cannot produce a field that is genuinely absent from the source document regardless of how the prompt is refined
 
-B. The extraction tool schema is far too restrictive and needs loosening
+B. The model is unable to recognize tax identifier formats in this invoice layout and requires additional few-shot examples to extract correctly
 
-C. **[✓]** Retries are ineffective when the required information is absent from the source
+C. The model temperature is set too low, causing the model to under-explore the document and miss non-obvious field placement locations
 
-D. The model temperature setting is too low for accurate extraction work
+D. The extraction schema is overly restrictive in its validation rules and is rejecting legitimate values that the model is successfully extracting
 
-**Correct Answer:** C
+**Correct Answer:** A
 
 **Explanation:** Retries with error feedback are ineffective when the required information is simply not present in the source document. No amount of retrying will extract a tax ID that was never printed on the invoice. The system should detect this situation by validating that the required fields actually exist in the source before retrying, and handle missing data gracefully (e.g., mark as 'not available' rather than retrying endlessly).
 
-**Source:** Exam Guide Ã‚Â§Task 4.8
+**Source:** Exam Guide §Task 4.8
 
 ---
 
@@ -2133,19 +2133,19 @@ D. The model temperature setting is too low for accurate extraction work
 
 **Options:**
 
-A. Process reports one at a time synchronously over ten thousand minutes
+A. Submit all ten thousand reports individually as concurrent synchronous API requests, relying on connection pooling to handle the parallelism
 
-B. Use streaming for all ten thousand requests in parallel simultaneously
+B. **[✓]** Use a batch submission strategy that processes all reports within a twenty-four-hour window, well within the thirty-six-hour SLA requirement
 
-C. Submit all ten thousand reports simultaneously in individual API requests
+C. Process all ten thousand reports one at a time synchronously, completing and waiting for each before submitting the next in sequence
 
-D. **[✓]** Use a batch submission strategy within a twenty four hour SLA window
+D. Open streaming connections for all ten thousand reports simultaneously, processing each response stream in parallel for maximum throughput
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** A batch submission strategy with a 24-hour maximum window is appropriate. Batch processing allows submitting all 10,000 reports at once with results available within 24 hours, well within the 36-hour SLA. This is far more efficient than sequential processing and avoids rate limiting issues. The window should be configured to ensure completion before the SLA deadline.
 
-**Source:** Exam Guide Ã‚Â§Task 4.9
+**Source:** Exam Guide §Task 4.9
 
 ---
 
@@ -2157,19 +2157,19 @@ D. **[✓]** Use a batch submission strategy within a twenty four hour SLA windo
 
 **Options:**
 
-A. Yes the Message Batches API is designed for all types of review workflows
+A. Yes, the Message Batches API is well suited to code review workflows when configured with a short enough processing window for the SLA
 
-B. **[✓]** No the Message Batches API is inappropriate for blocking pre-merge workflows entirely
+B. **[✓]** No, the Message Batches API is designed for asynchronous non-blocking use cases and is inappropriate for blocking synchronous pipeline gates
 
-C. Yes as long as the batch window is set below the required ten minutes
+C. Yes, the batch window can be configured to complete processing within ten minutes when only a small number of review items are submitted
 
-D. No because batch processing is not capable of handling code review tasks
+D. No, the Message Batches API lacks the capability to analyze code diffs or generate structured review comments for pull request workflows
 
 **Correct Answer:** B
 
 **Explanation:** The Message Batches API is designed for non-blocking, asynchronous processing with deferred result collection. It is inappropriate for blocking/pre-merge workflows where results are needed synchronously to gate a pipeline. For blocking workflows, use synchronous API calls or streaming to get results inline before proceeding with the merge decision.
 
-**Source:** Exam Guide Ã‚Â§Task 4.10
+**Source:** Exam Guide §Task 4.10
 
 ---
 
@@ -2181,19 +2181,19 @@ D. No because batch processing is not capable of handling code review tasks
 
 **Options:**
 
-A. There is no limitation the same session can effectively self-review its own work
+A. The model is architecturally incapable of performing code review effectively regardless of whether it wrote the code being reviewed
 
-B. **[✓]** Self-review in the same session suffers from confirmation bias and shared context blindness
+B. **[✓]** Self-review within the same session suffers from confirmation bias and shared context blindness that limits the discovery of novel issues
 
-C. The model does not have the capability to review code at all effectively
+C. There is no meaningful limitation because the same session can review its own output as effectively as an independent session would
 
-D. Self-review is only effective approach when using a completely different model
+D. Self-review is only viable when conducted by a different model variant that was not involved in generating the original implementation
 
 **Correct Answer:** B
 
 **Explanation:** Self-review within the same session suffers from confirmation bias and shared context blindness Ã¢â‚¬â€ the agent is operating with the same assumptions that led to the original implementation. An independent instance (separate session or separate agent) with a fresh perspective and no shared assumptions is significantly more effective at identifying issues and edge cases.
 
-**Source:** Exam Guide Ã‚Â§Task 4.11
+**Source:** Exam Guide §Task 4.11
 
 ---
 
@@ -2205,19 +2205,19 @@ D. Self-review is only effective approach when using a completely different mode
 
 **Options:**
 
-A. Use a much larger model to handle both types of tasks simultaneously
+A. Select a larger, higher-capacity model to handle both review thoroughness and edge case analysis simultaneously within a single inference pass
 
-B. Combine both concerns into a single comprehensive detailed system prompt
+B. **[✓]** Use a multi-pass architecture with one pass dedicated to implementation correctness review and a separate focused pass for edge case analysis
 
-C. **[✓]** Use a multi-pass architecture with separate passes for review and edge cases
+C. Combine both objectives into a single comprehensive system prompt with detailed instructions covering correctness and edge case coverage together
 
-D. Use random sampling to cover different aspects in each separate pass
+D. Apply random sampling of the codebase during each pass so that different code sections are evaluated for correctness and edge cases alternately
 
-**Correct Answer:** C
+**Correct Answer:** B
 
 **Explanation:** A multi-pass architecture separates concerns across different passes: one pass focuses on general implementation correctness, and a separate pass focuses specifically on edge case identification. Each pass has a focused objective and criteria. This separation produces more thorough coverage than trying to handle all concerns in a single pass, where attention is divided.
 
-**Source:** Exam Guide Ã‚Â§Task 4.12
+**Source:** Exam Guide §Task 4.12
 
 ---
 
@@ -2229,19 +2229,19 @@ D. Use random sampling to cover different aspects in each separate pass
 
 **Options:**
 
-A. Use the same system prompt for all agents to maintain consistency
+A. Minimize system prompt length to a single descriptive sentence per agent to reduce token consumption and keep context space available
 
-B. Use the system prompt only for formatting instructions not behavioral guidance
+B. Use the same system prompt for every agent in the system to ensure all agents share a common baseline of behavioral expectations and values
 
-C. Keep system prompts as short as possible ideally just one sentence
+C. Restrict system prompt content to output format specifications only and avoid including behavioral or role-defining guidance for any agent
 
-D. **[✓]** Design role-specific system prompts that clearly define each agent purpose and guidelines
+D. **[✓]** Design role-specific system prompts that define each agent's purpose, capability scope, tool access, and behavioral boundaries for its role
 
 **Correct Answer:** D
 
 **Explanation:** System prompt design principles require role-specific prompts that clearly define: (1) the agent's purpose and role in the system, (2) its capabilities and tools, (3) its limitations and boundaries (what it should not do), and (4) behavioral guidelines for interaction. Each agent needs a prompt tailored to its function. A one-size-fits-all approach leads to role confusion and boundary violations.
 
-**Source:** Exam Guide Ã‚Â§Task 4.1
+**Source:** Exam Guide §Task 4.1
 
 ---
 
@@ -2253,19 +2253,19 @@ D. **[✓]** Design role-specific system prompts that clearly define each agent 
 
 **Options:**
 
-A. Put all the messages in a single array without any role distinctions
+A. **[✓]** Assign proper user, assistant, and system roles to all messages so the model correctly attributes each statement to its originating source
 
-B. Use a single message that concatenates the entire conversation together as one
+B. Combine all messages into a flat array without role labels so the model processes the full conversation as a single undifferentiated text block
 
-C. Mark all messages as user messages for simplicity in the structure
+C. Concatenate the entire multi-turn conversation into one long user message before submitting to the API for each new turn in the dialogue
 
-D. **[✓]** Use proper message roles for user assistant and system in all messages
+D. Classify all messages as user-turn messages to simplify the message structure and avoid managing multiple role types in the conversation array
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** Using proper user turn vs assistant turn message roles is essential for the model to correctly attribute information. The user role represents human-provided information, the assistant role represents the model's own previous responses, and the system role provides instructions. This role structure is fundamental to the model's understanding of conversation context and who said what.
 
-**Source:** Exam Guide Ã‚Â§Task 4.2
+**Source:** Exam Guide §Task 4.2
 
 ---
 
@@ -2277,19 +2277,19 @@ D. **[✓]** Use proper message roles for user assistant and system in all messa
 
 **Options:**
 
-A. Write everything in a single paragraph to save on tokens
+A. Write all prompt components in a single contiguous paragraph to minimize token usage and avoid structural overhead from formatting elements
 
-B. **[✓]** Use XML tags like instructions context and examples to delineate prompt sections
+B. Place each distinct prompt section in a separate user or system message turn rather than combining them in a single structured message
 
-C. Use random separators like dashes between the different sections of the prompt
+C. **[✓]** Use descriptive XML tags such as instructions, context, examples, and output-format to clearly delineate and label each distinct prompt section
 
-D. Put each different section in a separate message turn instead
+D. Separate sections using repeated dash or equals characters as visual dividers to indicate boundaries between different prompt components
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** XML tagging for structured prompts uses descriptive tags like &lt;instructions&gt;, &lt;context&gt;, &lt;examples&gt;, and &lt;output-format&gt; to clearly delineate sections. This improves the model's ability to parse and reference different parts of the prompt. XML tags are well-understood by the model and provide clear section boundaries that support reference (e.g., 'following the format specified in &lt;output-format&gt;').
 
-**Source:** Exam Guide Ã‚Â§Task 4.3
+**Source:** Exam Guide §Task 4.3
 
 ---
 
@@ -2301,19 +2301,19 @@ D. Put each different section in a separate message turn instead
 
 **Options:**
 
-A. Ask the model to provide only the final recommendation without showing work
+A. **[✓]** Use chain-of-thought prompting to direct the model to reason through each analytical step explicitly before arriving at its final conclusions
 
-B. Ask the model to guess the correct answer quickly since reasoning takes too long
+B. Ask the model only for the final actionable recommendation and suppress the intermediate reasoning to minimize output length and token cost
 
-C. Use a single instruction telling the model to be correct at all times
+C. Prompt the model to produce a rapid best-guess answer first, then verify the conclusion in a follow-up call if confidence appears uncertain
 
-D. **[✓]** Use chain-of-thought prompting to encourage the model to reason step-by-step before concluding
+D. Provide a single high-level instruction directing the model to be accurate and thorough without specifying how it should structure its reasoning
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** Chain-of-thought prompting encourages the model to break down complex reasoning into explicit steps before arriving at conclusions. This produces more accurate results for multi-step analysis tasks and makes the reasoning transparent. The model should be prompted to show its analytical process, consider alternatives, and then present conclusions with supporting evidence.
 
-**Source:** Exam Guide Ã‚Â§Task 4.4
+**Source:** Exam Guide §Task 4.4
 
 ---
 
@@ -2325,19 +2325,19 @@ D. **[✓]** Use chain-of-thought prompting to encourage the model to reason ste
 
 **Options:**
 
-A. Treat each user message as an independent request without considering prior context
+A. Process each user message as a fully independent and self-contained request, discarding all prior conversational turns before each API call
 
-B. Reset the conversation after every three turns to keep context fresh
+B. Retain only the single most recent user message in the context window and discard all prior turns including the assistant's previous responses
 
-C. Only keep the last user message and discard all of the history
+C. Reset the full conversation context after every third user turn to prevent accumulated context from influencing subsequent response quality
 
-D. **[✓]** Maintain conversation history as message sequences with proper roles and context management
+D. **[✓]** Maintain the structured conversation history with proper message roles and implement context management to handle topic shifts coherently
 
 **Correct Answer:** D
 
 **Explanation:** Multi-turn conversation management requires maintaining the structured conversation history (user and assistant messages) across turns. The agent needs to understand the full context, handle topic shifts gracefully, and manage the context window by summarizing older turns or pruning irrelevant content. Discarding history or treating each turn independently loses the conversational context needed for coherent responses.
 
-**Source:** Exam Guide Ã‚Â§Task 4.5
+**Source:** Exam Guide §Task 4.5
 
 ---
 
@@ -2349,19 +2349,19 @@ D. **[✓]** Maintain conversation history as message sequences with proper role
 
 **Options:**
 
-A. No measures are needed since the model can detect manipulation attempts itself
+A. Display a terms-of-service message at session start that explicitly prohibits users from attempting any form of prompt manipulation behavior
 
-B. Tell users not to attempt prompt injection in the welcome message shown
+B. Remove all behavioral instructions from the system prompt to eliminate the attack surface that prompt injection exploits in chatbot systems
 
-C. **[✓]** Validate user inputs constrain model instructions and never expose tool capabilities to users
+C. Rely entirely on the model's training to autonomously detect and neutralize all prompt injection attempts present in user-submitted inputs
 
-D. Remove all instructions from the system prompt so there is nothing to manipulate
+D. **[✓]** Validate and sanitize user inputs before they reach the model, enforce behavioral constraints in the system prompt, and restrict tool visibility
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Prompt injection prevention requires: (1) validate and sanitize user inputs before they reach the model, (2) constrain the model's behavior through the system prompt with explicit boundaries, (3) never expose tool names or capabilities in user-visible responses, (4) use input/output guards that filter suspicious patterns, and (5) implement the principle of least privilege for tool access.
 
-**Source:** Exam Guide Ã‚Â§Task 4.6
+**Source:** Exam Guide §Task 4.6
 
 ---
 
@@ -2373,19 +2373,19 @@ D. Remove all instructions from the system prompt so there is nothing to manipul
 
 **Options:**
 
-A. Set high temperature and high top p values for maximum output diversity
+A. Set a high temperature and high top_p value to encourage diverse and creative output variation across repeated code generation invocations
 
-B. Temperature and top p settings do not affect output determinism at all
+B. Set temperature to its maximum value to generate the widest variety of implementation patterns from which the best option can be selected
 
-C. Set temperature to maximum for creativity since code generation needs variety
+C. Temperature and top_p parameters have no measurable effect on output consistency and can be safely ignored for deterministic generation tasks
 
-D. **[✓]** Set temperature to zero and top p to one for maximum output determinism
+D. **[✓]** Set temperature to zero and top_p to one to minimize token selection randomness and produce the most consistent and repeatable output possible
 
 **Correct Answer:** D
 
 **Explanation:** For deterministic output, set temperature to 0 (or very close to 0) and top_p to 1. Temperature controls the randomness of token selection: 0 makes the model always choose the most likely token, producing consistent output. Top_p is an alternative sampling method; setting it to 1 disables its effect. For creative tasks, higher values are appropriate, but for deterministic code generation, low temperature is correct.
 
-**Source:** Exam Guide Ã‚Â§Task 4.7
+**Source:** Exam Guide §Task 4.7
 
 ---
 
@@ -2397,19 +2397,19 @@ D. **[✓]** Set temperature to zero and top p to one for maximum output determi
 
 **Options:**
 
-A. Trust the model completely to self-limit its own output length automatically
+A. **[✓]** Set the max_tokens parameter to the desired token limit and optionally configure stop sequences to terminate generation at natural boundaries
 
-B. **[✓]** Configure the max tokens parameter and use stop sequences to respect the limit
+B. Rely on the model's self-regulation to keep outputs concise, since language models naturally produce shorter responses to code review prompts
 
-C. Manually truncate the generated model output after it has been produced
+C. Reduce the size of the code input provided to the model so that shorter input naturally yields shorter model-generated summary output
 
-D. Reduce the input size provided so the model naturally generates shorter output
+D. Apply manual post-processing truncation to the raw API response output before it is delivered to the pull request comment submission endpoint
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Max tokens and output length management requires setting the max_tokens parameter to the desired limit. This tells the API to stop generating once the limit is reached. Additionally, consider using stop sequences to terminate generation at natural break points. Post-generation truncation should be a last resort as it may cut off mid-sentence.
 
-**Source:** Exam Guide Ã‚Â§Task 4.8
+**Source:** Exam Guide §Task 4.8
 
 ---
 
@@ -2421,19 +2421,19 @@ D. Reduce the input size provided so the model naturally generates shorter outpu
 
 **Options:**
 
-A. Tell the model just the code no explanation in the system prompt
+A. Include a system prompt directive saying only output code and no explanation and rely on the model to interpret and consistently honor it
 
-B. **[✓]** Use stop sequences like code block markers that halt generation when encountered
+B. Set a low max_tokens value that forces generation to stop before the model has enough budget to append any explanatory text to the output
 
-C. Truncate the output manually after receiving the complete model response from the API
+C. **[✓]** Configure stop sequences such as closing code fence markers that halt token generation precisely when the code block boundary is encountered
 
-D. Set max tokens low so the model cannot generate extra text at all
+D. Truncate the complete model response at a fixed character limit after the API call returns to remove any trailing explanatory text added
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Stop sequences are one or more strings that, when generated by the model, signal the API to stop producing further tokens. For code generation, using stop sequences like ``` or \n``` halts generation at the end of the code block. This is more precise than max_tokens truncation and ensures the output ends at a clean boundary.
 
-**Source:** Exam Guide Ã‚Â§Task 4.9
+**Source:** Exam Guide §Task 4.9
 
 ---
 
@@ -2445,19 +2445,19 @@ D. Set max tokens low so the model cannot generate extra text at all
 
 **Options:**
 
-A. Make a new complete API call for each keystroke event
+A. **[✓]** Use the streaming API to receive and display completion tokens progressively as they are generated for a responsive real-time user experience
 
-B. Use batch processing to handle keystrokes together in groups
+B. Submit a fresh complete API request for every individual keystroke event to ensure the model always generates based on the latest typed input
 
-C. Pre-generate all possible completions for every character position
+C. Collect keystrokes into timed batches and submit a single batch API request at regular intervals to reduce total API call volume
 
-D. **[✓]** Use streaming responses to deliver tokens progressively as they generate
+D. Pre-generate a comprehensive completion cache for all possible character combinations and serve suggestions directly from the local cache
 
-**Correct Answer:** D
+**Correct Answer:** A
 
 **Explanation:** Streaming responses are the correct approach for real-time interactive experiences. Streaming delivers tokens incrementally as they are generated, allowing the UI to display partial results immediately. This provides a responsive user experience. Full-response waiting creates noticeable latency, and pre-generation is impractical for open-ended completions.
 
-**Source:** Exam Guide Ã‚Â§Task 4.10
+**Source:** Exam Guide §Task 4.10
 
 ---
 
@@ -2469,19 +2469,19 @@ D. **[✓]** Use streaming responses to deliver tokens progressively as they gen
 
 **Options:**
 
-A. Accept the format variation and write separate parsers for each format
+A. Implement a post-processing conversion layer that normalizes all model-generated output into the required JSON format after each API response
 
-B. **[✓]** Use multiple techniques together like schema tool use and few-shot examples for consistency
+B. Accept inconsistent output formats from the model and develop separate downstream parsers for each format variant that may be produced
 
-C. Only use the system prompt and hope the model complies this time
+C. Rely solely on a detailed system prompt instruction specifying the required JSON format and field names to enforce output structure consistency
 
-D. Post-process all the model output through an automated format converter tool
+D. **[✓]** Combine multiple reinforcing techniques including schema-enforced tool_use, few-shot examples, and explicit system prompt instructions together
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Response format consistency requires a multi-layered approach: (1) use tool_use with a strict JSON schema for programmatic enforcement, (2) provide few-shot examples showing the exact expected output, and (3) reinforce with system prompt instructions. No single technique is perfectly reliable, but the combination provides defense in depth.
 
-**Source:** Exam Guide Ã‚Â§Task 4.11
+**Source:** Exam Guide §Task 4.11
 
 ---
 
@@ -2493,19 +2493,19 @@ D. Post-process all the model output through an automated format converter tool
 
 **Options:**
 
-A. Rely only on subjective developer judgment to evaluate prompt quality
+A. Deploy the updated prompt directly to production and monitor customer satisfaction scores as the primary indicator of prompt quality improvement
 
-B. **[✓]** Create a test dataset with expected outputs and measure accuracy and consistency
+B. **[✓]** Build a labeled evaluation dataset with representative inputs and expected outputs, then measure accuracy and consistency across prompt variants
 
-C. Use the latest prompt version in production and monitor for complaints
+C. Use developer intuition and peer feedback as the primary signals for evaluating whether a given prompt change represents a quality improvement
 
-D. A/B test prompts in production without any structured measurement at all
+D. Conduct live A/B tests in production with real customer traffic without establishing baseline metrics or a structured measurement framework
 
 **Correct Answer:** B
 
 **Explanation:** Evaluation and testing of prompts requires a systematic methodology: (1) curate a test dataset representative of real inputs with expected outputs, (2) run prompt variants against this dataset, (3) measure metrics like accuracy, consistency, and format compliance, and (4) compare results statistically. This data-driven approach prevents subjective bias and ensures changes are genuinely improvements.
 
-**Source:** Exam Guide Ã‚Â§Task 4.12
+**Source:** Exam Guide §Task 4.12
 
 ---
 
@@ -2517,19 +2517,19 @@ D. A/B test prompts in production without any structured measurement at all
 
 **Options:**
 
-A. **[✓]** Use a JSON schema with tool_use to enforce the output structure and field types
+A. **[✓]** Define all optional schema fields as nullable to prevent the model from fabricating values when source document information is genuinely absent
 
-B. Rely on a single system prompt instruction describing the expected output format
+B. **[✓]** Enforce output structure and field types programmatically by using a JSON schema with tool_use rather than relying on prompt instructions alone
 
-C. **[✓]** Make optional fields nullable in the schema to prevent fabrication of missing values
+C. Rely on a single carefully worded system prompt instruction that describes the expected output format in sufficient detail for reliable compliance
 
-D. Set the prompt temperature to 1.0 to encourage maximum output variety
+D. Configure the model sampling temperature at 1.0 to encourage diverse output attempts and increase the probability of eventually producing correct structure
 
-**Correct Answers:** A, C
+**Correct Answers:** A, B
 
-**Explanation:** JSON schema enforcement via tool_use (option 0) guarantees the output structure matches downstream expectations. Nullable optional fields (option 2) prevent the model from fabricating values when information is absent from the source document. A single system prompt (option 1) is insufficient for reliable structured output. High temperature (option 3) reduces output consistency and increases hallucination risk.
+**Explanation:** JSON schema enforcement via tool_use (option 1) guarantees the output structure matches downstream expectations. Nullable optional fields (option 0) prevent the model from fabricating values when information is absent from the source document. A single system prompt (option 2) is insufficient for reliable structured output. High temperature (option 3) reduces output consistency and increases hallucination risk.
 
-**Source:** Exam Guide Ã‚Â§Task 4.5
+**Source:** Exam Guide §Task 4.5
 
 ---
 
@@ -2541,19 +2541,19 @@ D. Set the prompt temperature to 1.0 to encourage maximum output variety
 
 **Options:**
 
-A. **[✓]** Report all functional bugs and security vulnerabilities discovered in the changed code
+A. Flag every formatting choice and naming convention that differs from personal stylistic preference to ensure maximum consistency in the codebase
 
-B. Flag every formatting and naming style preference that differs from personal taste
+B. Comment on every line of code that could potentially benefit from any form of refactoring or structural improvement in any possible dimension
 
-C. **[✓]** Identify API compatibility breaks and performance regressions introduced by the changes
+C. **[✓]** Identify API compatibility breaks and performance regressions introduced by the changes because these affect system stability and integration partners
 
-D. Comment on every line that could potentially be refactored or improved in any way
+D. **[✓]** Report all functional bugs and security vulnerabilities identified in the changed code because these issues directly impact correctness and safety
 
-**Correct Answers:** A, C
+**Correct Answers:** C, D
 
-**Explanation:** Effective PR reviews should focus on functional bugs and security issues (option 0) and API compatibility and performance regressions (option 2). These are high-value findings that directly impact code quality and system stability. Formatting preferences (option 1) should be enforced by automated linters, not reviewer comments. Flagging every potential refactoring (option 3) creates review fatigue and drowns out critical issues.
+**Explanation:** Effective PR reviews should focus on functional bugs and security issues (option 3) and API compatibility and performance regressions (option 2). These are high-value findings that directly impact code quality and system stability. Formatting preferences (option 0) should be enforced by automated linters, not reviewer comments. Flagging every potential refactoring (option 1) creates review fatigue and drowns out critical issues.
 
-**Source:** Exam Guide Ã‚Â§Task 4.6
+**Source:** Exam Guide §Task 4.6
 
 ---
 
@@ -2567,19 +2567,19 @@ D. Comment on every line that could potentially be refactored or improved in any
 
 **Options:**
 
-A. The database tool is running too slowly for any practical usage
+A. **[✓]** Excessive fields in tool results consume disproportionate context tokens, leaving insufficient space for model reasoning after multiple queries
 
-B. **[✓]** Tool results with excessive fields consume context tokens disproportionately for reasoning
+B. The model is architecturally unable to parse or reason about structured database query results that exceed a certain number of columns
 
-C. The model cannot effectively parse large database query results at all
+C. The API enforces a strict limit on the maximum number of tool invocations permitted per conversation session regardless of result size
 
-D. The API imposes a hard limit on tool calls per conversation window only
+D. The database tool is querying a slow backend, and the latency from each of the five queries is degrading the overall session responsiveness
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** Tool results with excessive fields consume tokens disproportionately, crowding out space for model reasoning and conversation history. With 100KB of results per query, 5 queries consume 500KB of the context window, leaving very little room for analysis. This is a classic context management problem where tool output size must be controlled to preserve room for reasoning.
 
-**Source:** Exam Guide Ã‚Â§Task 5.1
+**Source:** Exam Guide §Task 5.1
 
 ---
 
@@ -2591,19 +2591,19 @@ D. The API imposes a hard limit on tool calls per conversation window only
 
 **Options:**
 
-A. Keep all transactional data in the conversation history for natural model reference
+A. **[✓]** Use a persistent structured case facts block maintained throughout the session to reliably anchor critical transactional data across all turns
 
-B. **[✓]** Use a persistent structured case facts block maintained throughout the session for critical data
+B. Keep all transactional state embedded in the natural conversation history so the model can reference it organically across turns as needed
 
-C. Store data in a separate file on disk and re-read it during each turn
+C. Resubmit the full transactional data object alongside every user message to ensure the model always has access to the complete state
 
-D. Resubmit the transactional data along with each and every single user message
+D. Serialize the transaction state to a disk file after each step and re-read it at the start of every subsequent turn to restore context
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** A persistent structured case facts block ensures critical transactional data (customer ID, amount, account number, transaction status) is preserved accurately across turns. Conversation history can accumulate and change focus, but a structured facts block in the system prompt or as a dedicated context section maintains authoritative data that the model can always reference.
 
-**Source:** Exam Guide Ã‚Â§Task 5.2
+**Source:** Exam Guide §Task 5.2
 
 ---
 
@@ -2615,19 +2615,19 @@ D. Resubmit the transactional data along with each and every single user message
 
 **Options:**
 
-A. **[✓]** Honor the explicit customer demand for a human agent immediately by triggering the escalation workflow without further automated attempts
+A. **[✓]** Honor the explicit request for a human agent immediately by triggering the escalation workflow without attempting further automated resolution
 
-B. Explain that the automated system is fully capable of resolving this particular request and continue processing the refund autonomously
+B. Acknowledge the customer's frustration empathetically and offer to resolve the issue first, escalating only if the customer repeats the request
 
-C. Acknowledge the customer frustration but offer to resolve the issue first escalating only if the customer reiterates the request
+C. Explain to the customer that the automated system is fully capable of resolving this refund and complete the process autonomously as designed
 
-D. Offer a callback option for the customer to speak with a human at a later time while processing the refund automatically in the meantime
+D. Queue a callback from a human representative while continuing to process the refund autonomously to satisfy both the request and the outcome
 
 **Correct Answer:** A
 
 **Explanation:** An explicit customer demand for a human is a mandatory escalation trigger. The agent must not negotiate, ignore, or override this request. The correct behavior is to immediately trigger the escalation process, provide a clear handoff summary, and gracefully transition the customer to a human agent. Respecting this boundary is both a design requirement and a regulatory consideration in many jurisdictions.
 
-**Source:** Exam Guide Ã‚Â§Task 5.3
+**Source:** Exam Guide §Task 5.3
 
 ---
 
@@ -2639,19 +2639,19 @@ D. Offer a callback option for the customer to speak with a human at a later tim
 
 **Options:**
 
-A. Use personal judgment to make the best possible decision and issue the refund
+A. Decline the request automatically since the absence of explicit policy coverage is functionally equivalent to a policy prohibition on the action
 
-B. **[✓]** Do not improvise and escalate to a human for policy exceptions and gaps
+B. Draft a provisional policy interpretation that covers the edge case and apply it consistently to this and all similar future requests received
 
-C. Create a brand new policy on the fly to handle this specific case
+C. Exercise best professional judgment to make the most reasonable interpretation of the policy gap and issue the refund on the agent's own authority
 
-D. Deny the request automatically since no existing policy covers it at all
+D. **[✓]** Escalate the request to a human who has authority to handle policy exceptions rather than improvising a resolution within an undefined boundary
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Policy exceptions and gaps require escalation, not improvisation. The agent must not create new policies or interpret reasonable-sounding requests as authorization. When there is no clear policy coverage, the correct action is to escalate to a human who has the authority to make exceptions or set new policy. Creating policies or improvising solutions outside defined boundaries is a serious design flaw leading to unpredictable behavior.
 
-**Source:** Exam Guide Ã‚Â§Task 5.4
+**Source:** Exam Guide §Task 5.4
 
 ---
 
@@ -2663,19 +2663,19 @@ D. Deny the request automatically since no existing policy covers it at all
 
 **Options:**
 
-A. The coordinator can always retry the operation regardless of the error type
+A. The coordinator should move on to the next request when a payment fails since errors are common and re-attempting rarely produces different results
 
-B. The coordinator should simply ignore errors and proceed with the next request
+B. A plain error message contains enough context for an experienced coordinator to infer the correct recovery action from the surrounding circumstances
 
-C. **[✓]** Generic error responses hide the context needed to determine the correct recovery strategy
+C. The coordinator can safely retry any failed operation without additional context because all payment errors are inherently transient and self-resolving
 
-D. The error message is sufficient for the coordinator to determine the next action
+D. **[✓]** A generic error response conceals the failure category, making it impossible for the coordinator to determine the appropriate recovery action
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Generic error responses ('Operation failed') hide the specific error context that the coordinator needs for intelligent recovery. Without knowing whether the error was transient (network timeout - retryable), validation (invalid account - fix input), or business (limit exceeded - escalate), the coordinator cannot determine the correct recovery action. Structured error responses with categories and details are essential for effective error recovery.
 
-**Source:** Exam Guide Ã‚Â§Task 5.5
+**Source:** Exam Guide §Task 5.5
 
 ---
 
@@ -2687,19 +2687,19 @@ D. The error message is sufficient for the coordinator to determine the next act
 
 **Options:**
 
-A. Restart the session from scratch and lose all of the previously gathered context
+A. Terminate the session and lose all accumulated investigation context, then start fresh with the user's goal restated from the very beginning
 
-B. Reduce the complexity of the investigation to better fit the context window
+B. Reduce the scope of ongoing investigation to a smaller set of simpler tasks that fit more comfortably within the remaining available context
 
-C. **[✓]** Use scratchpad files as external memory to persist findings and state throughout the session
+C. Ask the user to re-paste earlier context portions that the agent appears to have forgotten so investigation can continue without interruption
 
-D. Ask the user to repeat the information that the agent has already forgotten
+D. **[✓]** Write key findings, decisions, and active state to external scratchpad files that the agent can read back periodically to refresh its context
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Context degradation is a known challenge in long-running sessions. Scratchpad files serve as external memory that persists key findings, decisions, and state outside the conversation context. The agent can write structured summaries to scratchpad files periodically and read them back to refresh context. This is more reliable than relying on the conversation history which may be compressed or partly lost.
 
-**Source:** Exam Guide Ã‚Â§Task 5.6
+**Source:** Exam Guide §Task 5.6
 
 ---
 
@@ -2711,19 +2711,19 @@ D. Ask the user to repeat the information that the agent has already forgotten
 
 **Options:**
 
-A. Immediately reduce human review to ten percent sampling since automation is reliable
+A. Begin by reducing review only for the lowest-priority data segments before progressively extending automation to higher-priority categories
 
-B. Eliminate all human review entirely and trust the automated validation process
+B. Eliminate human review entirely and rely fully on the automated validation agent once it has been deployed and is operating in production
 
-C. **[✓]** First validate accuracy at the segment level then reduce review after establishing metrics
+C. Immediately reduce human review sampling to ten percent of outputs since the automated system has already demonstrated general reliability
 
-D. Reduce review only for low priority data segments before moving to high priority
+D. **[✓]** Validate accuracy at the data segment level first and reduce human review coverage only after establishing sufficient confidence thresholds
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Before reducing review thresholds, you must first establish accuracy metrics through segment-level accuracy validation. Measure the agent's accuracy on different data segments, compare against human review, and only reduce review coverage after achieving confidence thresholds. Premature reduction without validation risks quality degradation that may go undetected.
 
-**Source:** Exam Guide Ã‚Â§Task 5.7
+**Source:** Exam Guide §Task 5.7
 
 ---
 
@@ -2735,19 +2735,19 @@ D. Reduce review only for low priority data segments before moving to high prior
 
 **Options:**
 
-A. Have one agent do all the research to avoid multi-source synthesis problems
+A. Select findings exclusively from the most historically reliable research agent and exclude all other sources from the synthesis output entirely
 
-B. Include all raw source documents in the final report for the reader to cross-reference
+B. **[✓]** Maintain explicit claim-source mappings that tag each synthesized finding back to its originating agent for traceability and verification
 
-C. Focus only on findings from the most reliable source agent for the report
+C. Consolidate all research into a single agent to eliminate the multi-source synthesis problem and simplify the provenance tracking requirements
 
-D. **[✓]** Use claim-source mappings that explicitly track each finding back to its originating agent
+D. Append all raw source documents in full to the final report so readers can independently cross-reference claims against their original sources
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** Claim-source mappings prevent attribution loss during synthesis. Each finding should be explicitly tagged with its source (e.g., 'Analysis by Agent A found: ...'). This enables verification, provides traceability, and allows the reader (or downstream processes) to assess the reliability of each claim. Without source mappings, synthesized reports lose provenance information critical for trust and verification.
 
-**Source:** Exam Guide Ã‚Â§Task 5.8
+**Source:** Exam Guide §Task 5.8
 
 ---
 
@@ -2759,19 +2759,19 @@ D. **[✓]** Use claim-source mappings that explicitly track each finding back t
 
 **Options:**
 
-A. **[✓]** Annotate both conflicting values with explicit source attribution and methodological context for each separate measurement finding
+A. Flag the discrepancy as a potential data error and require both subagents to redo their analysis using identical tools and measurement windows
 
-B. Select the more conservative value and discard the alternative to present a single consistent finding in the final report
+B. **[✓]** Annotate both conflicting values with source attribution and methodological context so readers can interpret each measurement appropriately
 
-C. Compute the mathematical average of the two values to produce a compromise estimate between both available measurements
+C. Calculate the arithmetic average of both reported values to produce a single compromise estimate acceptable to all downstream report consumers
 
-D. Flag the discrepancy as a data extraction error and request each subagent to redo its analysis using identical measurement methodology
+D. Select the more conservative measurement value and discard the other to present a single internally consistent finding in the unified report
 
-**Correct Answer:** A
+**Correct Answer:** B
 
 **Explanation:** When sources conflict, the correct approach is to annotate both with attribution rather than arbitrarily selecting one value or computing a misleading average. The synthesis should present: 'Agent A (using DataDog) reports 200ms average; Agent B (using CloudWatch) reports 450ms average. This discrepancy may be due to different measurement periods or tooling differences.' This preserves the nuance and allows the reader to understand the context of each claim.
 
-**Source:** Exam Guide Ã‚Â§Task 5.9
+**Source:** Exam Guide §Task 5.9
 
 ---
 
@@ -2783,19 +2783,19 @@ D. Flag the discrepancy as a data extraction error and request each subagent to 
 
 **Options:**
 
-A. Ignore the limit and let the API truncate oldest content automatically
+A. Upgrade to the highest available context window tier so that document size is never a binding constraint on agent session capacity or quality
 
-B. **[✓]** Estimate token counts prioritize critical information and prune to stay within limits
+B. Divide all inputs into fixed-size chunks of equal token length and process each chunk independently without reference to document structure
 
-C. Always upgrade to the maximum available context window size available
+C. **[✓]** Estimate token counts proactively, prioritize critical information in a structured block, and prune verbose content to stay within context limits
 
-D. Process everything in fixed token chunks regardless of document boundaries
+D. Allow the API to handle context overflow automatically through built-in truncation, accepting that some oldest content may be silently discarded
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Context window limits and management require proactive planning: (1) estimate token counts for documents, tool results, and conversation history, (2) prioritize critical information in a structured facts block, (3) summarize verbose content, and (4) prune low-value history. Blind truncation of oldest content may lose critical information that the model still needs.
 
-**Source:** Exam Guide Ã‚Â§Task 5.10
+**Source:** Exam Guide §Task 5.10
 
 ---
 
@@ -2807,19 +2807,19 @@ D. Process everything in fixed token chunks regardless of document boundaries
 
 **Options:**
 
-A. Count the total characters and divide by four as a rough approximation
+A. Make the API call first and then check the input_tokens field in the usage response object to determine actual consumption after the fact
 
-B. **[✓]** Use a tokenizer library that matches the model tokenizer for accurate counting
+B. Use a rough character-based heuristic by counting total characters and dividing by four as an acceptable approximation for token estimation
 
-C. Make the API call and check the usage field in the response post-hoc
+C. Estimate token counts using a word-per-token ratio of 1.3 words per token as a portable approximation suitable for general text content
 
-D. Estimate based on number of words with one word equaling one point three tokens
+D. **[✓]** Use a tokenizer library that matches the model's own tokenizer to produce accurate pre-call token count estimates for dynamic prompt construction
 
-**Correct Answer:** B
+**Correct Answer:** D
 
 **Explanation:** Token counting and estimation should use a tokenizer library that matches the model's tokenizer (e.g., claude-tokenizer or Anthropic's token counting API). This provides accurate pre-call estimates, enabling proactive context management. Character-based heuristics or word-based estimates can be inaccurate, especially for code or structured data. Post-hoc checking is too late for prevention.
 
-**Source:** Exam Guide Ã‚Â§Task 5.11
+**Source:** Exam Guide §Task 5.11
 
 ---
 
@@ -2831,19 +2831,19 @@ D. Estimate based on number of words with one word equaling one point three toke
 
 **Options:**
 
-A. Delete the oldest messages and keep only the most recent half
+A. Delete the oldest half of the conversation and retain only the most recent messages to free context space for continued investigation activity
 
-B. Ask the model to write a single paragraph summarizing the entire session
+B. Export the complete session history to a file and begin a fresh session with only the new task context provided to the model at the start
 
-C. **[✓]** Generate topic-specific summaries for each thread preserving key findings and decisions
+C. **[✓]** Generate thread-specific summaries for each investigation topic that preserve key findings, decisions, and outstanding action items per thread
 
-D. Save the full conversation to a file and start a completely fresh session
+D. Ask the model to generate a single brief paragraph summarizing all prior session activity to replace the full history before continuing
 
 **Correct Answer:** C
 
 **Explanation:** Conversation summarization strategies should produce topic-specific summaries rather than generic compression. Each thread of investigation should be condensed into its key findings, decisions, and action items. This preserves the structured knowledge while removing verbose tool outputs and redundant exchanges. Single generic summaries lose too much context, and simple deletion risks losing important information.
 
-**Source:** Exam Guide Ã‚Â§Task 5.12
+**Source:** Exam Guide §Task 5.12
 
 ---
 
@@ -2855,19 +2855,19 @@ D. Save the full conversation to a file and start a completely fresh session
 
 **Options:**
 
-A. This is a random sampling error that will average out over time
+A. **[✓]** The lost-in-the-middle effect describes the observed phenomenon where models show reduced recall accuracy for information at mid-context positions
 
-B. **[✓]** The lost in the middle effect describes models having reduced accuracy for mid-context content
+B. This behavior occurs because documents with multiple distinct topics exceed the model's ability to maintain separate attention streams simultaneously
 
-C. This indicates the model is not capable of processing long documents effectively
+C. This pattern indicates that the model is fundamentally incapable of processing documents that exceed a certain length with acceptable accuracy
 
-D. This is caused by the input having too many distinct topics in the content
+D. This pattern represents a statistical anomaly in the random sampling process that will self-correct as more documents are processed over time
 
-**Correct Answer:** B
+**Correct Answer:** A
 
 **Explanation:** The 'lost in the middle' effect is a well-documented phenomenon where language models show reduced accuracy for information positioned in the middle of the context window, compared to information at the beginning (primacy effect) and end (recency effect). Mitigations include: placing critical information at the start or end, using structured formats, and performing targeted retrieval rather than relying on the model to scan the full context.
 
-**Source:** Exam Guide Ã‚Â§Task 5.13
+**Source:** Exam Guide §Task 5.13
 
 ---
 
@@ -2879,19 +2879,19 @@ D. This is caused by the input having too many distinct topics in the content
 
 **Options:**
 
-A. Keep all tool results in the conversation in case they are needed later
+A. Retain all tool results indefinitely in the active context window so they remain available for reference if earlier findings become relevant again
 
-B. Increase the size of the context window to accommodate all data
+B. Delete the oldest raw tool outputs directly from the conversation history without first extracting or preserving the analytical conclusions drawn
 
-C. Delete the oldest messages including tool outputs without any summarization at all
+C. Request a context window size upgrade from the API provider so that all historical tool outputs can be retained without any pruning required
 
-D. **[✓]** Prune verbose tool outputs after extracting key insights replacing them with concise summaries
+D. **[✓]** Prune verbose tool output from older turns after extracting key insights, replacing raw results with concise summaries of the conclusions drawn
 
 **Correct Answer:** D
 
 **Explanation:** Context pruning techniques should remove verbose raw data after it has served its purpose, replacing it with concise summaries of the conclusions drawn. This frees context window space while preserving the insights the model needs for ongoing reasoning. Simple deletion without summarization loses valuable conclusions, while retaining all raw data wastes precious context space.
 
-**Source:** Exam Guide Ã‚Â§Task 5.14
+**Source:** Exam Guide §Task 5.14
 
 ---
 
@@ -2903,19 +2903,19 @@ D. **[✓]** Prune verbose tool outputs after extracting key insights replacing 
 
 **Options:**
 
-A. Trust the synthesis agent implicitly to accurately represent all source information
+A. Accept the synthesis agent's output as authoritative since it is the designated responsible component for producing accurate unified findings
 
-B. **[✓]** Tag each finding with its source agent timestamp methodology and confidence level
+B. Include complete raw outputs from all research agents in the final report body so readers can independently locate and trace each claim's origin
 
-C. Put raw research output in the final report for the reader to parse
+C. **[✓]** Tag each finding throughout the pipeline with its source agent, timestamp, methodology, and confidence level to maintain full provenance metadata
 
-D. Have the coordinator review all findings for accuracy before passing them on
+D. Route all synthesized findings through a dedicated coordinator review step that validates accuracy before passing results to downstream consumers
 
-**Correct Answer:** B
+**Correct Answer:** C
 
 **Explanation:** Information provenance and source tracking requires each finding to be tagged with metadata throughout the pipeline: originating agent, timestamp, methodology used, and confidence level. This enables downstream consumers to verify claims, assess reliability, and trace information back to its origin. Without provenance metadata, synthesized information loses its audit trail and cannot be effectively verified.
 
-**Source:** Exam Guide Ã‚Â§Task 5.15
+**Source:** Exam Guide §Task 5.15
 
 ---
 
@@ -2927,19 +2927,19 @@ D. Have the coordinator review all findings for accuracy before passing them on
 
 **Options:**
 
-A. Assume the model and tools will work correctly most of the time
+A. Assume the model and underlying tools will handle most requests correctly and plan to investigate only when an anomalous failure rate is detected
 
-B. Process all tickets through a sequential workflow to reduce complexity
+B. **[✓]** Implement retry logic with exponential backoff, circuit breakers for failing services, and dead-letter queues for unprocessable tickets
 
-C. Monitor the system manually and restart it when failures occur
+C. Process all tickets through a strictly sequential single-worker pipeline to simplify failure handling and eliminate concurrency-related edge cases
 
-D. **[✓]** Implement retry with backoff circuit breakers and dead-letter queues for reliability
+D. Assign a human operator to monitor the system dashboard continuously and initiate manual restarts in response to observed failure incidents
 
-**Correct Answer:** D
+**Correct Answer:** B
 
 **Explanation:** Reliability patterns for production systems include: (1) retry with backoff for transient failures, (2) idempotent operations to safely retry without side effects, (3) circuit breakers to stop hammering failing services, (4) dead-letter queues for items that cannot be processed, and (5) comprehensive logging for debugging. Production AI systems need the same reliability infrastructure as traditional production services.
 
-**Source:** Exam Guide Ã‚Â§Task 5.16
+**Source:** Exam Guide §Task 5.16
 
 ---
 
@@ -2951,19 +2951,19 @@ D. **[✓]** Implement retry with backoff circuit breakers and dead-letter queue
 
 **Options:**
 
-A. Reject all incoming orders during outages and ask customers to try later
+A. Continue issuing API calls during outages indefinitely since most transient errors resolve quickly without requiring any explicit queueing logic
 
-B. Switch over to a fully manual process during every outage period
+B. Switch the entire order processing workflow to a fully manual human-operated process for the duration of every API outage period encountered
 
-C. **[✓]** Queue orders during outages with pending review and process when the API recovers
+C. Reject all incoming orders during API outages and display an error message asking customers to retry submission when the service is restored
 
-D. Completely ignore the API outages and continue attempting API calls indefinitely
+D. **[✓]** Queue all orders received during outages with a pending-review status and process the accumulated queue automatically once API access recovers
 
-**Correct Answer:** C
+**Correct Answer:** D
 
 **Explanation:** Fallback and degradation strategies should maintain system availability: (1) queue requests during outages with clear status tracking, (2) process queued items when service recovers, (3) notify customers of potential delays, (4) optionally use a simpler fallback model if available. This ensures the system remains functional even when the primary AI service is unavailable, maintaining business continuity.
 
-**Source:** Exam Guide Ã‚Â§Task 5.17
+**Source:** Exam Guide §Task 5.17
 
 ---
 
@@ -2975,19 +2975,19 @@ D. Completely ignore the API outages and continue attempting API calls indefinit
 
 **Options:**
 
-A. Let the AI process all applications and have humans audit them afterward
+A. Allow the AI to process all loan applications autonomously and conduct human audits of completed decisions in periodic batch review cycles
 
-B. Trust the AI to decide when human review is needed based on judgment
+B. Subject every loan application to mandatory human review regardless of amount to maintain uniform oversight and eliminate autonomous decisions
 
-C. Require human review of every single application regardless of the amount
+C. Trust the AI to identify which individual applications warrant human escalation based on its own risk assessment and uncertainty signals
 
-D. **[✓]** Use a human-in-the-loop workflow routing high-value loan applications to the reviewers
+D. **[✓]** Use a human-in-the-loop workflow that routes applications above the fifty-thousand-dollar threshold to human underwriters before finalization
 
 **Correct Answer:** D
 
 **Explanation:** Human-in-the-loop review workflows implement a threshold-based escalation: below the threshold ($50K), the AI processes autonomously with appropriate speed and efficiency. At or above the threshold, the AI prepares a comprehensive analysis package and routes it to a human for final decision. This balances efficiency for routine cases with appropriate oversight for high-risk decisions. Leaving the escalation decision to the AI's judgment is unreliable for regulatory compliance.
 
-**Source:** Exam Guide Ã‚Â§Task 5.18
+**Source:** Exam Guide §Task 5.18
 
 ---
 
@@ -2999,19 +2999,19 @@ D. **[✓]** Use a human-in-the-loop workflow routing high-value loan applicatio
 
 **Options:**
 
-A. **[✓]** Implement exponential backoff retry logic for transient error responses
+A. **[✓]** Deploy circuit breaker patterns that temporarily halt calls to a failing endpoint to allow recovery time before gradually resuming traffic
 
-B. Show customers a generic timeout message and discard the failed request entirely
+B. **[✓]** Implement exponential backoff retry logic that progressively increases delay between attempts when transient 429 or 503 errors are received
 
-C. **[✓]** Use circuit breaker patterns to stop calling a failing endpoint and allow recovery time
+C. Surface a generic timeout error message to customers and permanently discard any API request that fails on its initial submission attempt
 
-D. Immediately escalate every single API error to a human operator for resolution
+D. Escalate every individual API error to a human operator immediately regardless of error type or whether a retry would likely succeed
 
-**Correct Answers:** A, C
+**Correct Answers:** A, B
 
-**Explanation:** Exponential backoff retry (option 0) is the standard pattern for transient errors, starting with short delays and increasing between attempts. Circuit breakers (option 2) prevent cascading failures by stopping calls to a failing endpoint, allowing it time to recover, then gradually resuming traffic. Discarding requests (option 1) causes data loss. Escalating every error (option 3) is impractical and floods operators with non-critical alerts.
+**Explanation:** Exponential backoff retry (option 1) is the standard pattern for transient errors, starting with short delays and increasing between attempts. Circuit breakers (option 0) prevent cascading failures by stopping calls to a failing endpoint, allowing it time to recover, then gradually resuming traffic. Discarding requests (option 2) causes data loss. Escalating every error (option 3) is impractical and floods operators with non-critical alerts.
 
-**Source:** Exam Guide Ã‚Â§Task 5.19
+**Source:** Exam Guide §Task 5.19
 
 ---
 
