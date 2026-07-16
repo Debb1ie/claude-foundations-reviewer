@@ -41,6 +41,33 @@ const DIFFICULTY_COLORS = {
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
+const QUICK_RESOURCES = [
+  {
+    label: 'Official Docs',
+    title: 'CCA-F Exam Guide',
+    description: 'Official PDF covering all exam domains, weights, and format.',
+    url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
+  },
+  {
+    label: 'Essentials',
+    title: 'Claude Partner Network Path',
+    description: 'Official Skilljar learning path required for certification.',
+    url: 'https://anthropic.skilljar.com/page/claude-partner-network-learning-path',
+  },
+  {
+    label: 'Courses',
+    title: 'Learn Anthropic (Skilljar)',
+    description: "Anthropic's official platform with all Claude courses and modules.",
+    url: 'https://learn.anthropic.com/',
+  },
+  {
+    label: 'Guides',
+    title: 'Prompt Engineering Guide',
+    description: 'Best practices and strategies for writing effective Claude prompts.',
+    url: 'https://docs.anthropic.com/en/docs/prompt-engineering',
+  },
+];
+
 // Renders sourceExcerpt with sourceHighlight wrapped in a <mark>. Since this is our
 // own DOM (not a cross-origin page), the highlight always works — no dependency on
 // browser support or the external page still containing the exact phrase.
@@ -174,20 +201,6 @@ function SourceModal({ question, onClose }: { question: AdvancedQuestion | null;
   );
 }
 
-function MiniProgress({ value, colorBg }: { value: number; colorBg: string }) {
-  return (
-    <Box w="100%" h="6px" bg="rgba(0,0,0,0.06)" borderRadius="full" overflow="hidden">
-      <Box
-        w={`${Math.min(100, Math.max(0, value))}%`}
-        h="100%"
-        bg={colorBg}
-        borderRadius="full"
-        transition="width 0.4s ease"
-      />
-    </Box>
-  );
-}
-
 function StartScreen({ onStart }: { onStart: () => void }) {
   const domainCounts: Record<string, number> = { D1: 15, D2: 9, D3: 12, D4: 12, D5: 12 };
   return (
@@ -303,7 +316,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
 type ReviewFilter = 'all' | 'correct' | 'incorrect' | 'flagged';
 
 function ResultsScreen({ onReset }: { onReset: () => void }) {
-  const { getScore, questions, answers, flagged } = useAdvancedExamStore();
+  const { getScore, questions, answers, flagged, startTime, endTime } = useAdvancedExamStore();
   const { correct, total, pct } = getScore();
   const scaledScore = Math.round(100 + (pct / 100) * 900);
   const passed = scaledScore >= 720;
@@ -311,15 +324,22 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
   const [activeSource, setActiveSource] = useState<AdvancedQuestion | null>(null);
 
-  const incorrectCount = total - correct;
+  const incorrectCount = answers.filter((a, i) => a !== null && a !== questions[i].correctAnswer).length;
+  const unansweredCount = answers.filter((a) => a === null).length;
   const flaggedCount = flagged.filter(Boolean).length;
+  const timeTakenSeconds = startTime && endTime ? Math.round((endTime - startTime) / 1000) : 0;
+  const timeDisplay = (() => {
+    const mins = Math.floor(timeTakenSeconds / 60);
+    const secs = timeTakenSeconds % 60;
+    return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  })();
 
   const filteredEntries = questions
     .map((q, idx) => ({ q, idx }))
     .filter(({ q, idx }) => {
       const isCorrectQ = answers[idx] === q.correctAnswer;
       if (reviewFilter === 'correct') return isCorrectQ;
-      if (reviewFilter === 'incorrect') return !isCorrectQ;
+      if (reviewFilter === 'incorrect') return answers[idx] !== null && !isCorrectQ;
       if (reviewFilter === 'flagged') return flagged[idx];
       return true;
     });
@@ -345,27 +365,95 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
       <Container maxW="container.md" py={[8, 12]}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <VStack gap={6} align="stretch">
-            <Box textAlign="center">
-              <Box
-                display="inline-flex"
-                alignItems="center"
-                justifyContent="center"
-                w={20} h={20}
-                borderRadius="full"
-                bg={passed ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.10)'}
-                border="2px solid"
-                borderColor={passed ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.3)'}
-                mb={4}
-                mx="auto"
-              >
-                <Text fontSize="3xl">{passed ? '✓' : '✗'}</Text>
-              </Box>
-              <Heading size="2xl" fontWeight={800} color="brand.700" mb={2}>
-                {passed ? 'Passed!' : 'Keep Practicing'}
-              </Heading>
-              <Text color="gray.500" fontSize="lg">
-                {correct} / {total} correct · {pct}% · Scaled {scaledScore}
+            <Box
+              bg="rgba(255, 255, 255, 0.45)"
+              backdropFilter="blur(16px)"
+              _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              border="1.5px solid"
+              borderColor="rgba(255, 255, 255, 0.35)"
+              boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+              borderRadius="2xl"
+              p={[6, 8]}
+              textAlign="center"
+            >
+              <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em" mb={3}
+                _dark={{ color: 'brand.300' }}>
+                ADVANCED MOCK EXAM
               </Text>
+              <Badge
+                size="md"
+                px={3}
+                py={1}
+                borderRadius="full"
+                bg={passed ? 'success.100' : 'error.100'}
+                color={passed ? 'success.700' : 'error.700'}
+                border="1px solid"
+                borderColor={passed ? 'success.200' : 'error.200'}
+                mb={4}
+                fontSize="xs"
+                fontWeight={700}
+                fontFamily="mono"
+              >
+                {passed ? 'PASSED CERTIFICATION' : 'PRACTICE MORE'}
+              </Badge>
+
+              <Text
+                fontSize={['5xl', '6xl']}
+                fontWeight={800}
+                lineHeight={1.1}
+                color={passed ? 'success.600' : 'error.600'}
+                fontFamily="heading"
+                letterSpacing="tight"
+              >
+                {pct}%
+              </Text>
+
+              <Text fontSize="xs" fontFamily="mono" color="gray.400" fontWeight={600} mt={2}>
+                Scaled Score Equivalent: ~{scaledScore}/1000 &middot; Passing Mark: 720
+              </Text>
+
+              <Heading as="h2" size="md" fontWeight={700} mt={4} color="brand.700">
+                {passed ? 'Advanced Mock Exam Success!' : 'Keep Pushing Forward'}
+              </Heading>
+
+              <Text fontSize="sm" color="gray.600" lineHeight={1.7} mt={3} textAlign="left" px={[0, 2]}>
+                {passed
+                  ? "Congratulations on clearing the Advanced Mock Exam! This tier is deliberately harder than the standard practice set, so passing here is a strong signal you're ready. Keep in mind the actual proctored exam can still surprise you — stay sharp with the review kit and official Claude Partner Network resources so you carry this momentum all the way through."
+                  : "You're building real judgment by working through the hardest questions in the bank — this tier is intentionally tougher than standard practice, so don't read this score the way you'd read a regular one. Stay consistent with the review kit and official resources, and focus your next pass on the domains where you scored lowest below."}
+              </Text>
+
+              <SimpleGrid columns={[2, 4]} gap={4} mt={6} pt={6} borderTop="1px solid" borderColor="border">
+                <VStack gap={0.5} align="center">
+                  <Text fontSize="lg" fontWeight={700} color="brand.600">{correct}</Text>
+                  <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">CORRECT</Text>
+                </VStack>
+                <VStack gap={0.5} align="center">
+                  <Text fontSize="lg" fontWeight={700} color="brand.600">{incorrectCount}</Text>
+                  <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">INCORRECT</Text>
+                </VStack>
+                <VStack gap={0.5} align="center">
+                  <Text fontSize="lg" fontWeight={700} color="brand.600">{unansweredCount}</Text>
+                  <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">UNANSWERED</Text>
+                </VStack>
+                <VStack gap={0.5} align="center">
+                  <Text fontSize="lg" fontWeight={700} color="brand.600">{timeDisplay}</Text>
+                  <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">TIME TAKEN</Text>
+                </VStack>
+              </SimpleGrid>
+
+              <Button
+                mt={8}
+                size="lg"
+                bg="brand.600"
+                color="white"
+                fontWeight={700}
+                _hover={{ bg: 'brand.700' }}
+                onClick={onReset}
+                px={10}
+                borderRadius="lg"
+              >
+                Restart Simulator
+              </Button>
             </Box>
 
             <Box
@@ -376,32 +464,105 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
               border="1px solid rgba(255, 255, 255, 0.35)"
               _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4}>Domain Breakdown</Text>
-              <VStack gap={3} align="stretch">
+              <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={5} letterSpacing="0.05em">
+                DOMAIN-WISE PERFORMANCE ANALYSIS
+              </Heading>
+              <VStack gap={5} align="stretch">
                 {domainBreakdown.map(({ domain, correct: dc, total: dt }) => {
-                  const pctVal = dt > 0 ? (dc / dt) * 100 : 0;
-                  const barColor = dc === dt ? '#22c55e' : dc >= dt * 0.7 ? '#5C4EFA' : '#ef4444';
-                  const textColor = dc === dt ? 'green.500' : dc >= dt * 0.7 ? 'brand.600' : 'red.400';
+                  const pctVal = dt > 0 ? Math.round((dc / dt) * 100) : 0;
                   return (
-                    <Box key={domain.id}>
-                      <HStack justify="space-between" mb={1.5}>
+                    <VStack key={domain.id} align="stretch" gap={1.5}>
+                      <HStack justify="space-between" align="center">
                         <HStack gap={2}>
                           <Badge bg={DOMAIN_SOLID_BGS[domain.id]} color={DOMAIN_SOLID_TEXT[domain.id]}
-                            px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
+                            border="none" px={2.5} py={0.5} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
                             {domain.id}
                           </Badge>
-                          <Text fontSize="xs" fontWeight={600} color="brand.700">{DOMAIN_NAMES[domain.id]}</Text>
+                          <Text fontSize="xs" fontWeight={700} color="brand.700">{domain.name}</Text>
                         </HStack>
-                        <Text fontSize="xs" fontWeight={700} color={textColor}>
-                          {dc}/{dt}
+                        <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.600">
+                          {dc} / {dt} ({pctVal}%)
                         </Text>
                       </HStack>
-                      <MiniProgress value={pctVal} colorBg={barColor} />
-                    </Box>
+                      <Progress.Root value={pctVal} size="sm">
+                        <Progress.Track bg="border">
+                          <Progress.Range bg={domain.color} />
+                        </Progress.Track>
+                      </Progress.Root>
+                    </VStack>
                   );
                 })}
               </VStack>
             </Box>
+
+            {/* Recommended Resources — shown only on fail */}
+            {!passed && (
+              <Box
+                bg="rgba(255, 241, 241, 0.55)"
+                backdropFilter="blur(16px)"
+                _dark={{ bg: 'rgba(60, 20, 20, 0.35)', borderColor: 'rgba(255, 100, 100, 0.15)' }}
+                border="1.5px solid"
+                borderColor="rgba(240, 90, 90, 0.22)"
+                borderRadius="2xl"
+                p={[6, 8]}
+                boxShadow="0 8px 32px 0 rgba(240, 90, 90, 0.06)"
+              >
+                <HStack justify="space-between" align="center" mb={5} wrap="wrap" gap={3}>
+                  <VStack align="flex-start" gap={0.5}>
+                    <Heading as="h3" size="sm" fontWeight={700} color="error.700" _dark={{ color: 'red.300' }} letterSpacing="0.05em">
+                      RECOMMENDED RESOURCES
+                    </Heading>
+                    <Text fontSize="xs" color="gray.500">Start here to close the gap before your next attempt.</Text>
+                  </VStack>
+                  <Link as={NextLink} href="/sources" fontSize="xs" fontWeight={700} color="brand.600"
+                    _hover={{ color: 'brand.700', textDecoration: 'underline' }}>
+                    View all resources →
+                  </Link>
+                </HStack>
+                <SimpleGrid columns={[1, 2]} gap={4}>
+                  {QUICK_RESOURCES.map((r) => (
+                    <Link
+                      key={r.url}
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      display="flex"
+                      flexDirection="column"
+                      p={4}
+                      borderRadius="xl"
+                      border="1.5px solid"
+                      borderColor="rgba(255, 255, 255, 0.4)"
+                      bg="rgba(255, 255, 255, 0.55)"
+                      backdropFilter="blur(10px)"
+                      _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                      transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
+                      _hover={{
+                        borderColor: 'brand.400',
+                        bg: 'rgba(255,255,255,0.8)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
+                        textDecoration: 'none',
+                      }}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <HStack justify="space-between" mb={2}>
+                        <Badge px={2} py={0.5} borderRadius="full" bg="brand.100" color="brand.700"
+                          fontSize="2xs" fontWeight={700} fontFamily="mono">
+                          {r.label}
+                        </Badge>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" color="var(--chakra-colors-gray-400)">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>{r.title}</Text>
+                      <Text fontSize="xs" color="gray.500" lineHeight={1.5}>{r.description}</Text>
+                    </Link>
+                  ))}
+                </SimpleGrid>
+              </Box>
+            )}
 
             <HStack gap={3} justify="center">
               <Link as={NextLink} href="/home" style={{ textDecoration: 'none' }}>
@@ -429,19 +590,6 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 onClick={() => setShowReview(!showReview)}
               >
                 {showReview ? 'Hide Review' : 'Review Answers'}
-              </Button>
-              <Button
-                bg="brand.600"
-                color="white"
-                fontWeight={700}
-                borderRadius="xl"
-                px={8}
-                boxShadow="0 4px 14px rgba(57,73,171,0.3)"
-                _hover={{ bg: 'brand.700', transform: 'translateY(-2px)' }}
-                transition="all 0.2s"
-                onClick={onReset}
-              >
-                Retry
               </Button>
             </HStack>
 
@@ -617,6 +765,14 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)"
+              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
+              <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
+                <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
+              </Text>
+            </Box>
           </VStack>
         </motion.div>
       </Container>
@@ -629,10 +785,11 @@ function QuestionView() {
   const {
     questions, currentQuestion, answers, flagged,
     setAnswer, nextQuestion, prevQuestion, goToQuestion,
-    toggleFlag, complete,
+    toggleFlag, complete, startReview,
   } = useAdvancedExamStore();
 
   const [isPaused, setIsPaused] = useState(false);
+  const [finishDialogOpen, setFinishDialogOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
@@ -689,7 +846,12 @@ function QuestionView() {
 
   const handleFinish = () => {
     setIsPaused(false);
-    complete();
+    setFinishDialogOpen(true);
+  };
+
+  const handleConfirmFinish = () => {
+    setFinishDialogOpen(false);
+    startReview();
   };
 
   const renderQuestionGrid = () => (
@@ -863,6 +1025,63 @@ function QuestionView() {
                     </Button>
                   </Link>
                 </VStack>
+              </Box>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Finish confirmation dialog */}
+      <AnimatePresence>
+        {finishDialogOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(8px)', padding: '16px',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            >
+              <Box
+                bg="rgba(255, 255, 255, 0.88)"
+                backdropFilter="blur(20px)"
+                _dark={{ bg: 'rgba(15, 23, 42, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                w="100%"
+                maxW="500px"
+                borderRadius="2xl"
+                border="1px solid"
+                borderColor="rgba(255, 255, 255, 0.45)"
+                boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
+                p={[6, 8]}
+                position="relative"
+              >
+                <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em" mb={2}
+                  _dark={{ color: 'brand.300' }}>
+                  ADVANCED MOCK EXAM
+                </Text>
+                <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: 'brand.200' }} mb={4}>
+                  Finish Practice Session?
+                </Heading>
+                <Text fontSize="sm" color="gray.800" _dark={{ color: 'gray.100' }} fontWeight={500} lineHeight="tall" mb={6}>
+                  You will be redirected to the bulk review dashboard where you can check all your chosen options before final score evaluation.
+                </Text>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                  <Button variant="outline" size="sm" onClick={() => setFinishDialogOpen(false)} fontWeight={600} color="gray.700" _dark={{ color: 'gray.300', _hover: { bg: 'white/10' } }}>
+                    Cancel
+                  </Button>
+                  <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={handleConfirmFinish} fontWeight={700}>
+                    Review Selected Answers
+                  </Button>
+                </HStack>
               </Box>
             </motion.div>
           </motion.div>
@@ -1262,14 +1481,279 @@ function QuestionView() {
   );
 }
 
+function BulkReviewScreen() {
+  const { questions, answers, flagged, cancelReview, complete } = useAdvancedExamStore();
+  const [submitOpen, setSubmitOpen] = useState(false);
+
+  const answeredCount = answers.filter((a) => a !== null).length;
+  const totalCount = questions.length;
+  const unansweredCount = totalCount - answeredCount;
+
+  const handleSubmit = () => {
+    complete();
+    setSubmitOpen(false);
+  };
+
+  return (
+    <Box
+      bg="transparent"
+      minH="100vh"
+      display="flex"
+      flexDirection="column"
+      userSelect="none"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {/* Header */}
+      <Box
+        borderBottom="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
+        bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
+        _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+        position="sticky" top={0} zIndex={10}
+      >
+        <Container maxW="container.md" py={4}>
+          <HStack justify="space-between" align="center">
+            <VStack align="flex-start" gap={0}>
+              <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em"
+                _dark={{ color: 'brand.300' }}>
+                ADVANCED MOCK EXAM
+              </Text>
+              <Text fontSize="sm" fontWeight={700} color="brand.700">Review</Text>
+            </VStack>
+            <Text fontSize="xs" fontFamily="mono" color="gray.500" fontWeight={600}>
+              Progress: {answeredCount}/{totalCount} Completed
+            </Text>
+          </HStack>
+        </Container>
+      </Box>
+
+      <Container maxW="container.md" py={[6, 8]} flex={1}>
+        <VStack gap={5} align="stretch">
+          {/* Warning banner */}
+          <AnimatePresence>
+            {unansweredCount > 0 && (
+              <motion.div
+                key="unanswered-alert"
+                initial={{ height: 0, opacity: 0, scale: 0.95 }}
+                animate={{ height: 'auto', opacity: 1, scale: 1 }}
+                exit={{ height: 0, opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <Box p={4} bg="orange.50" border="1.5px solid" borderColor="orange.200" borderRadius="xl"
+                  boxShadow="0 2px 8px rgba(246,173,85,0.05)" mb={4}>
+                  <HStack align="flex-start" gap={3}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#dd6b20" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <VStack align="stretch" gap={0.5}>
+                      <Text fontSize="sm" fontWeight={700} color="orange.800">
+                        Unanswered Questions Alert
+                      </Text>
+                      <Text fontSize="xs" color="orange.700" lineHeight={1.5}>
+                        You still have <strong>{unansweredCount}</strong> {unansweredCount === 1 ? 'question' : 'questions'} remaining without an answer. Please review them before final evaluation to ensure maximum score potential.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Questions checklist */}
+          <VStack gap={4} align="stretch">
+            {questions.map((q, i) => {
+              const domainKey = DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1';
+              const userAnswer = answers[i];
+              const isFlaggedQ = flagged[i];
+              const isUnanswered = userAnswer === null;
+
+              return (
+                <Box
+                  key={q.id}
+                  bg={isUnanswered ? 'rgba(251, 191, 36, 0.05)' : 'rgba(255, 255, 255, 0.45)'}
+                  backdropFilter="blur(12px)"
+                  _dark={{
+                    bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(30, 41, 59, 0.45)',
+                    borderColor: isFlaggedQ ? 'orange.400' : (isUnanswered ? 'orange.300' : 'rgba(255, 255, 255, 0.08)'),
+                  }}
+                  border="1.5px solid"
+                  borderColor={isFlaggedQ ? 'orange.400' : (isUnanswered ? 'orange.300' : 'rgba(255, 255, 255, 0.35)')}
+                  borderRadius="xl"
+                  p={5}
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.02)"
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  _hover={{ borderColor: 'brand.400', bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(255, 255, 255, 0.65)' }}
+                >
+                  <HStack justify="space-between" mb={3} wrap="wrap" gap={2}>
+                    <HStack gap={2.5}>
+                      <Badge px={2} py={0.5} borderRadius="md" bg={DOMAIN_SOLID_BGS[domainKey]} color={DOMAIN_SOLID_TEXT[domainKey]}
+                        fontFamily="mono" fontSize="2xs" fontWeight={700} border="none">
+                        {q.domain}
+                      </Badge>
+                      <Text fontSize="2xs" color="gray.500" fontFamily="mono" fontWeight={600}>
+                        {DOMAIN_NAMES[domainKey]}
+                      </Text>
+                      <Text fontSize="2xs" fontFamily="mono" color="gray.400" fontWeight={700}>
+                        QUESTION {i + 1}
+                      </Text>
+                    </HStack>
+                    <HStack gap={2}>
+                      {isFlaggedQ && (
+                        <Badge bg="orange.100" color="orange.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="orange.200">
+                          FLAGGED
+                        </Badge>
+                      )}
+                      {isUnanswered ? (
+                        <Badge bg="red.50" color="red.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="red.100">
+                          UNANSWERED
+                        </Badge>
+                      ) : (
+                        <Badge bg="brand.50" color="brand.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="brand.100">
+                          COMPLETED
+                        </Badge>
+                      )}
+                    </HStack>
+                  </HStack>
+
+                  <Text fontSize="sm" color="brand.700" fontWeight={600} mb={4} lineHeight={1.5}>
+                    {q.text}
+                  </Text>
+
+                  <VStack gap={2} align="stretch">
+                    {q.options.map((opt, oi) => {
+                      const isUserAnswer = userAnswer === oi;
+                      return (
+                        <HStack
+                          key={oi}
+                          p={2.5}
+                          borderRadius="lg"
+                          bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
+                          border="1px solid"
+                          borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
+                          gap={3}
+                        >
+                          <Box
+                            w="20px" h="20px" borderRadius="md" border="1px solid"
+                            borderColor={isUserAnswer ? 'brand.500' : 'border'}
+                            bg={isUserAnswer ? 'brand.600' : 'transparent'}
+                            display="flex" alignItems="center" justifyContent="center" flexShrink={0}
+                            color={isUserAnswer ? 'white' : 'gray.400'}
+                            fontFamily="mono" fontSize="2xs" fontWeight={700}
+                          >
+                            {OPTION_LABELS[oi]}
+                          </Box>
+                          <Text fontSize="xs" color={isUserAnswer ? 'brand.700' : 'gray.600'} fontWeight={isUserAnswer ? 600 : 500} flex={1} lineHeight={1.4}>
+                            {opt}
+                          </Text>
+                          {isUserAnswer && (
+                            <Badge size="sm" bg="brand.600" color="white" borderRadius="md" px={2} py={0.5} fontSize="3xs" fontWeight={700} fontFamily="mono">
+                              SELECTED
+                            </Badge>
+                          )}
+                        </HStack>
+                      );
+                    })}
+                  </VStack>
+                </Box>
+              );
+            })}
+          </VStack>
+        </VStack>
+      </Container>
+
+      {/* Sticky footer */}
+      <Box
+        borderTop="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
+        bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
+        _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+        position="sticky" bottom={0} zIndex={10}
+      >
+        <Container maxW="container.md" py={3.5}>
+          <HStack justify="space-between" align="center" wrap="wrap" gap={3}>
+            <Text fontSize="xs" color="gray.500" fontWeight={600} fontFamily="mono">
+              Progress: {answeredCount} / {totalCount} Answered &bull; {unansweredCount} Remaining
+            </Text>
+            <HStack gap={3}>
+              <Button size="md" variant="outline" borderColor="border" onClick={cancelReview} fontWeight={600}>
+                Return to Simulator
+              </Button>
+              <Button size="md" bg="brand.600" color="white" fontWeight={700} _hover={{ bg: 'brand.700' }}
+                onClick={() => setSubmitOpen(true)}>
+                Submit Practice Exam
+              </Button>
+            </HStack>
+          </HStack>
+        </Container>
+      </Box>
+
+      {/* Submit confirmation dialog */}
+      <AnimatePresence>
+        {submitOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(8px)', padding: '16px',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            >
+              <Box
+                bg="rgba(255, 255, 255, 0.88)" backdropFilter="blur(20px)"
+                _dark={{ bg: 'rgba(15, 23, 42, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                w="100%" maxW="500px" borderRadius="2xl" border="1px solid"
+                borderColor="rgba(255, 255, 255, 0.45)" boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
+                p={[6, 8]} position="relative"
+              >
+                <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: 'brand.200' }} mb={4}>
+                  Submit simulator answers?
+                </Heading>
+                <Text fontSize="sm" color="gray.800" _dark={{ color: 'gray.100' }} fontWeight={500} lineHeight="tall" mb={6}>
+                  Are you sure you want to finalize your practice exam? You will not be able to return to modify any answers after this action.
+                  {unansweredCount > 0 && (
+                    <Text as="span" color="orange.600" fontWeight={700} display="block" mt={2.5}>
+                      🚨 WARNING: You have {unansweredCount} unanswered {unansweredCount === 1 ? 'question' : 'questions'} that will be marked incorrect.
+                    </Text>
+                  )}
+                </Text>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                  <Button variant="outline" size="sm" onClick={() => setSubmitOpen(false)} fontWeight={600} color="gray.700" _dark={{ color: 'gray.300', _hover: { bg: 'white/10' } }}>
+                    Cancel
+                  </Button>
+                  <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={handleSubmit} fontWeight={700}>
+                    Submit Evaluation
+                  </Button>
+                </HStack>
+              </Box>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Box>
+  );
+}
+
 export function AdvancedPracticeView() {
   const [mounted, setMounted] = useState(false);
-  const { isStarted, isComplete, start, reset } = useAdvancedExamStore();
+  const { isStarted, isComplete, isReviewing, start, reset } = useAdvancedExamStore();
 
   useEffect(() => { setMounted(true); }, []);
 
   if (!mounted) return null;
   if (!isStarted) return <StartScreen onStart={() => start()} />;
+  if (isReviewing) return <BulkReviewScreen />;
   if (isComplete) return <ResultsScreen onReset={() => { reset(); start(); }} />;
   return <QuestionView />;
 }

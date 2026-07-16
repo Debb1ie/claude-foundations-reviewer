@@ -25,6 +25,7 @@ interface AdvancedExamStore {
   answers: (number | null)[];
   isStarted: boolean;
   isComplete: boolean;
+  isReviewing: boolean;
   startTime: number | null;
   endTime: number | null;
   flagged: boolean[];
@@ -35,6 +36,8 @@ interface AdvancedExamStore {
   nextQuestion: () => void;
   prevQuestion: () => void;
   toggleFlag: (index: number) => void;
+  startReview: () => void;
+  cancelReview: () => void;
   complete: () => void;
   reset: () => void;
 
@@ -102,6 +105,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       answers: new Array(TOTAL_QUESTIONS).fill(null),
       isStarted: false,
       isComplete: false,
+      isReviewing: false,
       startTime: null,
       endTime: null,
       flagged: new Array(TOTAL_QUESTIONS).fill(false),
@@ -113,6 +117,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           answers: new Array(TOTAL_QUESTIONS).fill(null),
           isStarted: true,
           isComplete: false,
+          isReviewing: false,
           startTime: Date.now(),
           endTime: null,
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
@@ -154,8 +159,16 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
         set({ flagged: newFlagged });
       },
 
+      startReview: () => {
+        set({ isReviewing: true });
+      },
+
+      cancelReview: () => {
+        set({ isReviewing: false });
+      },
+
       complete: () => {
-        set({ isComplete: true, endTime: Date.now() });
+        set({ isComplete: true, isReviewing: false, endTime: Date.now() });
       },
 
       reset: () => {
@@ -164,6 +177,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           answers: new Array(TOTAL_QUESTIONS).fill(null),
           isStarted: false,
           isComplete: false,
+          isReviewing: false,
           startTime: null,
           endTime: null,
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
@@ -181,7 +195,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       },
     }),
     {
-      name: 'advanced-exam-storage-v8',
+      name: 'advanced-exam-storage-v9',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         questions: state.questions,
@@ -189,6 +203,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
         answers: state.answers,
         isStarted: state.isStarted,
         isComplete: state.isComplete,
+        isReviewing: state.isReviewing,
         startTime: state.startTime,
         endTime: state.endTime,
         flagged: state.flagged,
