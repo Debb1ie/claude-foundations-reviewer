@@ -2278,5 +2278,233 @@
     "sourceLabel": "Claude Code Docs: MCP",
     "sourceExcerpt": "MCP servers give Claude Code access to your tools, databases, and APIs. Connect a server when you find yourself copying data into chat from another tool, like an issue tracker or a monitoring dashboard.",
     "sourceHighlight": "Connect a server when you find yourself copying data into chat"
+  },
+  {
+    "id": "adv-121",
+    "number": 121,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A platform team at Meridian Robotics has just finished building an internal MCP server that will run as a managed cloud service, reachable over the network so that every engineer's Claude Code session -- regardless of which laptop or CI runner it's on -- can connect to the same instance. The team is deciding which transport to configure when they run claude mcp add for this new server, and wants the option Anthropic actually recommends for this kind of cloud-hosted deployment rather than whichever one happens to be easiest to prototype with. Which transport should they choose?",
+    "options": [
+      "stdio, since it is the default transport and requires the least configuration to get a new server running quickly.",
+      "SSE (Server-Sent Events), since it was purpose-built for this exact remote, cloud-hosted use case.",
+      "HTTP, the recommended and most widely supported transport for cloud-based, remote MCP servers.",
+      "WebSocket, since a persistent bidirectional connection is required for any server reachable over a network."
+    ],
+    "correctAnswer": 2,
+    "explanation": "HTTP is explicitly the recommended transport for remote, cloud-based MCP servers, and the most widely supported option for this kind of deployment. stdio servers run as local processes on the developer's own machine, so they cannot serve as a single shared cloud instance. SSE is a real remote transport, but Claude Code's own documentation marks it deprecated in favor of HTTP. WebSocket suits servers that need to push events to Claude unprompted; it doesn't support OAuth or the --transport flag the way HTTP does, and isn't the default choice for a server that simply responds to requests.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=HTTP%20servers%20are%20the%20recommended%20option%20for%20connecting%20to%20remote%20MCP%20servers",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "HTTP servers are the recommended option for connecting to remote MCP servers. This is the most widely supported transport for cloud-based services.",
+    "sourceHighlight": "HTTP servers are the recommended option for connecting to remote MCP servers"
+  },
+  {
+    "id": "adv-122",
+    "number": 122,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "An engineering team at Solace Freight is building a dashboard-alerting MCP server that needs to push live incident notifications into a developer's Claude Code session the moment a production alert fires, without Claude ever having to ask the server first. A teammate proposes just using the same HTTP transport the team already uses for its other internal servers, since it's familiar and well-documented. Another engineer objects, pointing out that HTTP is built around Claude sending a request and the server responding, which doesn't fit a server that needs to push events on its own timeline. Which transport actually fits this specific push-first requirement, and why does the team's default HTTP setup fall short here?",
+    "options": [
+      "HTTP, since it is the most widely supported transport and can be adapted to push events with enough custom configuration.",
+      "stdio, because a local subprocess can always intercept and forward proactive push notifications on its own schedule.",
+      "SSE, since despite being older it still remains Anthropic's top recommendation for any server that needs to push events.",
+      "WebSocket, since it holds a persistent bidirectional connection suited to servers that push events to Claude unprompted."
+    ],
+    "correctAnswer": 3,
+    "explanation": "WebSocket transport holds a persistent, bidirectional connection, which is exactly what suits a remote MCP server that needs to push events to Claude unprompted, rather than only responding to requests Claude initiates. HTTP is recommended for the common case of request-and-response interactions, not for a server that must proactively push data on its own schedule. stdio servers are local processes tied to the developer's own machine, not a shared push-capable service. SSE is deprecated in favor of HTTP for the standard remote case and isn't positioned as the answer to the push-notification requirement here.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=WebSocket%20servers%20hold%20a%20persistent%20bidirectional%20connection",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "WebSocket servers hold a persistent bidirectional connection, which suits remote MCP servers that push events to Claude unprompted. Use HTTP instead when your server only responds to requests, since HTTP supports OAuth and the claude mcp add --transport flag, while WebSocket supports neither.",
+    "sourceHighlight": "WebSocket servers hold a persistent bidirectional connection, which suits remote MCP servers that push events to Claude unprompted"
+  },
+  {
+    "id": "adv-123",
+    "number": 123,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A developer at Ferrostone Analytics has a linter MCP server configured at user scope so it's available across every project on her laptop. While working inside one particular repository, she notices the project's committed .mcp.json also defines a server named linter, with a different configuration pointing at a stricter, team-approved ruleset. She wants to know which of the two definitions Claude Code will actually connect to while she's working in that repository, given that both are named identically.",
+    "options": [
+      "The user-scoped definition always wins everywhere, since user scope is meant to represent the developer's own persistent preferences across all projects.",
+      "Claude Code merges the two configurations field by field, combining settings from both the user-scoped and project-scoped entries.",
+      "The project-scoped definition from .mcp.json wins in this project, since project scope takes precedence over user scope in the scope hierarchy.",
+      "Both servers connect simultaneously under the same name, and Claude Code lets the developer choose which one to call for each individual tool invocation."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Claude Code's scope hierarchy resolves a same-named server to a single definition rather than merging or running both: local scope wins first, then project scope, then user scope, then plugin-provided servers, then claude.ai connectors. Since this repository's own .mcp.json project-scoped entry outranks the developer's user-scoped one, the project's stricter, team-approved configuration is the one Claude Code actually connects to here -- not a global merge, not the user-scoped fallback, and not a dual connection under one name.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=When%20the%20same%20server%20is%20defined%20in%20more%20than%20one%20place",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "When the same server is defined in more than one place, Claude Code connects to it once, using the definition from the highest-precedence source. The entire server entry from that source is used; fields are not merged across scopes.",
+    "sourceHighlight": "Claude Code connects to it once, using the definition from the highest-precedence source"
+  },
+  {
+    "id": "adv-124",
+    "number": 124,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "The infrastructure team at Halcyon Biotech commits a .mcp.json file to the root of a shared repository, configuring a project-scoped lab-data MCP server so every teammate who clones the repo gets access to the same lab-database tools without individually reconfiguring anything. A new hire clones the repository, opens it in Claude Code, and expects the lab-data tools to be available immediately, the same way they would be for a locally-added server. What actually happens the first time Claude Code loads this project-scoped server from .mcp.json?",
+    "options": [
+      "The tools become available immediately and silently, exactly as they would for any server the developer had added themselves.",
+      "Claude Code prompts the new hire for approval before using the project-scoped server, since project-scoped servers from .mcp.json require explicit approval for security reasons.",
+      "Claude Code refuses to load any project-scoped server unless the repository administrator has separately granted the new hire's account explicit access in advance.",
+      "The server loads automatically but with every tool disabled by default until the new hire manually enables each tool one at a time."
+    ],
+    "correctAnswer": 1,
+    "explanation": "For security reasons, Claude Code prompts for approval before using project-scoped servers loaded from a committed .mcp.json file -- a cloned repository is not automatically trusted just because its .mcp.json defines a server, since that file (and the commands or URLs it points to) came from whoever committed it. Tools don't just silently activate, and there's no separate repository-administrator-managed access list or a tool-by-tool manual enablement step; it's a single approval prompt per server, and claude mcp reset-project-choices can reset that approval decision later if needed.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=For%20security%20reasons%2C%20Claude%20Code%20prompts%20for%20approval%20before%20using%20project-scoped%20servers",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "For security reasons, Claude Code prompts for approval before using project-scoped servers from .mcp.json files. If you need to reset these approval choices, use the claude mcp reset-project-choices command.",
+    "sourceHighlight": "For security reasons, Claude Code prompts for approval before using project-scoped servers from .mcp.json files"
+  },
+  {
+    "id": "adv-125",
+    "number": 125,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A developer at Outrigger Systems tries to register her team's new internal browser-automation MCP server under the name computer-use, since that name accurately describes exactly what the server does. When she runs claude mcp add, the command fails outright with an error refusing to accept that name. A teammate suggests she must have simply mistyped something, since server names are otherwise freely chosen strings. What is actually going on, and what should she do instead?",
+    "options": [
+      "The name is fine; the failure is unrelated and unusually only happens on stdio transport servers specifically.",
+      "computer-use is one of a small set of names reserved for Claude Code's own built-in servers, so claude mcp add rejects it and she needs to choose a different name.",
+      "Server names longer than a fixed character limit are silently truncated, and computer-use happens to exceed that specific limit.",
+      "The add command only rejects names containing spaces, so something else entirely in her command syntax must be malformed."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A handful of names -- workspace, claude-in-chrome, computer-use, Claude Preview, and Claude Browser -- are reserved for Claude Code's built-in servers. claude mcp add rejects a reserved name outright with an error, while a configuration file that happens to define a server under one of these names is simply skipped at load time with a warning asking for a rename. The fix is just to pick a different, non-reserved name for the new server; there's no length limit or space-only restriction at play here, and the behavior isn't specific to any particular transport.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=Some%20server%20names%20are%20reserved%20for%20Claude%20Code%27s%20built-in%20servers",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Some server names are reserved for Claude Code's built-in servers: workspace, claude-in-chrome, computer-use, Claude Preview, and Claude Browser. If your configuration defines a server with a reserved name, Claude Code skips it at load time and shows a warning asking you to rename it. claude mcp add rejects a reserved name with an error.",
+    "sourceHighlight": "claude mcp add rejects a reserved name with an error"
+  },
+  {
+    "id": "adv-126",
+    "number": 126,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A vendor-hosted MCP server used by the support team at Lumen Cloud regularly adds and removes tools as the vendor ships new features on their own release schedule, entirely outside the support team's control. Historically, whenever the vendor added a new tool, engineers had to manually disconnect and reconnect the server inside Claude Code before the new tool became available, which meant new capabilities often sat unused for days until someone remembered to reconnect. The team wants Claude Code to just pick up these changes automatically going forward. What capability, if the vendor's server supports it, would let Claude Code refresh its available tools without anyone manually disconnecting and reconnecting?",
+    "options": [
+      "Increasing the server's per-tool timeout value so Claude Code polls the server more frequently for configuration changes.",
+      "Setting oauth.scopes to a broader value so the server is authorized to advertise additional tools without a reconnect.",
+      "The server sending an MCP list_changed notification, which Claude Code uses to automatically refresh its available tools, prompts, and resources.",
+      "Enabling the claude/channel capability so the server can push each new tool definition directly into the conversation as a message."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Claude Code supports MCP list_changed notifications specifically so a server can dynamically update its available tools, prompts, and resources without requiring anyone to disconnect and reconnect -- when the server sends this notification, Claude Code automatically refreshes what it knows is available from that server. A timeout value only bounds how long a tool call is allowed to run, not how tool lists are refreshed. oauth.scopes governs authorization scope, not tool-list discovery. The claude/channel capability is for pushing event-driven messages into a session (like CI results or chat notifications), a different mechanism from updating the tool catalog itself.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=Claude%20Code%20supports%20MCP%20list_changed%20notifications",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Claude Code supports MCP list_changed notifications, allowing MCP servers to dynamically update their available tools, prompts, and resources without requiring you to disconnect and reconnect. When an MCP server sends a list_changed notification, Claude Code automatically refreshes the available capabilities from that server.",
+    "sourceHighlight": "allowing MCP servers to dynamically update their available tools, prompts, and resources without requiring you to disconnect and reconnect"
+  },
+  {
+    "id": "adv-127",
+    "number": 127,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "During a flaky network window, two of Meridian Analytics' MCP servers both lose connectivity mid-session: a remote billing-api server reachable over HTTP, and a local local-cache server that Claude Code launched as a stdio subprocess on the developer's own machine. Ten minutes later, the developer notices billing-api silently reconnected on its own, while local-cache is still shown as disconnected and never came back without the developer manually restarting it. Why did only one of the two servers recover automatically?",
+    "options": [
+      "Claude Code automatically reconnects HTTP and SSE servers with exponential backoff after a disconnect, but stdio servers are local processes and are not reconnected automatically.",
+      "Both servers should have reconnected automatically; the difference is a bug specific to how local-cache happened to be configured, not a general rule about transports.",
+      "Only servers added at user scope ever reconnect automatically, and local-cache was likely added at project or local scope instead.",
+      "Automatic reconnection only applies to servers that have completed OAuth authentication, and stdio servers are never able to authenticate via OAuth."
+    ],
+    "correctAnswer": 0,
+    "explanation": "If an HTTP or SSE server disconnects mid-session, Claude Code automatically reconnects with exponential backoff -- up to five attempts, starting at a one-second delay and doubling each time. Stdio servers, by contrast, are local processes rather than network connections Claude Code can retry against, so they are not reconnected automatically and need a manual restart. This is a transport-level distinction, not a scope-based rule or an OAuth-authentication requirement -- most stdio servers don't use OAuth at all, since those flags only apply to HTTP and SSE transports.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=If%20an%20HTTP%20or%20SSE%20server%20disconnects%20mid-session%2C%20Claude%20Code%20automatically%20reconnects",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "If an HTTP or SSE server disconnects mid-session, Claude Code automatically reconnects with exponential backoff: up to five attempts, starting at a one-second delay and doubling each time. ... Stdio servers are local processes and are not reconnected automatically.",
+    "sourceHighlight": "Stdio servers are local processes and are not reconnected automatically"
+  },
+  {
+    "id": "adv-128",
+    "number": 128,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A get_schema tool on an internal MCP server at Cobalt Freight returns the entire database schema for a large analytics warehouse, often tens of thousands of tokens in a single response. Engineers keep seeing Claude Code's output warning trigger, and responses from this specific tool are frequently persisted to disk and replaced with a file reference instead of being shown inline, which breaks a workflow that depends on reading the schema directly in the conversation. Raising the global MAX_MCP_OUTPUT_TOKENS environment variable helps a little, but the team wants a fix that specifically targets this one large-but-necessary tool without loosening limits for every other MCP tool in the environment. What is the correct fix?",
+    "options": [
+      "Ask every engineer to individually set MAX_MCP_OUTPUT_TOKENS to its maximum possible value in their own personal shell configuration.",
+      "Have the server set _meta[\"anthropic/maxResultSizeChars\"] on the get_schema tool's tools/list entry to raise that specific tool's output threshold.",
+      "Switch the get_schema tool from HTTP to stdio transport, since stdio servers are exempt from all MCP output size limits entirely.",
+      "Mark the tool with _meta[\"anthropic/requiresUserInteraction\"]: true so oversized responses are approved manually instead of being persisted to disk."
+    ],
+    "correctAnswer": 1,
+    "explanation": "The anthropic/maxResultSizeChars annotation lets an individual tool declare its own higher output threshold (up to a hard ceiling of 500,000 characters), which Claude Code honors for that tool's text content independent of whatever MAX_MCP_OUTPUT_TOKENS is set to globally -- exactly the targeted, per-tool fix this scenario calls for. Raising the global environment variable for every engineer loosens the limit everywhere, not just for this one large-but-necessary tool. Output size limits are a general MCP behavior, not something transport-specific that stdio servers are exempt from. requiresUserInteraction controls whether a tool always needs an explicit approval prompt; it has nothing to do with output size or the persist-to-disk threshold.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=you%20can%20allow%20individual%20tools%20to%20return%20results%20larger%20than%20the%20default%20persist-to-disk%20threshold",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "If you're building an MCP server, you can allow individual tools to return results larger than the default persist-to-disk threshold by setting _meta[\"anthropic/maxResultSizeChars\"] in the tool's tools/list response entry. Claude Code raises that tool's threshold to the annotated value, up to a hard ceiling of 500,000 characters.",
+    "sourceHighlight": "Claude Code raises that tool's threshold to the annotated value, up to a hard ceiling of 500,000 characters"
+  },
+  {
+    "id": "adv-129",
+    "number": 129,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A compliance team at Solstice Bank is building an MCP server with a grant_access tool that provisions elevated database permissions for a requesting engineer. Legal has been explicit: this specific action must always be reviewed and explicitly approved by a human on every single call, with no exceptions, even for engineers who run Claude Code in auto or bypassPermissions mode for their day-to-day work, and even if an existing allow rule would otherwise match this tool. The team wants a way to guarantee this at the tool's own definition, rather than hoping every engineer's personal permission configuration happens to be strict enough. How should the server guarantee this?",
+    "options": [
+      "Document the requirement clearly in the tool's description field, instructing Claude never to call it without first confirming with the user.",
+      "Set _meta[\"anthropic/requiresUserInteraction\"]: true on the tool's tools/list entry so its permission prompt always appears, regardless of mode or allow rules.",
+      "Require every engineer to individually configure their own personal settings to deny this tool by name before they are permitted to use the server at all.",
+      "Rely on the server rejecting the call server-side unless a specific header is present, since Claude Code's own permission modes cannot be trusted to enforce this."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Setting _meta[\"anthropic/requiresUserInteraction\"]: true on the tool's tools/list entry makes Claude Code show that tool's permission prompt on every call, even in acceptEdits, auto, and bypassPermissions permission modes, without offering a \"don't ask again\" option -- and allow rules that would otherwise match the tool don't skip the prompt either. This is a server-side, tool-level guarantee rather than something that depends on each engineer's personal configuration being strict enough. A description-field instruction is only a prompt-level suggestion the model could still fail to follow. Requiring every engineer to manually deny the tool by name is fragile and easy to skip. Relying purely on a server-side header check abandons Claude Code's own confirmation mechanism rather than using the annotation built specifically for this case.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=you%20can%20mark%20a%20tool%20as%20requiring%20explicit%20approval%20on%20every%20call",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "If you're building an MCP server, you can mark a tool as requiring explicit approval on every call by setting _meta[\"anthropic/requiresUserInteraction\"] to true in the tool's tools/list response entry. ... Claude Code shows that tool's permission prompt on every call, even in acceptEdits, auto, and bypassPermissions permission modes, and doesn't offer a \"don't ask again\" option for it. Allow rules that match the tool don't skip the prompt either.",
+    "sourceHighlight": "Claude Code shows that tool's permission prompt on every call, even in acceptEdits, auto, and bypassPermissions permission modes"
+  },
+  {
+    "id": "adv-130",
+    "number": 130,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A third-party MCP server connected to Claude Code at Ashgrove Capital defines one of its tools with a JSON Schema input that uses oneOf at the very top level of the schema, since the tool genuinely accepts two structurally different shapes of input depending on the request type. An engineer reviewing the integration recalls reading that the Claude API doesn't accept anyOf, oneOf, or allOf combinators at the root of a tool's input schema, and is confused why the tool still shows up and works correctly in Claude Code rather than failing outright. What is actually happening?",
+    "options": [
+      "Claude Code silently drops the oneOf constraint entirely and accepts any input shape the model happens to produce for that tool.",
+      "The MCP server is misconfigured and this tool should not actually be working; the engineer is likely looking at cached results from before the schema was added.",
+      "Claude Code flattens the root-level combinator into a single object schema before sending it to the API, and adds a sentence to the tool's description telling Claude which parameters belong together.",
+      "Claude API added native support for root-level oneOf schemas, so no special handling is needed on Claude Code's side any longer."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Claude Code detects a tool schema with a root-level combinator (anyOf, oneOf, or allOf), flattens it into a single object schema the API will accept, and prepends a sentence to the tool's description explaining which parameter groups belong together -- for anyOf/oneOf specifically, each branch's properties are merged and its required list is described in the text rather than enforced by the schema itself, so the server still needs to validate the actual argument combination it receives. Nothing is silently dropped, this isn't a caching artifact, and the Claude API itself still doesn't natively accept root-level combinators -- the rewrite happens entirely on Claude Code's side before the request goes out.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=Before%20sending%20the%20tool%20to%20the%20API%2C%20Claude%20Code%20flattens%20the%20schema",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Before sending the tool to the API, Claude Code flattens the schema into a single object and prepends a sentence to the tool's description that tells Claude which parameter groups belong together ... Your server receives whichever arguments Claude chose, so keep validating the combination server-side.",
+    "sourceHighlight": "Claude Code flattens the schema into a single object and prepends a sentence to the tool's description that tells Claude which parameter groups belong together"
+  },
+  {
+    "id": "adv-131",
+    "number": 131,
+    "domain": "tool-design-mcp",
+    "difficulty": "3x",
+    "text": "A team at Ridgeline Software installs a plugin called db-tools-plugin that bundles its own MCP server, registered internally as database-tools, exposing a query tool. When a security engineer writes a hook intended to intercept every call to that tool, she writes the matcher as mcp__database-tools__.*, expecting it to catch calls from the plugin-bundled server the same way it would for a manually-configured server of that name. During testing, the hook never fires, even though the query tool is clearly being called successfully. What is she missing about how plugin-bundled MCP tool names actually work?",
+    "options": [
+      "Plugin-bundled MCP tools cannot be matched by hooks at all under any circumstances, regardless of how the matcher is written.",
+      "The tool's callable name actually takes the form mcp__plugin_db-tools-plugin_database-tools__query, embedding the plugin name, so a matcher written against just the bare server key never matches it.",
+      "Hook matchers only work against tools from manually-configured servers added via claude mcp add, never against tools from any plugin whatsoever.",
+      "The hook is written correctly, but hooks for MCP tools only fire on the very first call to that tool per session, not on every subsequent call."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Tools from a plugin-bundled MCP server include both the plugin name and the server key in their callable name, in the full form mcp__plugin_<plugin-name>_<server-name>__<tool-name>. For the database-tools server bundled in db-tools-plugin, the query tool's real callable name is mcp__plugin_db-tools-plugin_database-tools__query -- a hook matcher written against the bare server key, like mcp__database-tools__.*, never fires for a plugin-bundled server, because that pattern doesn't match the plugin-qualified name the tool actually registers under. Plugin MCP tools absolutely can be matched by hooks, and there's no first-call-only restriction -- the fix is simply writing the matcher against the correct, plugin-qualified tool name.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=The%20full%20form%20is%20mcp__plugin_%3Cplugin-name%3E_%3Cserver-name%3E__%3Ctool-name%3E",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "Tools from a plugin-bundled MCP server include both the plugin name and the server key in their callable name. The full form is mcp__plugin_<plugin-name>_<server-name>__<tool-name> ... A hook matcher written against the bare server key, such as mcp__database-tools__.*, never fires for a plugin-bundled server.",
+    "sourceHighlight": "A hook matcher written against the bare server key ... never fires for a plugin-bundled server"
+  },
+  {
+    "id": "adv-132",
+    "number": 132,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A developer at Northwind Robotics wants to use Claude Desktop as her day-to-day chat interface, but still wants access to Claude Code's own file-editing and shell tools from within that Desktop session. She learns Claude Code can itself run as an MCP server via claude mcp serve and configures Claude Desktop to launch it as a stdio server. Before relying on this setup for real work, she wants to understand exactly what safety behavior she can expect out of the box when Claude, running inside Claude Desktop, tries to call one of Claude Code's tools like Edit through this connection.",
+    "options": [
+      "Claude Code's usual permission-prompt system carries over automatically, so Claude Desktop will show the same approval dialogs Claude Code normally shows for file edits and shell commands.",
+      "claude mcp serve only exposes read-only tools like View; write and shell-execution tools are never available through this mechanism.",
+      "The MCP connection itself provides no user-confirmation step for individual tool calls; the connecting client (Claude Desktop, in this case) is responsible for implementing that confirmation.",
+      "Claude Code automatically detects it is running as an MCP server and disables all destructive tools like Edit and Bash entirely for the duration of the session."
+    ],
+    "correctAnswer": 2,
+    "explanation": "claude mcp serve exposes Claude Code's own tools -- View, Edit, LS, and others -- to whatever MCP client connects to it, but that server only exposes the tools; it doesn't carry Claude Code's own permission-prompt UI along with it. Confirming individual tool calls is left to the connecting client, so if Claude Desktop (or any other MCP client) doesn't implement its own confirmation step, calls proceed without one. Nothing here restricts the exposed tools to read-only ones, and Claude Code doesn't automatically disable destructive tools just because it's running in server mode -- the responsibility for gating those calls sits entirely with the client on the other end of the connection.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp#:~:text=This%20MCP%20server%20only%20exposes%20Claude%20Code%27s%20tools%20to%20your%20MCP%20client",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "The server provides access to Claude's tools like View, Edit, LS, etc. ... This MCP server only exposes Claude Code's tools to your MCP client, so your own client is responsible for implementing user confirmation for individual tool calls.",
+    "sourceHighlight": "your own client is responsible for implementing user confirmation for individual tool calls"
   }
 ]
