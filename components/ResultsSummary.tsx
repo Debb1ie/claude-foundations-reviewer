@@ -335,7 +335,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                           borderColor: 'brand.400',
                           bg: 'rgba(255,255,255,0.8)',
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
+                          boxShadow: '0 8px 24px rgba(33,150,243,0.10)',
                           textDecoration: 'none'
                         }}
                         style={{ textDecoration: 'none' }}
@@ -431,9 +431,9 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                           {q.scenario && (
                             <Box
                               p={3.5}
-                              bg="rgba(57, 73, 171, 0.08)"
+                              bg="rgba(33, 150, 243, 0.08)"
                               border="1px solid"
-                              borderColor="rgba(57, 73, 171, 0.18)"
+                              borderColor="rgba(33, 150, 243, 0.18)"
                               borderLeft="3px solid"
                               borderLeftColor="brand.500"
                               borderRadius="lg"
@@ -551,9 +551,9 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
 
                           <Box
                             p={4}
-                            bg="rgba(57, 73, 171, 0.05)"
+                            bg="rgba(33, 150, 243, 0.05)"
                             border="1px solid"
-                            borderColor="rgba(57, 73, 171, 0.15)"
+                            borderColor="rgba(33, 150, 243, 0.15)"
                             borderRadius="xl"
                             _dark={{
                               bg: "rgba(124, 110, 250, 0.08)",

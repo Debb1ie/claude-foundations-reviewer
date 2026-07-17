@@ -187,7 +187,7 @@ export function OnboardingModal() {
             transition={{ duration: 0.3 }}
           >
             <VStack gap={6} align="center" textAlign="center" minH="240px" justify="center">
-              <Box color="brand.600" p={4} bg="brand.50" _dark={{ bg: "rgba(57, 73, 171, 0.2)", color: "brand.300" }} borderRadius="full">
+              <Box color="brand.600" p={4} bg="brand.50" _dark={{ bg: "rgba(33, 150, 243, 0.2)", color: "brand.300" }} borderRadius="full">
                 {slides[currentSlide].icon}
               </Box>
               <Heading size="lg" color="brand.800" _dark={{ color: "brand.200" }} fontWeight="bold">

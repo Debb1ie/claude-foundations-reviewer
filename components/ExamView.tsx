@@ -238,10 +238,10 @@ export function ExamView() {
           let bgColor = 'transparent';
           let borderColor = isNavigable ? 'border' : 'bg.muted';
           if (isCurrent) {
-            bgColor = 'rgba(57,73,171,0.08)';
+            bgColor = 'rgba(33,150,243,0.08)';
             borderColor = 'brand.500';
           } else if (isAns) {
-            bgColor = showAnswerFeedback ? (isCorrect ? '#e6f9f1' : '#fde8e8') : 'rgba(57,73,171,0.06)';
+            bgColor = showAnswerFeedback ? (isCorrect ? '#e6f9f1' : '#fde8e8') : 'rgba(33,150,243,0.06)';
             borderColor = showAnswerFeedback ? (isCorrect ? '#22c88a' : '#f05a5a') : 'brand.400';
           }
           const textColor = isAns
@@ -264,7 +264,7 @@ export function ExamView() {
                 color={textColor}
                 cursor={isNavigable ? 'pointer' : 'not-allowed'}
                 transition="all 0.15s"
-                _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' } : {}}
+                _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(33,150,243,0.04)' } : {}}
                 onClick={() => {
                   if (isNavigable) {
                     goToQuestion(i);
@@ -322,10 +322,10 @@ export function ExamView() {
                   gap={1.5}
                   px={3}
                   py={1}
-                  bg="rgba(57, 73, 171, 0.08)"
+                  bg="rgba(33, 150, 243, 0.08)"
                   borderRadius="md"
                   border="1px solid"
-                  borderColor="rgba(57, 73, 171, 0.18)"
+                  borderColor="rgba(33, 150, 243, 0.18)"
                   _dark={{
                     bg: "rgba(124, 110, 250, 0.12)",
                     borderColor: "rgba(255, 255, 255, 0.12)"
@@ -545,9 +545,9 @@ export function ExamView() {
                 {q.scenario && (
                   <Box
                     p={4}
-                    bg="rgba(57, 73, 171, 0.08)"
+                    bg="rgba(33, 150, 243, 0.08)"
                     border="1px solid"
-                    borderColor="rgba(57, 73, 171, 0.18)"
+                    borderColor="rgba(33, 150, 243, 0.18)"
                     borderLeft="4px solid"
                     borderLeftColor="brand.500"
                     borderRadius="lg"
@@ -621,7 +621,7 @@ export function ExamView() {
                       }
                     } else if (isSelected) {
                       borderColor = 'brand.500';
-                      bgColor = 'rgba(57,73,171,0.06)';
+                      bgColor = 'rgba(33,150,243,0.06)';
                       keyBg = 'brand.600';
                       keyBorderColor = 'brand.500';
                       keyTextColor = 'white';
@@ -648,7 +648,7 @@ export function ExamView() {
                         transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                         _hover={{
                           borderColor: isSelected ? 'brand.500' : 'brand.400',
-                          bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.45)',
+                          bg: isSelected ? 'rgba(33, 150, 243, 0.08)' : 'rgba(255, 255, 255, 0.45)',
                           _dark: {
                             bg: isSelected ? 'rgba(124, 110, 250, 0.15)' : 'rgba(30, 41, 59, 0.5)'
                           }
@@ -720,9 +720,9 @@ export function ExamView() {
                       >
                         <Box
                           p={5}
-                          bg="rgba(57, 73, 171, 0.05)"
+                          bg="rgba(33, 150, 243, 0.05)"
                           border="1px solid"
-                          borderColor="rgba(57, 73, 171, 0.15)"
+                          borderColor="rgba(33, 150, 243, 0.15)"
                           borderRadius="xl"
                           boxShadow="inset 0 2px 4px rgba(0,0,0,0.01)"
                           mt={2}
@@ -852,11 +852,11 @@ export function ExamView() {
                     COLOR LEGEND
                   </Text>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(57,73,171,0.08)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(33,150,243,0.08)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Active Question</Text>
                   </HStack>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(57,73,171,0.06)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(33,150,243,0.06)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Answered Question</Text>
                   </HStack>
                   <HStack gap={2}>
@@ -905,10 +905,21 @@ export function ExamView() {
                   <Box
                     display="inline-flex" alignItems="center" justifyContent="center"
                     w={14} h={14} borderRadius="full"
-                    bg={isTimed ? "rgba(57,73,171,0.08)" : "rgba(239,68,68,0.08)"} mb={4}
-                    border="2px solid" borderColor={isTimed ? "rgba(57,73,171,0.15)" : "rgba(239,68,68,0.15)"}
+                    bg={isTimed ? "rgba(33,150,243,0.08)" : "rgba(239,68,68,0.08)"} mb={4}
+                    border="2px solid" borderColor={isTimed ? "rgba(33,150,243,0.15)" : "rgba(239,68,68,0.15)"}
                   >
-                    <Text fontSize="2xl">{isTimed ? '⏸' : '🚪'}</Text>
+                    {isTimed ? (
+                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="#1e88e5" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="#ef4444" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                      </svg>
+                    )}
                   </Box>
                   <Heading size="lg" fontWeight={800} color="brand.700" mb={1}
                     _dark={{ color: 'gray.100' }}>
@@ -920,8 +931,8 @@ export function ExamView() {
                 </Box>
 
                 <Box mx={6} mb={5} p={4} borderRadius="xl"
-                  bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
+                  bg="rgba(33,150,243,0.05)" border="1px solid rgba(33,150,243,0.1)"
+                  _dark={{ bg: 'rgba(33,150,243,0.1)', borderColor: 'rgba(33,150,243,0.2)' }}>
                   <SimpleGrid columns={3} gap={3}>
                     {[
                       { label: 'Answered', value: `${answeredCount}/${questions.length}` },
@@ -942,7 +953,7 @@ export function ExamView() {
                     w="full" size="lg"
                     bg="brand.600" color="white"
                     fontWeight={700} borderRadius="xl"
-                    boxShadow="0 4px 14px rgba(57,73,171,0.35)"
+                    boxShadow="0 4px 14px rgba(33,150,243,0.35)"
                     _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
                     transition="all 0.2s"
                     onClick={isTimed ? handleResume : () => setDialogOpen(false)}
@@ -973,7 +984,7 @@ export function ExamView() {
                     color={isTimed ? "gray.500" : "red.500"}
                     fontWeight={600}
                     borderRadius="xl"
-                    _hover={{ color: isTimed ? 'brand.600' : 'red.600', bg: isTimed ? 'rgba(57,73,171,0.06)' : 'rgba(239,68,68,0.06)' }}
+                    _hover={{ color: isTimed ? 'brand.600' : 'red.600', bg: isTimed ? 'rgba(33,150,243,0.06)' : 'rgba(239,68,68,0.06)' }}
                     onClick={handleExit}
                   >
                     ← {isTimed ? 'Exit to Configuration' : 'Exit and Lose Progress'}

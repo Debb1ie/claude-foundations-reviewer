@@ -149,10 +149,10 @@ function SourceModal({ question, onClose }: { question: AdvancedQuestion | null;
               {question.sourceExcerpt ? (
                 <Box
                   p={4}
-                  bg="rgba(57,73,171,0.05)"
+                  bg="rgba(33,150,243,0.05)"
                   borderRadius="lg"
-                  borderLeft="3px solid rgba(57,73,171,0.3)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.4)' }}
+                  borderLeft="3px solid rgba(33,150,243,0.3)"
+                  _dark={{ bg: 'rgba(33,150,243,0.1)', borderColor: 'rgba(33,150,243,0.4)' }}
                 >
                   <Text fontSize="sm" color="gray.700" lineHeight="tall" fontStyle="italic" _dark={{ color: 'gray.200' }}>
                     &ldquo;{renderHighlightedExcerpt(question.sourceExcerpt, question.sourceHighlight)}&rdquo;
@@ -291,15 +291,15 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               </Link>
               <Button
                 size="lg"
-                bg="#3949AB"
+                bg="#2196f3"
                 color="white"
                 fontWeight={800}
                 borderRadius="xl"
                 px={10}
                 opacity={1}
-                boxShadow="0 6px 24px rgba(57,73,171,0.55)"
-                _hover={{ bg: '#303F9F', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(57,73,171,0.6)' }}
-                _active={{ transform: 'translateY(0)', boxShadow: '0 4px 14px rgba(57,73,171,0.4)' }}
+                boxShadow="0 6px 24px rgba(33,150,243,0.55)"
+                _hover={{ bg: '#303F9F', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(33,150,243,0.6)' }}
+                _active={{ transform: 'translateY(0)', boxShadow: '0 4px 14px rgba(33,150,243,0.4)' }}
                 transition="all 0.2s"
                 onClick={onStart}
               >
@@ -540,7 +540,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                         borderColor: 'brand.400',
                         bg: 'rgba(255,255,255,0.8)',
                         transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
+                        boxShadow: '0 8px 24px rgba(33,150,243,0.10)',
                         textDecoration: 'none',
                       }}
                       style={{ textDecoration: 'none' }}
@@ -654,7 +654,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                         >
                           <HStack gap={2} mb={3} flexWrap="wrap">
                             <Badge
-                              bg="rgba(57,73,171,0.08)"
+                              bg="rgba(33,150,243,0.08)"
                               color="brand.600"
                               px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}
                             >
@@ -723,10 +723,10 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
                           <Box
                             p={3}
-                            bg="rgba(57,73,171,0.05)"
+                            bg="rgba(33,150,243,0.05)"
                             borderRadius="lg"
-                            borderLeft="3px solid rgba(57,73,171,0.3)"
-                            _dark={{ bg: 'rgba(57,73,171,0.08)', borderColor: 'rgba(57,73,171,0.4)' }}
+                            borderLeft="3px solid rgba(33,150,243,0.3)"
+                            _dark={{ bg: 'rgba(33,150,243,0.08)', borderColor: 'rgba(33,150,243,0.4)' }}
                           >
                             <Text fontSize="xs" fontWeight={700} color="brand.600" mb={1}>Explanation</Text>
                             <Text fontSize="xs" color="gray.600" lineHeight="tall" _dark={{ color: 'gray.400' }}>
@@ -741,7 +741,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                 mt={2.5}
                                 pt={2}
                                 w="100%"
-                                borderTop="1px solid rgba(57,73,171,0.12)"
+                                borderTop="1px solid rgba(33,150,243,0.12)"
                                 fontSize="2xs"
                                 fontWeight={700}
                                 color="brand.500"
@@ -876,8 +876,8 @@ function QuestionView() {
             alignItems="center"
             justifyContent="center"
             bg={
-              isCurrent ? 'rgba(57,73,171,0.08)' :
-              isAnsweredQ ? 'rgba(57,73,171,0.06)' :
+              isCurrent ? 'rgba(33,150,243,0.08)' :
+              isAnsweredQ ? 'rgba(33,150,243,0.06)' :
               'transparent'
             }
             color={
@@ -894,7 +894,7 @@ function QuestionView() {
             }
             cursor={isNavigable ? 'pointer' : 'not-allowed'}
             transition="all 0.15s"
-            _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' } : {}}
+            _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(33,150,243,0.04)' } : {}}
             onClick={() => {
               if (!isNavigable) return;
               goToQuestion(idx);
@@ -954,8 +954,8 @@ function QuestionView() {
                   <Box
                     display="inline-flex" alignItems="center" justifyContent="center"
                     w={14} h={14} borderRadius="full"
-                    bg="rgba(57,73,171,0.08)" mb={4}
-                    border="2px solid rgba(57,73,171,0.15)"
+                    bg="rgba(33,150,243,0.08)" mb={4}
+                    border="2px solid rgba(33,150,243,0.15)"
                   >
                     <Text fontSize="2xl">⏸</Text>
                   </Box>
@@ -967,8 +967,8 @@ function QuestionView() {
                 </Box>
 
                 <Box mx={6} mb={5} p={4} borderRadius="xl"
-                  bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
+                  bg="rgba(33,150,243,0.05)" border="1px solid rgba(33,150,243,0.1)"
+                  _dark={{ bg: 'rgba(33,150,243,0.1)', borderColor: 'rgba(33,150,243,0.2)' }}>
                   <SimpleGrid columns={3} gap={3}>
                     {[
                       { label: 'Answered', value: `${totalAnswered}/${questions.length}` },
@@ -989,7 +989,7 @@ function QuestionView() {
                     w="full" size="lg"
                     bg="brand.600" color="white"
                     fontWeight={700} borderRadius="xl"
-                    boxShadow="0 4px 14px rgba(57,73,171,0.35)"
+                    boxShadow="0 4px 14px rgba(33,150,243,0.35)"
                     _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
                     transition="all 0.2s"
                     onClick={() => setIsPaused(false)}
@@ -1019,7 +1019,7 @@ function QuestionView() {
                       color="gray.500"
                       fontWeight={600}
                       borderRadius="xl"
-                      _hover={{ color: 'brand.600', bg: 'rgba(57,73,171,0.06)' }}
+                      _hover={{ color: 'brand.600', bg: 'rgba(33,150,243,0.06)' }}
                     >
                       ← Exit to Home
                     </Button>
@@ -1112,10 +1112,10 @@ function QuestionView() {
                 gap={1.5}
                 px={3}
                 py={1}
-                bg="rgba(57, 73, 171, 0.08)"
+                bg="rgba(33, 150, 243, 0.08)"
                 borderRadius="md"
                 border="1px solid"
-                borderColor="rgba(57, 73, 171, 0.18)"
+                borderColor="rgba(33, 150, 243, 0.18)"
                 _dark={{
                   bg: "rgba(124, 110, 250, 0.12)",
                   borderColor: "rgba(255, 255, 255, 0.12)"
@@ -1301,7 +1301,7 @@ function QuestionView() {
                         const isSelected = userAnswer === idx;
 
                         const borderColor = isSelected ? 'brand.500' : 'border';
-                        const bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
+                        const bg = isSelected ? 'rgba(33,150,243,0.06)' : 'transparent';
                         const keyBg = isSelected ? 'brand.600' : 'transparent';
                         const keyBorderColor: any = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
                         const keyTextColor: any = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
@@ -1324,7 +1324,7 @@ function QuestionView() {
                             transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                             textAlign="left"
                             _dark={{
-                              bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
+                              bg: isSelected ? 'rgba(33,150,243,0.12)' : 'rgba(30,41,59,0.3)',
                               borderColor: isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
                             }}
                             _hover={!answered ? {
@@ -1456,11 +1456,11 @@ function QuestionView() {
                     COLOR LEGEND
                   </Text>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(57,73,171,0.08)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(33,150,243,0.08)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Active Question</Text>
                   </HStack>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(57,73,171,0.06)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(33,150,243,0.06)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Answered Question</Text>
                   </HStack>
                   <HStack gap={2}>
@@ -1631,7 +1631,7 @@ function BulkReviewScreen() {
                           key={oi}
                           p={2.5}
                           borderRadius="lg"
-                          bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
+                          bg={isUserAnswer ? 'rgba(33,150,243,0.06)' : 'transparent'}
                           border="1px solid"
                           borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
                           gap={3}
@@ -1723,9 +1723,16 @@ function BulkReviewScreen() {
                 <Text fontSize="sm" color="gray.800" _dark={{ color: 'gray.100' }} fontWeight={500} lineHeight="tall" mb={6}>
                   Are you sure you want to finalize your practice exam? You will not be able to return to modify any answers after this action.
                   {unansweredCount > 0 && (
-                    <Text as="span" color="orange.600" fontWeight={700} display="block" mt={2.5}>
-                      🚨 WARNING: You have {unansweredCount} unanswered {unansweredCount === 1 ? 'question' : 'questions'} that will be marked incorrect.
-                    </Text>
+                    <HStack as="span" display="flex" alignItems="flex-start" gap={1.5} color="orange.600" fontWeight={700} mt={2.5}>
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                      <Text as="span">
+                        WARNING: You have {unansweredCount} unanswered {unansweredCount === 1 ? 'question' : 'questions'} that will be marked incorrect.
+                      </Text>
+                    </HStack>
                   )}
                 </Text>
                 <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>

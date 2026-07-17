@@ -127,7 +127,7 @@ export default function SourcesPage() {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.1)',
+                    boxShadow: '0 12px 40px 0 rgba(33, 150, 243, 0.1)',
                     textDecoration: 'none'
                   }}
                   display="flex"
@@ -192,7 +192,7 @@ export default function SourcesPage() {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.1)',
+                    boxShadow: '0 12px 40px 0 rgba(33, 150, 243, 0.1)',
                     textDecoration: 'none'
                   }}
                   display="flex"

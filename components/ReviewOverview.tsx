@@ -222,7 +222,7 @@ export function ReviewOverview() {
                               key={oi}
                               p={2.5}
                               borderRadius="lg"
-                              bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
+                              bg={isUserAnswer ? 'rgba(33,150,243,0.06)' : 'transparent'}
                               border="1px solid"
                               borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
                               gap={3}
@@ -376,9 +376,16 @@ export function ReviewOverview() {
                 <Text fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight="tall" mb={6}>
                   Are you sure you want to finalize your practice exam? You will not be able to return to modify any answers after this action.
                   {unansweredCount > 0 && (
-                    <Text as="span" color="orange.600" fontWeight={700} display="block" mt={2.5}>
-                      🚨 WARNING: You have {unansweredCount} unanswered {unansweredCount === 1 ? 'question' : 'questions'} that will be marked incorrect.
-                    </Text>
+                    <HStack as="span" display="flex" alignItems="flex-start" gap={1.5} color="orange.600" fontWeight={700} mt={2.5}>
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                      <Text as="span">
+                        WARNING: You have {unansweredCount} unanswered {unansweredCount === 1 ? 'question' : 'questions'} that will be marked incorrect.
+                      </Text>
+                    </HStack>
                   )}
                 </Text>
                 <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
