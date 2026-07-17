@@ -4,18 +4,18 @@ const system = createSystem(defaultConfig, {
   theme: {
     tokens: {
       colors: {
-        // Primary: True blue — the DevCon sky blue
+        // Primary: Deep navy/indigo — the dark blue from DevCon clouds & logo
         brand: {
-          50:  { value: '#e3f2fd' },
-          100: { value: '#bbdefb' },
-          200: { value: '#90caf9' },
-          300: { value: '#64b5f6' },
-          400: { value: '#42a5f5' },
-          500: { value: '#2196f3' },  // core brand blue
-          600: { value: '#1e88e5' },  // deep blue
-          700: { value: '#1565c0' },  // darkest blue
-          800: { value: '#0d47a1' },
-          900: { value: '#0a3573' },
+          50:  { value: '#e8eaf6' },
+          100: { value: '#c5cae9' },
+          200: { value: '#9fa8da' },
+          300: { value: '#7986cb' },
+          400: { value: '#5c6bc0' },
+          500: { value: '#3949ab' },  // core brand blue
+          600: { value: '#283593' },  // deep indigo
+          700: { value: '#1a237e' },  // darkest navy
+          800: { value: '#131a60' },
+          900: { value: '#0b1048' },
         },
         // Accent: Vivid cyan — background sky tone
         accent: {
@@ -57,7 +57,7 @@ const system = createSystem(defaultConfig, {
           900: { value: '#a23108' },
         },
         // Domain colors matching DevCon vivid palette
-        d1: { value: '#2196f3' },  // true blue (brand)
+        d1: { value: '#3949ab' },  // deep indigo (brand)
         d2: { value: '#FF6D00' },  // vivid orange
         d3: { value: '#00BCD4' },  // cyan
         d4: { value: '#FFD600' },  // golden yellow

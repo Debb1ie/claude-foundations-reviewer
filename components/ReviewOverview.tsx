@@ -222,7 +222,7 @@ export function ReviewOverview() {
                               key={oi}
                               p={2.5}
                               borderRadius="lg"
-                              bg={isUserAnswer ? 'rgba(33,150,243,0.06)' : 'transparent'}
+                              bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
                               border="1px solid"
                               borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
                               gap={3}

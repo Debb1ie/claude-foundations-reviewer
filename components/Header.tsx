@@ -120,11 +120,11 @@ export function Header() {
                       fontSize="md" 
                       fontWeight={600} 
                       color="brand.700" 
-                      bg="rgba(33, 150, 243, 0.08)"
+                      bg="rgba(57, 73, 171, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(33, 150, 243, 0.18)"
+                      borderColor="rgba(57, 73, 171, 0.18)"
                       borderRadius="md"
-                      _hover={{ bg: 'rgba(33, 150, 243, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                      _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                       _dark={{
                         bg: "rgba(124, 110, 250, 0.12)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
@@ -145,11 +145,11 @@ export function Header() {
                       fontSize="md" 
                       fontWeight={600} 
                       color="brand.700" 
-                      bg="rgba(33, 150, 243, 0.08)"
+                      bg="rgba(57, 73, 171, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(33, 150, 243, 0.18)"
+                      borderColor="rgba(57, 73, 171, 0.18)"
                       borderRadius="md"
-                      _hover={{ bg: 'rgba(33, 150, 243, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                      _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                       _dark={{
                         bg: "rgba(124, 110, 250, 0.12)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
@@ -172,11 +172,11 @@ export function Header() {
                     fontSize="md" 
                     fontWeight={600} 
                     color="brand.700" 
-                    bg="rgba(33, 150, 243, 0.08)"
+                    bg="rgba(57, 73, 171, 0.08)"
                     border="1px solid"
-                    borderColor="rgba(33, 150, 243, 0.18)"
+                    borderColor="rgba(57, 73, 171, 0.18)"
                     borderRadius="md"
-                    _hover={{ bg: 'rgba(33, 150, 243, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                    _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                     _dark={{
                       bg: "rgba(124, 110, 250, 0.12)",
                       borderColor: "rgba(255, 255, 255, 0.12)",

@@ -139,7 +139,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(33, 150, 243, 0.12)',
+                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
                     textDecoration: 'none'
                   }}
                   display="flex"
@@ -151,9 +151,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Box
                         p={2.5}
                         borderRadius="lg"
-                        bg="rgba(33, 150, 243, 0.08)"
+                        bg="rgba(57, 73, 171, 0.08)"
                         border="1px solid"
-                        borderColor="rgba(33, 150, 243, 0.16)"
+                        borderColor="rgba(57, 73, 171, 0.16)"
                         color="brand.600"
                         transition="all 0.2s"
                         _dark={{
@@ -192,7 +192,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       color="white"
                       fontWeight={700}
                       borderRadius="lg"
-                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(33,150,243,0.35)' }}
+                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                       transition="all 0.2s"
                     >
                       Browse Resources
@@ -217,7 +217,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       cursor="pointer"
                       border="2px solid"
                       borderColor={isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.35)'}
-                      bg={isSelected ? 'rgba(33, 150, 243, 0.06)' : 'rgba(255, 255, 255, 0.45)'}
+                      bg={isSelected ? 'rgba(57, 73, 171, 0.06)' : 'rgba(255, 255, 255, 0.45)'}
                       backdropFilter="blur(12px)"
                       _dark={{
                         bg: isSelected ? 'rgba(124, 110, 250, 0.1)' : 'rgba(30, 41, 59, 0.45)',
@@ -227,12 +227,12 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       p={5}
                       textAlign="left"
                       transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                      boxShadow={isSelected ? '0 10px 25px -5px rgba(33,150,243,0.15)' : '0 8px 32px 0 rgba(31, 38, 135, 0.03)'}
+                      boxShadow={isSelected ? '0 10px 25px -5px rgba(57,73,171,0.15)' : '0 8px 32px 0 rgba(31, 38, 135, 0.03)'}
                       _hover={{
                         borderColor: isSelected ? 'brand.500' : 'brand.300',
-                        bg: isSelected ? 'rgba(33, 150, 243, 0.08)' : 'rgba(255, 255, 255, 0.65)',
+                        bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.65)',
                         transform: 'translateY(-3px)',
-                        boxShadow: '0 12px 40px 0 rgba(33, 150, 243, 0.12)'
+                        boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)'
                       }}
                       display="flex"
                       flexDirection="column"
@@ -244,9 +244,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                           <Box
                             p={2.5}
                             borderRadius="lg"
-                            bg={isSelected ? 'brand.600' : 'rgba(33, 150, 243, 0.08)'}
+                            bg={isSelected ? 'brand.600' : 'rgba(57, 73, 171, 0.08)'}
                             border={isSelected ? 'none' : '1px solid'}
-                            borderColor={isSelected ? 'transparent' : 'rgba(33, 150, 243, 0.16)'}
+                            borderColor={isSelected ? 'transparent' : 'rgba(57, 73, 171, 0.16)'}
                             color={isSelected ? 'white' : 'brand.600'}
                             transition="all 0.2s"
                             _dark={isSelected ? {} : {
@@ -292,7 +292,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 color="white"
                                 fontWeight={700}
                                 borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(33,150,243,0.35)' }}
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                                 transition="all 0.2s"
                                 whiteSpace="nowrap"
                                 onClick={(e) => {
@@ -308,7 +308,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 color="white"
                                 fontWeight={700}
                                 borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(33,150,243,0.35)' }}
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                                 transition="all 0.2s"
                                 whiteSpace="nowrap"
                                 flexShrink={0}
@@ -327,9 +327,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 mt={2}
                                 p={3}
                                 borderRadius="lg"
-                                bg="rgba(33, 150, 243, 0.04)"
+                                bg="rgba(57, 73, 171, 0.04)"
                                 border="1px solid"
-                                borderColor="rgba(33, 150, 243, 0.12)"
+                                borderColor="rgba(57, 73, 171, 0.12)"
                                 _dark={{ bg: 'rgba(124, 110, 250, 0.08)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                               >
                                 <Text fontSize="2xs" fontWeight={700} color="gray.500" textTransform="uppercase" letterSpacing="0.06em" mb={2}>
@@ -344,7 +344,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                     fontSize="xs"
                                     fontWeight={700}
                                     border="1.5px solid"
-                                    borderColor={examTimed ? 'brand.500' : 'rgba(33, 150, 243, 0.16)'}
+                                    borderColor={examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
                                     bg={examTimed ? 'brand.600' : 'transparent'}
                                     color={examTimed ? 'white' : 'gray.500'}
                                     transition="all 0.18s"
@@ -361,7 +361,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                     fontSize="xs"
                                     fontWeight={700}
                                     border="1.5px solid"
-                                    borderColor={!examTimed ? 'brand.500' : 'rgba(33, 150, 243, 0.16)'}
+                                    borderColor={!examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
                                     bg={!examTimed ? 'brand.600' : 'transparent'}
                                     color={!examTimed ? 'white' : 'gray.500'}
                                     transition="all 0.18s"
@@ -380,7 +380,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 color="white"
                                 fontWeight={700}
                                 borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(33,150,243,0.35)' }}
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                                 transition="all 0.2s"
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -423,7 +423,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(33, 150, 243, 0.12)',
+                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
                   }}
                   display="flex"
                   flexDirection="column"
@@ -433,9 +433,9 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Box
                         p={2.5}
                         borderRadius="lg"
-                        bg="rgba(33, 150, 243, 0.08)"
+                        bg="rgba(57, 73, 171, 0.08)"
                         border="1px solid"
-                        borderColor="rgba(33, 150, 243, 0.16)"
+                        borderColor="rgba(57, 73, 171, 0.16)"
                         color="brand.600"
                         transition="all 0.2s"
                         _dark={{
@@ -474,7 +474,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         color="white"
                         fontWeight={700}
                         borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(33,150,243,0.35)' }}
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => {
                           useAdvancedExamStore.getState().start();
