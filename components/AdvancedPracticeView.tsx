@@ -793,6 +793,41 @@ function QuestionView() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showCaptureWarning, setShowCaptureWarning] = useState(false);
+  const captureCooldownRef = React.useRef(false);
+
+  // Best-effort screenshot/screen-capture deterrent: this cannot actually
+  // block OS-level screenshot tools or third-party capture extensions, but
+  // it reacts to the two signals a capture attempt usually produces --
+  // the PrintScreen key, and the window losing focus -- by sending the
+  // learner back to question 1 (answers are preserved) and flagging it.
+  useEffect(() => {
+    const triggerCaptureViolation = () => {
+      if (captureCooldownRef.current) return;
+      captureCooldownRef.current = true;
+      setShowCaptureWarning(true);
+      goToQuestion(0);
+      setTimeout(() => setShowCaptureWarning(false), 4000);
+      setTimeout(() => { captureCooldownRef.current = false; }, 4000);
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'PrintScreen') triggerCaptureViolation();
+    };
+    const handleBlur = () => triggerCaptureViolation();
+    const handleVisibilityChange = () => {
+      if (document.hidden) triggerCaptureViolation();
+    };
+
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [goToQuestion]);
 
   useEffect(() => {
     if (isPaused) {
@@ -919,6 +954,46 @@ function QuestionView() {
       onCut={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >
+      {/* Screenshot / tab-switch capture warning */}
+      <AnimatePresence>
+        {showCaptureWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              top: 16,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10000,
+            }}
+          >
+            <Box
+              px={5}
+              py={3}
+              borderRadius="xl"
+              bg="red.600"
+              color="white"
+              boxShadow="0 8px 24px rgba(0,0,0,0.25)"
+              display="flex"
+              alignItems="center"
+              gap={2.5}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <Text fontSize="sm" fontWeight={700}>
+                Screen capture / tab switch detected — returned to Question 1
+              </Text>
+            </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Pause overlay */}
       <AnimatePresence>
         {isPaused && (
