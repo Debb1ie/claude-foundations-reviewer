@@ -1620,22 +1620,9 @@ function QuestionView() {
 function BulkReviewScreen() {
   const { questions, answers, flagged, cancelReview, complete, restartCurrentSession } = useAdvancedExamStore();
   const [submitOpen, setSubmitOpen] = useState(false);
-  // Options are hidden by default on this screen -- it lists all 60
-  // questions on one page, so a single screenshot here would leak far
-  // more of the bank than one question at a time. Expand per-question,
-  // as needed, only when actually double-checking an answer.
-  const [expandedIdx, setExpandedIdx] = useState<Set<number>>(new Set());
   const { showTabWarning, showResetWarning, isFullscreen, flashBlackout } = useCaptureDeterrent({
     onSevereViolation: restartCurrentSession,
   });
-
-  const toggleExpanded = (idx: number) => {
-    setExpandedIdx((prev) => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx); else next.add(idx);
-      return next;
-    });
-  };
 
   const answeredCount = answers.filter((a) => a !== null).length;
   const totalCount = questions.length;
@@ -1778,79 +1765,9 @@ function BulkReviewScreen() {
                     </HStack>
                   </HStack>
 
-                  <Text fontSize="sm" color="brand.700" fontWeight={600} mb={4} lineHeight={1.5}>
+                  <Text fontSize="sm" color="brand.700" fontWeight={600} lineHeight={1.5}>
                     {q.text}
                   </Text>
-
-                  {expandedIdx.has(i) ? (
-                    <VStack gap={2} align="stretch">
-                      {q.options.map((opt, oi) => {
-                        const isUserAnswer = userAnswer === oi;
-                        return (
-                          <HStack
-                            key={oi}
-                            p={2.5}
-                            borderRadius="lg"
-                            bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
-                            border="1px solid"
-                            borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
-                            gap={3}
-                          >
-                            <Box
-                              w="20px" h="20px" borderRadius="md" border="1px solid"
-                              borderColor={isUserAnswer ? 'brand.500' : 'border'}
-                              bg={isUserAnswer ? 'brand.600' : 'transparent'}
-                              display="flex" alignItems="center" justifyContent="center" flexShrink={0}
-                              color={isUserAnswer ? 'white' : 'gray.400'}
-                              fontFamily="mono" fontSize="2xs" fontWeight={700}
-                            >
-                              {OPTION_LABELS[oi]}
-                            </Box>
-                            <Text fontSize="xs" color={isUserAnswer ? 'brand.700' : 'gray.600'} fontWeight={isUserAnswer ? 600 : 500} flex={1} lineHeight={1.4}>
-                              {opt}
-                            </Text>
-                            {isUserAnswer && (
-                              <Badge size="sm" bg="brand.600" color="white" borderRadius="md" px={2} py={0.5} fontSize="3xs" fontWeight={700} fontFamily="mono">
-                                SELECTED
-                              </Badge>
-                            )}
-                          </HStack>
-                        );
-                      })}
-                      <Box
-                        as="button"
-                        onClick={() => toggleExpanded(i)}
-                        fontSize="2xs"
-                        fontWeight={700}
-                        fontFamily="mono"
-                        color="gray.400"
-                        textAlign="center"
-                        py={1}
-                        _hover={{ color: 'brand.500' }}
-                      >
-                        Hide options
-                      </Box>
-                    </VStack>
-                  ) : (
-                    <HStack
-                      as="button"
-                      onClick={() => toggleExpanded(i)}
-                      w="100%"
-                      p={2.5}
-                      borderRadius="lg"
-                      border="1px dashed"
-                      borderColor="border"
-                      justify="space-between"
-                      _hover={{ borderColor: 'brand.400', bg: 'rgba(57,73,171,0.03)' }}
-                    >
-                      <Text fontSize="xs" color="gray.500" fontWeight={600}>
-                        {isUnanswered ? 'No answer selected' : `You selected option ${OPTION_LABELS[userAnswer as number]}`}
-                      </Text>
-                      <Text fontSize="2xs" color="brand.500" fontWeight={700} fontFamily="mono">
-                        SHOW OPTIONS
-                      </Text>
-                    </HStack>
-                  )}
                 </Box>
               );
             })}
