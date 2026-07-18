@@ -958,18 +958,22 @@ function QuestionView() {
       <AnimatePresence>
         {showCaptureWarning && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
             style={{
               position: 'fixed',
               top: 16,
-              left: '50%',
-              transform: 'translateX(-50%)',
+              left: 0,
+              right: 0,
               zIndex: 10000,
+              display: 'flex',
+              justifyContent: 'center',
             }}
           >
+            <motion.div
+              initial={{ opacity: 0, y: -20, x: 0 }}
+              animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, x: { duration: 0.4, ease: 'easeInOut' } }}
+            >
             <Box
               px={5}
               py={3}
@@ -979,6 +983,7 @@ function QuestionView() {
               boxShadow="0 8px 24px rgba(0,0,0,0.25)"
               display="flex"
               alignItems="center"
+              justifyContent="center"
               gap={2.5}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -990,6 +995,7 @@ function QuestionView() {
                 Screen capture / tab switch detected — returned to Question 1
               </Text>
             </Box>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
