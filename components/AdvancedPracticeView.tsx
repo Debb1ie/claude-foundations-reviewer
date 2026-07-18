@@ -874,6 +874,8 @@ function QuestionView() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const [questionSeconds, setQuestionSeconds] = useState(0);
+  const questionIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const [showTabWarning, setShowTabWarning] = useState(false);
   const [showResetWarning, setShowResetWarning] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(true);
@@ -959,6 +961,19 @@ function QuestionView() {
     }, 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPaused, complete]);
+
+  // Live "time on this question" stopwatch -- resets whenever the current
+  // question changes, so the learner can see their own pace in real time
+  // (not just the overall countdown), matching the per-question floors
+  // used for the fast-completion flag on the results screen.
+  useEffect(() => {
+    setQuestionSeconds(0);
+    if (isPaused) return;
+    questionIntervalRef.current = setInterval(() => {
+      setQuestionSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => { if (questionIntervalRef.current) clearInterval(questionIntervalRef.current); };
+  }, [currentQuestion, isPaused]);
 
   const timerHours = Math.floor(secondsLeft / 3600);
   const timerMinutes = Math.floor((secondsLeft % 3600) / 60);
@@ -1422,6 +1437,34 @@ function QuestionView() {
                     {timerDisplay}
                   </Text>
                 )}
+              </HStack>
+
+              {/* Live time-on-this-question stopwatch, resets per question */}
+              <HStack
+                gap={1.5}
+                px={3}
+                py={1}
+                bg="rgba(148,163,184,0.1)"
+                borderRadius="md"
+                border="1px solid"
+                borderColor="rgba(148,163,184,0.2)"
+                _dark={{ bg: 'rgba(148,163,184,0.12)', borderColor: 'rgba(255,255,255,0.1)' }}
+              >
+                <Text fontFamily="mono" fontSize="2xs" color="gray.500" fontWeight={600}>
+                  THIS Q:
+                </Text>
+                <Text
+                  fontFamily="mono"
+                  fontSize="xs"
+                  fontWeight={700}
+                  color={
+                    questionSeconds > FAST_ANSWER_FLOOR_SECONDS[q.difficulty]
+                      ? 'gray.600'
+                      : 'orange.500'
+                  }
+                >
+                  {Math.floor(questionSeconds / 60)}:{(questionSeconds % 60).toString().padStart(2, '0')}
+                </Text>
               </HStack>
             </HStack>
             <HStack gap={3}>
