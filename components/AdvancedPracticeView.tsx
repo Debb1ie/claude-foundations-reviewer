@@ -786,7 +786,7 @@ function QuestionView() {
   const {
     questions, currentQuestion, answers, flagged,
     setAnswer, nextQuestion, prevQuestion, goToQuestion,
-    toggleFlag, complete, startReview,
+    toggleFlag, complete, startReview, restartCurrentSession,
   } = useAdvancedExamStore();
 
   const [isPaused, setIsPaused] = useState(false);
@@ -794,9 +794,11 @@ function QuestionView() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const [showCaptureWarning, setShowCaptureWarning] = useState(false);
+  const [showTabWarning, setShowTabWarning] = useState(false);
+  const [showResetWarning, setShowResetWarning] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(true);
-  const captureCooldownRef = React.useRef(false);
+  const tabWarningCooldownRef = React.useRef(false);
+  const resetCooldownRef = React.useRef(false);
 
   // Try to enter fullscreen as soon as the question view mounts, in case
   // the learner landed here without going through the "Start Advanced
@@ -808,33 +810,42 @@ function QuestionView() {
     requestAppFullscreen();
   }, []);
 
-  // Best-effort screenshot/screen-capture deterrent: this cannot actually
-  // block OS-level screenshot tools or third-party capture extensions, but
-  // it reacts to the signals a capture attempt usually produces -- the
-  // PrintScreen key, the window losing focus, or leaving fullscreen -- by
-  // sending the learner back to question 1 (answers are preserved) and
-  // flagging it.
+  // Two different responses to two different signals. Tab-switching,
+  // PrintScreen, and losing window focus are only ever a warning -- these
+  // are common enough (a notification, alt-tabbing to check something)
+  // that punishing them would mostly hit false positives. Leaving
+  // fullscreen is the one signal that actually indicates someone opened a
+  // side panel / another app deliberately, so that's where the real
+  // penalty -- wiping answers and restarting from question 1 -- lives.
   useEffect(() => {
-    const triggerCaptureViolation = () => {
-      if (captureCooldownRef.current) return;
-      captureCooldownRef.current = true;
-      setShowCaptureWarning(true);
-      goToQuestion(0);
-      setTimeout(() => setShowCaptureWarning(false), 4000);
-      setTimeout(() => { captureCooldownRef.current = false; }, 4000);
+    const triggerTabWarning = () => {
+      if (tabWarningCooldownRef.current) return;
+      tabWarningCooldownRef.current = true;
+      setShowTabWarning(true);
+      setTimeout(() => setShowTabWarning(false), 4000);
+      setTimeout(() => { tabWarningCooldownRef.current = false; }, 4000);
+    };
+
+    const triggerFullReset = () => {
+      if (resetCooldownRef.current) return;
+      resetCooldownRef.current = true;
+      setShowResetWarning(true);
+      restartCurrentSession();
+      setTimeout(() => setShowResetWarning(false), 5000);
+      setTimeout(() => { resetCooldownRef.current = false; }, 5000);
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'PrintScreen') triggerCaptureViolation();
+      if (e.key === 'PrintScreen') triggerTabWarning();
     };
-    const handleBlur = () => triggerCaptureViolation();
+    const handleBlur = () => triggerTabWarning();
     const handleVisibilityChange = () => {
-      if (document.hidden) triggerCaptureViolation();
+      if (document.hidden) triggerTabWarning();
     };
     const handleFullscreenChange = () => {
       const fs = isAppFullscreen();
       setIsFullscreen(fs);
-      if (!fs) triggerCaptureViolation();
+      if (!fs) triggerFullReset();
     };
 
     window.addEventListener('keyup', handleKeyUp);
@@ -849,7 +860,7 @@ function QuestionView() {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
     };
-  }, [goToQuestion]);
+  }, [restartCurrentSession]);
 
   useEffect(() => {
     if (isPaused) {
@@ -976,9 +987,9 @@ function QuestionView() {
       onCut={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >
-      {/* Screenshot / tab-switch capture warning */}
+      {/* Mild warning: tab switch / PrintScreen / window blur -- no penalty */}
       <AnimatePresence>
-        {showCaptureWarning && (
+        {showTabWarning && (
           <motion.div
             style={{
               position: 'fixed',
@@ -996,27 +1007,73 @@ function QuestionView() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2, x: { duration: 0.4, ease: 'easeInOut' } }}
             >
-            <Box
-              px={5}
-              py={3}
-              borderRadius="xl"
-              bg="red.600"
-              color="white"
-              boxShadow="0 8px 24px rgba(0,0,0,0.25)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={2.5}
+              <Box
+                px={5}
+                py={3}
+                borderRadius="xl"
+                bg="orange.500"
+                color="white"
+                boxShadow="0 8px 24px rgba(0,0,0,0.25)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap={2.5}
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <Text fontSize="sm" fontWeight={700}>
+                  Tab switch / screen capture detected — stay on this tab
+                </Text>
+              </Box>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Severe warning: fullscreen exited -- full penalty, session restarted */}
+      <AnimatePresence>
+        {showResetWarning && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: 16,
+              left: 0,
+              right: 0,
+              zIndex: 10000,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20, x: 0 }}
+              animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, x: { duration: 0.4, ease: 'easeInOut' } }}
             >
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-              <Text fontSize="sm" fontWeight={700}>
-                Screen capture / tab switch detected — returned to Question 1
-              </Text>
-            </Box>
+              <Box
+                px={5}
+                py={3}
+                borderRadius="xl"
+                bg="red.600"
+                color="white"
+                boxShadow="0 8px 24px rgba(0,0,0,0.25)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap={2.5}
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <Text fontSize="sm" fontWeight={700}>
+                  Fullscreen exited — progress reset, starting over from Question 1
+                </Text>
+              </Box>
             </motion.div>
           </motion.div>
         )}

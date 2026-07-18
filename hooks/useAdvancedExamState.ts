@@ -40,6 +40,7 @@ interface AdvancedExamStore {
   cancelReview: () => void;
   complete: () => void;
   reset: () => void;
+  restartCurrentSession: () => void;
 
   getScore: () => { correct: number; total: number; pct: number };
 }
@@ -180,6 +181,17 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           isReviewing: false,
           startTime: null,
           endTime: null,
+          flagged: new Array(TOTAL_QUESTIONS).fill(false),
+        });
+      },
+
+      // Wipes answers/flags and returns to question 1, but keeps the same
+      // question set and stays on the exam page -- used to penalize
+      // leaving fullscreen, without kicking the learner back to the menu.
+      restartCurrentSession: () => {
+        set({
+          currentQuestion: 0,
+          answers: new Array(TOTAL_QUESTIONS).fill(null),
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
         });
       },
