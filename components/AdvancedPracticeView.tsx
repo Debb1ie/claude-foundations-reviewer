@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
+import { requestAppFullscreen, isAppFullscreen } from '@/lib/fullscreen';
 
 const DOMAIN_NAMES: Record<string, string> = {
   D1: 'Agentic Architecture',
@@ -794,13 +795,25 @@ function QuestionView() {
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const [showCaptureWarning, setShowCaptureWarning] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true);
   const captureCooldownRef = React.useRef(false);
+
+  // Try to enter fullscreen as soon as the question view mounts, in case
+  // the learner landed here without going through the "Start Advanced
+  // Practice" button (e.g. resuming a session). Fullscreen hides browser
+  // chrome -- the address bar, extension toolbar, and most side panels --
+  // which is what makes an extension side panel like an AI assistant
+  // harder to have open alongside the exam.
+  useEffect(() => {
+    requestAppFullscreen();
+  }, []);
 
   // Best-effort screenshot/screen-capture deterrent: this cannot actually
   // block OS-level screenshot tools or third-party capture extensions, but
-  // it reacts to the two signals a capture attempt usually produces --
-  // the PrintScreen key, and the window losing focus -- by sending the
-  // learner back to question 1 (answers are preserved) and flagging it.
+  // it reacts to the signals a capture attempt usually produces -- the
+  // PrintScreen key, the window losing focus, or leaving fullscreen -- by
+  // sending the learner back to question 1 (answers are preserved) and
+  // flagging it.
   useEffect(() => {
     const triggerCaptureViolation = () => {
       if (captureCooldownRef.current) return;
@@ -818,14 +831,23 @@ function QuestionView() {
     const handleVisibilityChange = () => {
       if (document.hidden) triggerCaptureViolation();
     };
+    const handleFullscreenChange = () => {
+      const fs = isAppFullscreen();
+      setIsFullscreen(fs);
+      if (!fs) triggerCaptureViolation();
+    };
 
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('blur', handleBlur);
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     return () => {
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
     };
   }, [goToQuestion]);
 
@@ -996,6 +1018,41 @@ function QuestionView() {
               </Text>
             </Box>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Not-in-fullscreen prompt: re-entering fullscreen requires a fresh
+          user gesture, so this gives the learner a one-click way back in
+          instead of leaving them stuck after a violation reset. */}
+      <AnimatePresence>
+        {!isFullscreen && !isPaused && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              bottom: 20,
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              size="sm"
+              bg="gray.800"
+              color="white"
+              fontWeight={700}
+              borderRadius="full"
+              boxShadow="0 8px 24px rgba(0,0,0,0.3)"
+              _hover={{ bg: 'gray.900' }}
+              onClick={() => requestAppFullscreen()}
+            >
+              Not in fullscreen — click to re-enter
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
