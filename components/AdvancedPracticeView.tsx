@@ -316,8 +316,17 @@ function StartScreen({ onStart }: { onStart: () => void }) {
 
 type ReviewFilter = 'all' | 'correct' | 'incorrect' | 'flagged';
 
+// Plausible minimum reading+reasoning time per difficulty tier. Below
+// this floor, a correct answer is much more likely to be copied from
+// somewhere than actually worked out -- these questions are dense,
+// multi-paragraph scenarios, not quick recall lookups.
+const FAST_ANSWER_FLOOR_SECONDS: Record<'2x' | '3x', number> = {
+  '2x': 45,
+  '3x': 90,
+};
+
 function ResultsScreen({ onReset }: { onReset: () => void }) {
-  const { getScore, questions, answers, flagged, startTime, endTime } = useAdvancedExamStore();
+  const { getScore, questions, answers, flagged, startTime, endTime, questionTimeSpent } = useAdvancedExamStore();
   const { correct, total, pct } = getScore();
   const scaledScore = Math.round(100 + (pct / 100) * 900);
   const passed = scaledScore >= 720;
@@ -334,6 +343,17 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
     const secs = timeTakenSeconds % 60;
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
   })();
+
+  // Self-check flag, not a punishment: an answered question completed
+  // faster than the plausible reading floor for its difficulty tier.
+  const answeredIdx = answers.map((a, i) => (a !== null ? i : -1)).filter((i) => i !== -1);
+  const fastAnswered = answeredIdx.filter((i) => {
+    const floor = FAST_ANSWER_FLOOR_SECONDS[questions[i].difficulty];
+    const seconds = (questionTimeSpent[i] ?? 0) / 1000;
+    return seconds < floor;
+  });
+  const fastPct = answeredIdx.length > 0 ? fastAnswered.length / answeredIdx.length : 0;
+  const showFastFlag = correct >= 50 && answeredIdx.length >= 20 && fastPct > 0.5;
 
   const filteredEntries = questions
     .map((q, idx) => ({ q, idx }))
@@ -456,6 +476,35 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 Restart Simulator
               </Button>
             </Box>
+
+            {showFastFlag && (
+              <Box
+                p={5}
+                bg="rgba(234,179,8,0.08)"
+                border="1px solid rgba(234,179,8,0.3)"
+                borderRadius="xl"
+                _dark={{ bg: 'rgba(234,179,8,0.1)', borderColor: 'rgba(234,179,8,0.3)' }}
+              >
+                <HStack align="flex-start" gap={3}>
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="#a16207" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <VStack align="stretch" gap={1}>
+                    <Text fontSize="sm" fontWeight={700} color="yellow.800" _dark={{ color: 'yellow.200' }}>
+                      Unusually fast completion for this score
+                    </Text>
+                    <Text fontSize="xs" color="yellow.700" lineHeight={1.5} _dark={{ color: 'yellow.300' }}>
+                      {Math.round(fastPct * 100)}% of the questions you answered were completed faster than the
+                      expected reading time for their difficulty (45s for standard questions, 90s for the harder
+                      tier). This isn't a penalty -- just a self-check: these are dense, multi-paragraph scenarios,
+                      so a score like this at this pace is worth a second look at whether every question was
+                      actually read in full.
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+            )}
 
             <Box
               p={6}
@@ -638,6 +687,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                     )}
                     {filteredEntries.map(({ q, idx }) => {
                       const userAns = answers[idx];
+                      const isSkipped = userAns === null;
                       const isCorrectQ = userAns === q.correctAnswer;
                       return (
                         <Box
@@ -645,12 +695,12 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                           p={5}
                           borderRadius="xl"
                           border="1px solid"
-                          borderColor={isCorrectQ ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.25)'}
-                          bg={isCorrectQ ? 'rgba(34,197,94,0.04)' : 'rgba(239,68,68,0.04)'}
+                          borderColor={isSkipped ? 'rgba(148,163,184,0.35)' : isCorrectQ ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.25)'}
+                          bg={isSkipped ? 'rgba(148,163,184,0.06)' : isCorrectQ ? 'rgba(34,197,94,0.04)' : 'rgba(239,68,68,0.04)'}
                           backdropFilter="blur(8px)"
                           _dark={{
-                            bg: isCorrectQ ? 'rgba(34,197,94,0.07)' : 'rgba(239,68,68,0.07)',
-                            borderColor: isCorrectQ ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.2)',
+                            bg: isSkipped ? 'rgba(148,163,184,0.08)' : isCorrectQ ? 'rgba(34,197,94,0.07)' : 'rgba(239,68,68,0.07)',
+                            borderColor: isSkipped ? 'rgba(148,163,184,0.3)' : isCorrectQ ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.2)',
                           }}
                         >
                           <HStack gap={2} mb={3} flexWrap="wrap">
@@ -665,12 +715,12 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                               px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
                               {q.domain}
                             </Badge>
-                            <Text fontSize="xs" fontWeight={700} color={isCorrectQ ? 'green.600' : 'red.500'}>
-                              {isCorrectQ ? '✓ Correct' : '✗ Incorrect'}
+                            <Text fontSize="xs" fontWeight={700} color={isSkipped ? 'gray.500' : isCorrectQ ? 'green.600' : 'red.500'}>
+                              {isSkipped ? '○ Skipped' : isCorrectQ ? '✓ Correct' : '✗ Incorrect'}
                             </Text>
-                            {!isCorrectQ && (
+                            {!isCorrectQ && !isSkipped && (
                               <Text fontSize="xs" color="gray.500">
-                                Your answer: {userAns !== null ? OPTION_LABELS[userAns] : 'Skipped'} · Correct: {OPTION_LABELS[q.correctAnswer]}
+                                Your answer: {OPTION_LABELS[userAns]} · Correct: {OPTION_LABELS[q.correctAnswer]}
                               </Text>
                             )}
                           </HStack>
@@ -680,6 +730,34 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                             {q.text}
                           </Text>
 
+                          {isSkipped ? (
+                            <>
+                              <VStack gap={1.5} align="stretch" mb={3}>
+                                {q.options.map((opt, oidx) => (
+                                  <HStack key={oidx} gap={2} p={2.5} borderRadius="lg" border="1px solid" borderColor="transparent">
+                                    <Text fontSize="xs" fontWeight={800} fontFamily="mono" color="gray.400" minW={4}>
+                                      {OPTION_LABELS[oidx]}
+                                    </Text>
+                                    <Text fontSize="xs" color="gray.700" lineHeight="tall" flex={1} _dark={{ color: 'gray.300' }}>
+                                      {opt}
+                                    </Text>
+                                  </HStack>
+                                ))}
+                              </VStack>
+                              <Box
+                                p={3}
+                                bg="rgba(148,163,184,0.08)"
+                                borderRadius="lg"
+                                borderLeft="3px solid rgba(148,163,184,0.4)"
+                                _dark={{ bg: 'rgba(148,163,184,0.1)', borderColor: 'rgba(148,163,184,0.4)' }}
+                              >
+                                <Text fontSize="xs" color="gray.500" lineHeight="tall">
+                                  You didn't answer this one, so the correct answer and explanation stay hidden — attempt it in a future session to see them.
+                                </Text>
+                              </Box>
+                            </>
+                          ) : (
+                          <>
                           <VStack gap={1.5} align="stretch" mb={3}>
                             {q.options.map((opt, oidx) => {
                               const isCorrectOpt = oidx === q.correctAnswer;
@@ -759,6 +837,8 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                               </Box>
                             )}
                           </Box>
+                          </>
+                          )}
                         </Box>
                       );
                     })}

@@ -29,6 +29,9 @@ interface AdvancedExamStore {
   startTime: number | null;
   endTime: number | null;
   flagged: boolean[];
+  /** Milliseconds spent on each question index -- used to flag suspiciously
+   *  fast completion (see checkFastAnswerFlag in the Results screen). */
+  questionTimeSpent: number[];
 
   start: () => void;
   setAnswer: (answer: number) => void;
@@ -81,6 +84,25 @@ function shuffleOptions(q: AdvancedQuestion): AdvancedQuestion {
   };
 }
 
+// Wall-clock timestamp of when the learner landed on the currently-active
+// question. Deliberately kept outside the persisted store: it's a
+// transient bookkeeping value, not exam state, and a mid-session page
+// refresh simply restarts the clock for whichever question is current --
+// erring toward under- rather than over-counting elapsed time.
+let questionEnteredAt = Date.now();
+
+function recordElapsed(
+  get: () => AdvancedExamStore,
+  set: (partial: Partial<AdvancedExamStore>) => void
+) {
+  const { currentQuestion, questionTimeSpent } = get();
+  const now = Date.now();
+  const updated = [...questionTimeSpent];
+  updated[currentQuestion] = (updated[currentQuestion] || 0) + (now - questionEnteredAt);
+  set({ questionTimeSpent: updated });
+  questionEnteredAt = now;
+}
+
 const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
 export const TOTAL_QUESTIONS = Object.values(targetPerDomain).reduce((a, b) => a + b, 0);
 
@@ -110,8 +132,10 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       startTime: null,
       endTime: null,
       flagged: new Array(TOTAL_QUESTIONS).fill(false),
+      questionTimeSpent: new Array(TOTAL_QUESTIONS).fill(0),
 
       start: () => {
+        questionEnteredAt = Date.now();
         set({
           questions: buildSession(),
           currentQuestion: 0,
@@ -122,6 +146,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           startTime: Date.now(),
           endTime: null,
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
+          questionTimeSpent: new Array(TOTAL_QUESTIONS).fill(0),
         });
       },
 
@@ -135,6 +160,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       goToQuestion: (index) => {
         const { questions } = get();
         if (index >= 0 && index < questions.length) {
+          recordElapsed(get, set);
           set({ currentQuestion: index });
         }
       },
@@ -142,6 +168,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       nextQuestion: () => {
         const { currentQuestion, questions } = get();
         if (currentQuestion < questions.length - 1) {
+          recordElapsed(get, set);
           set({ currentQuestion: currentQuestion + 1 });
         }
       },
@@ -149,6 +176,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       prevQuestion: () => {
         const { currentQuestion } = get();
         if (currentQuestion > 0) {
+          recordElapsed(get, set);
           set({ currentQuestion: currentQuestion - 1 });
         }
       },
@@ -169,6 +197,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       },
 
       complete: () => {
+        recordElapsed(get, set);
         set({ isComplete: true, isReviewing: false, endTime: Date.now() });
       },
 
@@ -182,6 +211,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
           startTime: null,
           endTime: null,
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
+          questionTimeSpent: new Array(TOTAL_QUESTIONS).fill(0),
         });
       },
 
@@ -189,10 +219,12 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       // question set and stays on the exam page -- used to penalize
       // leaving fullscreen, without kicking the learner back to the menu.
       restartCurrentSession: () => {
+        questionEnteredAt = Date.now();
         set({
           currentQuestion: 0,
           answers: new Array(TOTAL_QUESTIONS).fill(null),
           flagged: new Array(TOTAL_QUESTIONS).fill(false),
+          questionTimeSpent: new Array(TOTAL_QUESTIONS).fill(0),
         });
       },
 
@@ -219,6 +251,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
         startTime: state.startTime,
         endTime: state.endTime,
         flagged: state.flagged,
+        questionTimeSpent: state.questionTimeSpent,
       }),
     }
   )
