@@ -90,6 +90,14 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
   const [selectedMode, setSelectedMode] = React.useState<'exam' | 'review' | 'zen' | 'focus' | null>(null);
   const [selectedDomain, setSelectedDomain] = React.useState<Domain | null>(null);
   const [examTimed, setExamTimed] = React.useState<boolean>(true);
+  const [showAdvancedWarning, setShowAdvancedWarning] = React.useState(false);
+
+  const beginAdvancedPractice = () => {
+    setShowAdvancedWarning(false);
+    requestAppFullscreen();
+    useAdvancedExamStore.getState().start();
+    router.push('/advanced');
+  };
 
   return (
     <Box bg="transparent" minH="100vh">
@@ -477,11 +485,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         borderRadius="lg"
                         _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
                         transition="all 0.2s"
-                        onClick={() => {
-                          requestAppFullscreen();
-                          useAdvancedExamStore.getState().start();
-                          router.push('/advanced');
-                        }}
+                        onClick={() => setShowAdvancedWarning(true)}
                       >
                         Start Advanced Practice
                       </Button>
@@ -609,6 +613,73 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
           </VStack>
         </motion.div>
       </Container>
+
+      {/* Advanced Practice rules warning, shown before the session starts */}
+      <AnimatePresence>
+        {showAdvancedWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(10,14,40,0.72)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '24px',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 16 }}
+              transition={{ duration: 0.22 }}
+              style={{ width: '100%', maxWidth: '480px' }}
+            >
+              <Box
+                bg="rgba(255,255,255,0.97)"
+                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                borderRadius="2xl"
+                border="1px solid rgba(255,255,255,0.35)"
+                boxShadow="0 24px 64px rgba(10,14,40,0.35)"
+                overflow="hidden"
+                p={[6, 7]}
+              >
+                <Heading size="md" fontWeight={800} color="brand.700" mb={1} _dark={{ color: 'gray.100' }}>
+                  Before you start
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mb={5}>
+                  Advanced Practice enforces a few rules to make your score mean something:
+                </Text>
+                <VStack align="stretch" gap={3} mb={6}>
+                  {[
+                    'This runs in fullscreen. Leaving fullscreen wipes your answers and restarts you from Question 1.',
+                    'Switching tabs, alt-tabbing, or taking a screenshot triggers a warning banner.',
+                    'Each question has its own time limit -- 60s for standard questions, 105s for the harder tier. When it runs out, the question is skipped automatically, answered or not.',
+                    'The review screen hides answer options and correct answers for anything you skip -- you only see what you actually attempted.',
+                  ].map((line, i) => (
+                    <HStack key={i} align="flex-start" gap={2.5}>
+                      <Box w="6px" h="6px" borderRadius="full" bg="brand.500" mt="7px" flexShrink={0} />
+                      <Text fontSize="sm" color="gray.700" _dark={{ color: 'gray.300' }} lineHeight={1.5}>
+                        {line}
+                      </Text>
+                    </HStack>
+                  ))}
+                </VStack>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                  <Button variant="outline" size="sm" onClick={() => setShowAdvancedWarning(false)} fontWeight={600} color="gray.700" _dark={{ color: 'gray.300' }}>
+                    Cancel
+                  </Button>
+                  <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={beginAdvancedPractice} fontWeight={700}>
+                    I Understand — Start
+                  </Button>
+                </HStack>
+              </Box>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Box>
   );
 }

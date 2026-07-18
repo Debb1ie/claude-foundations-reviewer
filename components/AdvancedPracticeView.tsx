@@ -326,6 +326,15 @@ const FAST_ANSWER_FLOOR_SECONDS: Record<'2x' | '3x', number> = {
   '3x': 90,
 };
 
+// Hard per-question time limit -- the upper end of the expected reading
+// window. Once reached, the question auto-advances (skips), answered or
+// not, so lingering on one question to go look something up costs the
+// question rather than just costing time.
+const PER_QUESTION_TIME_LIMIT_SECONDS: Record<'2x' | '3x', number> = {
+  '2x': 60,
+  '3x': 105,
+};
+
 function ResultsScreen({ onReset }: { onReset: () => void }) {
   const { getScore, questions, answers, flagged, startTime, endTime, questionTimeSpent } = useAdvancedExamStore();
   const { correct, total, pct } = getScore();
@@ -876,6 +885,7 @@ function QuestionView() {
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const [questionSeconds, setQuestionSeconds] = useState(0);
+  const [showSkipNotice, setShowSkipNotice] = useState(false);
   const questionIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const { showTabWarning, showResetWarning, isFullscreen, flashBlackout } = useCaptureDeterrent({
     onSevereViolation: restartCurrentSession,
@@ -902,15 +912,33 @@ function QuestionView() {
   // Live "time on this question" stopwatch -- resets whenever the current
   // question changes, so the learner can see their own pace in real time
   // (not just the overall countdown), matching the per-question floors
-  // used for the fast-completion flag on the results screen.
+  // used for the fast-completion flag on the results screen. Once it
+  // reaches the hard per-question limit, the question auto-advances --
+  // answered or not -- rather than letting someone sit on one question
+  // indefinitely.
   useEffect(() => {
     setQuestionSeconds(0);
     if (isPaused) return;
+    const limit = PER_QUESTION_TIME_LIMIT_SECONDS[questions[currentQuestion].difficulty];
+    const isLastQuestion = currentQuestion === questions.length - 1;
     questionIntervalRef.current = setInterval(() => {
-      setQuestionSeconds((prev) => prev + 1);
+      setQuestionSeconds((prev) => {
+        const next = prev + 1;
+        if (next >= limit) {
+          if (questionIntervalRef.current) clearInterval(questionIntervalRef.current);
+          setShowSkipNotice(true);
+          setTimeout(() => setShowSkipNotice(false), 3000);
+          if (isLastQuestion) {
+            startReview();
+          } else {
+            nextQuestion();
+          }
+        }
+        return next;
+      });
     }, 1000);
     return () => { if (questionIntervalRef.current) clearInterval(questionIntervalRef.current); };
-  }, [currentQuestion, isPaused]);
+  }, [currentQuestion, isPaused, questions, nextQuestion, startReview]);
 
   const timerHours = Math.floor(secondsLeft / 3600);
   const timerMinutes = Math.floor((secondsLeft % 3600) / 60);
@@ -1026,6 +1054,30 @@ function QuestionView() {
         flashBlackout={flashBlackout}
         hideFullscreenPrompt={isPaused}
       />
+
+      {/* Per-question time limit reached -- auto-advanced */}
+      <AnimatePresence>
+        {showSkipNotice && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            style={{ position: 'fixed', top: 16, left: 0, right: 0, zIndex: 10000, display: 'flex', justifyContent: 'center' }}
+          >
+            <Box px={5} py={3} borderRadius="xl" bg="gray.700" color="white" boxShadow="0 8px 24px rgba(0,0,0,0.25)"
+              display="flex" alignItems="center" justifyContent="center" gap={2.5}>
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <Text fontSize="sm" fontWeight={700}>
+                Time&apos;s up for this question — moved to the next one
+              </Text>
+            </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Pause overlay */}
       <AnimatePresence>
@@ -1276,12 +1328,16 @@ function QuestionView() {
                   fontSize="xs"
                   fontWeight={700}
                   color={
-                    questionSeconds > FAST_ANSWER_FLOOR_SECONDS[q.difficulty]
+                    questionSeconds >= PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] - 10
+                      ? 'red.500'
+                      : questionSeconds > FAST_ANSWER_FLOOR_SECONDS[q.difficulty]
                       ? 'gray.600'
                       : 'orange.500'
                   }
                 >
                   {Math.floor(questionSeconds / 60)}:{(questionSeconds % 60).toString().padStart(2, '0')}
+                  {' / '}
+                  {Math.floor(PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] / 60)}:{(PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] % 60).toString().padStart(2, '0')}
                 </Text>
               </HStack>
             </HStack>
