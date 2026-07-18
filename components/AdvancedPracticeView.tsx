@@ -17,7 +17,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
-import { requestAppFullscreen, isAppFullscreen } from '@/lib/fullscreen';
+import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
+import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
 
 const DOMAIN_NAMES: Record<string, string> = {
   D1: 'Agentic Architecture',
@@ -876,73 +877,9 @@ function QuestionView() {
   const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const [questionSeconds, setQuestionSeconds] = useState(0);
   const questionIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const [showTabWarning, setShowTabWarning] = useState(false);
-  const [showResetWarning, setShowResetWarning] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(true);
-  const tabWarningCooldownRef = React.useRef(false);
-  const resetCooldownRef = React.useRef(false);
-
-  // Try to enter fullscreen as soon as the question view mounts, in case
-  // the learner landed here without going through the "Start Advanced
-  // Practice" button (e.g. resuming a session). Fullscreen hides browser
-  // chrome -- the address bar, extension toolbar, and most side panels --
-  // which is what makes an extension side panel like an AI assistant
-  // harder to have open alongside the exam.
-  useEffect(() => {
-    requestAppFullscreen();
-  }, []);
-
-  // Two different responses to two different signals. Tab-switching,
-  // PrintScreen, and losing window focus are only ever a warning -- these
-  // are common enough (a notification, alt-tabbing to check something)
-  // that punishing them would mostly hit false positives. Leaving
-  // fullscreen is the one signal that actually indicates someone opened a
-  // side panel / another app deliberately, so that's where the real
-  // penalty -- wiping answers and restarting from question 1 -- lives.
-  useEffect(() => {
-    const triggerTabWarning = () => {
-      if (tabWarningCooldownRef.current) return;
-      tabWarningCooldownRef.current = true;
-      setShowTabWarning(true);
-      setTimeout(() => setShowTabWarning(false), 4000);
-      setTimeout(() => { tabWarningCooldownRef.current = false; }, 4000);
-    };
-
-    const triggerFullReset = () => {
-      if (resetCooldownRef.current) return;
-      resetCooldownRef.current = true;
-      setShowResetWarning(true);
-      restartCurrentSession();
-      setTimeout(() => setShowResetWarning(false), 5000);
-      setTimeout(() => { resetCooldownRef.current = false; }, 5000);
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'PrintScreen') triggerTabWarning();
-    };
-    const handleBlur = () => triggerTabWarning();
-    const handleVisibilityChange = () => {
-      if (document.hidden) triggerTabWarning();
-    };
-    const handleFullscreenChange = () => {
-      const fs = isAppFullscreen();
-      setIsFullscreen(fs);
-      if (!fs) triggerFullReset();
-    };
-
-    window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    return () => {
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-    };
-  }, [restartCurrentSession]);
+  const { showTabWarning, showResetWarning, isFullscreen, flashBlackout } = useCaptureDeterrent({
+    onSevereViolation: restartCurrentSession,
+  });
 
   useEffect(() => {
     if (isPaused) {
@@ -1082,132 +1019,13 @@ function QuestionView() {
       onCut={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >
-      {/* Mild warning: tab switch / PrintScreen / window blur -- no penalty */}
-      <AnimatePresence>
-        {showTabWarning && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              top: 16,
-              left: 0,
-              right: 0,
-              zIndex: 10000,
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -20, x: 0 }}
-              animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2, x: { duration: 0.4, ease: 'easeInOut' } }}
-            >
-              <Box
-                px={5}
-                py={3}
-                borderRadius="xl"
-                bg="orange.500"
-                color="white"
-                boxShadow="0 8px 24px rgba(0,0,0,0.25)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                gap={2.5}
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <Text fontSize="sm" fontWeight={700}>
-                  Tab switch / screen capture detected — stay on this tab
-                </Text>
-              </Box>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Severe warning: fullscreen exited -- full penalty, session restarted */}
-      <AnimatePresence>
-        {showResetWarning && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              top: 16,
-              left: 0,
-              right: 0,
-              zIndex: 10000,
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -20, x: 0 }}
-              animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2, x: { duration: 0.4, ease: 'easeInOut' } }}
-            >
-              <Box
-                px={5}
-                py={3}
-                borderRadius="xl"
-                bg="red.600"
-                color="white"
-                boxShadow="0 8px 24px rgba(0,0,0,0.25)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                gap={2.5}
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <Text fontSize="sm" fontWeight={700}>
-                  Fullscreen exited — progress reset, starting over from Question 1
-                </Text>
-              </Box>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Not-in-fullscreen prompt: re-entering fullscreen requires a fresh
-          user gesture, so this gives the learner a one-click way back in
-          instead of leaving them stuck after a violation reset. */}
-      <AnimatePresence>
-        {!isFullscreen && !isPaused && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              bottom: 20,
-              left: 0,
-              right: 0,
-              zIndex: 9999,
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <Button
-              size="sm"
-              bg="gray.800"
-              color="white"
-              fontWeight={700}
-              borderRadius="full"
-              boxShadow="0 8px 24px rgba(0,0,0,0.3)"
-              _hover={{ bg: 'gray.900' }}
-              onClick={() => requestAppFullscreen()}
-            >
-              Not in fullscreen — click to re-enter
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <CaptureDeterrentOverlay
+        showTabWarning={showTabWarning}
+        showResetWarning={showResetWarning}
+        isFullscreen={isFullscreen}
+        flashBlackout={flashBlackout}
+        hideFullscreenPrompt={isPaused}
+      />
 
       {/* Pause overlay */}
       <AnimatePresence>
@@ -1800,8 +1618,24 @@ function QuestionView() {
 }
 
 function BulkReviewScreen() {
-  const { questions, answers, flagged, cancelReview, complete } = useAdvancedExamStore();
+  const { questions, answers, flagged, cancelReview, complete, restartCurrentSession } = useAdvancedExamStore();
   const [submitOpen, setSubmitOpen] = useState(false);
+  // Options are hidden by default on this screen -- it lists all 60
+  // questions on one page, so a single screenshot here would leak far
+  // more of the bank than one question at a time. Expand per-question,
+  // as needed, only when actually double-checking an answer.
+  const [expandedIdx, setExpandedIdx] = useState<Set<number>>(new Set());
+  const { showTabWarning, showResetWarning, isFullscreen, flashBlackout } = useCaptureDeterrent({
+    onSevereViolation: restartCurrentSession,
+  });
+
+  const toggleExpanded = (idx: number) => {
+    setExpandedIdx((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
+  };
 
   const answeredCount = answers.filter((a) => a !== null).length;
   const totalCount = questions.length;
@@ -1823,6 +1657,13 @@ function BulkReviewScreen() {
       onCut={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >
+      <CaptureDeterrentOverlay
+        showTabWarning={showTabWarning}
+        showResetWarning={showResetWarning}
+        isFullscreen={isFullscreen}
+        flashBlackout={flashBlackout}
+      />
+
       {/* Header */}
       <Box
         borderBottom="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
@@ -1941,41 +1782,75 @@ function BulkReviewScreen() {
                     {q.text}
                   </Text>
 
-                  <VStack gap={2} align="stretch">
-                    {q.options.map((opt, oi) => {
-                      const isUserAnswer = userAnswer === oi;
-                      return (
-                        <HStack
-                          key={oi}
-                          p={2.5}
-                          borderRadius="lg"
-                          bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
-                          border="1px solid"
-                          borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
-                          gap={3}
-                        >
-                          <Box
-                            w="20px" h="20px" borderRadius="md" border="1px solid"
-                            borderColor={isUserAnswer ? 'brand.500' : 'border'}
-                            bg={isUserAnswer ? 'brand.600' : 'transparent'}
-                            display="flex" alignItems="center" justifyContent="center" flexShrink={0}
-                            color={isUserAnswer ? 'white' : 'gray.400'}
-                            fontFamily="mono" fontSize="2xs" fontWeight={700}
+                  {expandedIdx.has(i) ? (
+                    <VStack gap={2} align="stretch">
+                      {q.options.map((opt, oi) => {
+                        const isUserAnswer = userAnswer === oi;
+                        return (
+                          <HStack
+                            key={oi}
+                            p={2.5}
+                            borderRadius="lg"
+                            bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
+                            border="1px solid"
+                            borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
+                            gap={3}
                           >
-                            {OPTION_LABELS[oi]}
-                          </Box>
-                          <Text fontSize="xs" color={isUserAnswer ? 'brand.700' : 'gray.600'} fontWeight={isUserAnswer ? 600 : 500} flex={1} lineHeight={1.4}>
-                            {opt}
-                          </Text>
-                          {isUserAnswer && (
-                            <Badge size="sm" bg="brand.600" color="white" borderRadius="md" px={2} py={0.5} fontSize="3xs" fontWeight={700} fontFamily="mono">
-                              SELECTED
-                            </Badge>
-                          )}
-                        </HStack>
-                      );
-                    })}
-                  </VStack>
+                            <Box
+                              w="20px" h="20px" borderRadius="md" border="1px solid"
+                              borderColor={isUserAnswer ? 'brand.500' : 'border'}
+                              bg={isUserAnswer ? 'brand.600' : 'transparent'}
+                              display="flex" alignItems="center" justifyContent="center" flexShrink={0}
+                              color={isUserAnswer ? 'white' : 'gray.400'}
+                              fontFamily="mono" fontSize="2xs" fontWeight={700}
+                            >
+                              {OPTION_LABELS[oi]}
+                            </Box>
+                            <Text fontSize="xs" color={isUserAnswer ? 'brand.700' : 'gray.600'} fontWeight={isUserAnswer ? 600 : 500} flex={1} lineHeight={1.4}>
+                              {opt}
+                            </Text>
+                            {isUserAnswer && (
+                              <Badge size="sm" bg="brand.600" color="white" borderRadius="md" px={2} py={0.5} fontSize="3xs" fontWeight={700} fontFamily="mono">
+                                SELECTED
+                              </Badge>
+                            )}
+                          </HStack>
+                        );
+                      })}
+                      <Box
+                        as="button"
+                        onClick={() => toggleExpanded(i)}
+                        fontSize="2xs"
+                        fontWeight={700}
+                        fontFamily="mono"
+                        color="gray.400"
+                        textAlign="center"
+                        py={1}
+                        _hover={{ color: 'brand.500' }}
+                      >
+                        Hide options
+                      </Box>
+                    </VStack>
+                  ) : (
+                    <HStack
+                      as="button"
+                      onClick={() => toggleExpanded(i)}
+                      w="100%"
+                      p={2.5}
+                      borderRadius="lg"
+                      border="1px dashed"
+                      borderColor="border"
+                      justify="space-between"
+                      _hover={{ borderColor: 'brand.400', bg: 'rgba(57,73,171,0.03)' }}
+                    >
+                      <Text fontSize="xs" color="gray.500" fontWeight={600}>
+                        {isUnanswered ? 'No answer selected' : `You selected option ${OPTION_LABELS[userAnswer as number]}`}
+                      </Text>
+                      <Text fontSize="2xs" color="brand.500" fontWeight={700} fontFamily="mono">
+                        SHOW OPTIONS
+                      </Text>
+                    </HStack>
+                  )}
                 </Box>
               );
             })}
