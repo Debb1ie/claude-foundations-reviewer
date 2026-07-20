@@ -16,11 +16,14 @@ import NextLink from 'next/link';
 import { useExamStore } from '@/hooks/useExamState';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { getActiveCertification } from '@/lib/certifications';
+
+const cert = getActiveCertification();
 
 const QUICK_RESOURCES = [
   {
     label: 'Official Docs',
-    title: 'CCA-F Exam Guide',
+    title: `${cert.shortName} Exam Guide`,
     description: 'Official PDF covering all exam domains, weights, and format.',
     url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
     icon: 'pdf',

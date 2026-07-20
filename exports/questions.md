@@ -1,11 +1,11 @@
 # CCA-F Question Bank
-> Claude Certified Architect — Foundations Exam
-> Exported on 2026-07-16
+> Claude Certified Architect – Foundations Exam
+> Exported on 2026-07-20
 > Total Questions: 125
 
 ---
 
-## D1: Agentic Architecture & Orchestration (33 questions)
+## agentic-architecture: Agentic Architecture & Orchestration (33 questions)
 
 ### q001 — Task 1.1
 
@@ -799,7 +799,7 @@ D. All subagents should share access to a common centralized tool pool to maximi
 
 ---
 
-## D2: Tool Design & MCP Integration (23 questions)
+## tool-design-mcp: Tool Design & MCP Integration (23 questions)
 
 ### q017 — Task 2.1
 
@@ -1353,7 +1353,7 @@ D. **[✓]** Use SSE transport to enable the MCP server to communicate with clie
 
 ---
 
-## D3: Claude Code Configuration & Workflows (24 questions)
+## claude-code: Claude Code Configuration & Workflows (24 questions)
 
 ### q028 — Task 3.1
 
@@ -1931,7 +1931,7 @@ D. Embed the required custom logic directly into each individual tool's implemen
 
 ---
 
-## D4: Prompt Engineering & Structured Output (26 questions)
+## prompt-engineering: Prompt Engineering & Structured Output (26 questions)
 
 ### q040 — Task 4.1
 
@@ -2557,7 +2557,7 @@ D. **[✓]** Report all functional bugs and security vulnerabilities identified 
 
 ---
 
-## D5: Context Management & Reliability (19 questions)
+## context-management: Context Management & Reliability (19 questions)
 
 ### q052 — Task 5.1
 

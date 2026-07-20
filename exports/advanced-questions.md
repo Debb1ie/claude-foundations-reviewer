@@ -1,6 +1,6 @@
 # Advanced Practice Question Bank
-> Claude Certified Architect — Foundations Exam (Advanced Practice mode)
-> Exported on 2026-07-17
+> Claude Certified Architect – Foundations Exam (Advanced Practice mode)
+> Exported on 2026-07-20
 > Total Questions: 132
 
 ---

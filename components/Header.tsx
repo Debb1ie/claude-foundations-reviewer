@@ -4,6 +4,9 @@ import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Box, Container, HStack, Heading, Link, Flex, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getActiveCertification } from '@/lib/certifications';
+
+const cert = getActiveCertification();
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
@@ -41,7 +44,7 @@ export function Header() {
           <HStack gap={3}>
             <Link as={NextLink} href="/home" _hover={{ textDecoration: 'none' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
               <Heading as="h1" size={{ base: 'sm', md: 'md' }} fontWeight={600} color="brand.700" lineHeight="1.3">
-                Claude Certified Architect Exam Simulator
+                {cert.fullName} Exam Simulator
               </Heading>
             </Link>
           </HStack>

@@ -5,13 +5,12 @@ const questions = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'data', 'advanced-questions.json'), 'utf-8')
 );
 
-const DOMAIN_NAMES = {
-  'agentic-architecture': 'Agentic Architecture & Orchestration',
-  'tool-design-mcp': 'Tool Design & MCP Integration',
-  'claude-code': 'Claude Code Configuration & Workflows',
-  'prompt-engineering': 'Prompt Engineering & Structured Output',
-  'context-management': 'Context Management & Reliability',
-};
+const cert = require(path.join(__dirname, '..', 'data', 'certifications', 'cca-f', 'config.json'));
+
+const DOMAIN_NAMES = {};
+for (const d of cert.domains) {
+  DOMAIN_NAMES[d.id] = d.name;
+}
 
 const grouped = {};
 for (const q of questions) {
@@ -20,7 +19,7 @@ for (const q of questions) {
 }
 
 let md = `# Advanced Practice Question Bank
-> Claude Certified Architect — Foundations Exam (Advanced Practice mode)
+> ${cert.fullName} Exam (Advanced Practice mode)
 > Exported on ${new Date().toISOString().split('T')[0]}
 > Total Questions: ${questions.length}
 

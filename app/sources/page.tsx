@@ -13,6 +13,9 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { getActiveCertification } from '@/lib/certifications';
+
+const cert = getActiveCertification();
 
 const PARTNER_LINKS = [
   {
@@ -37,8 +40,8 @@ const PARTNER_LINKS = [
 
 const SOURCES = [
   {
-    title: 'Claude Certified Architect – Foundations Exam Guide',
-    description: 'The official comprehensive PDF guide detailing the scope, format, and topics covered in the CCA-F certification exam.',
+    title: `${cert.fullName} Exam Guide`,
+    description: `The official comprehensive PDF guide detailing the scope, format, and topics covered in the ${cert.shortName} certification exam.`,
     url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
     category: 'Official Docs'
   },
@@ -80,7 +83,7 @@ const SOURCES = [
   },
   {
     title: 'Claude Certifications Exam Guide (Unofficial)',
-    description: 'An unofficial guide to help you prepare for the Claude Certified Architect certification.',
+    description: `An unofficial guide to help you prepare for the ${cert.fullName} certification.`,
     url: 'https://claudecertifications.com/claude-certified-architect/exam-guide',
     category: 'Community Resources'
   }
@@ -96,7 +99,7 @@ export default function SourcesPage() {
               Study Resources
             </Heading>
             <Text color="gray.600" fontSize="lg" lineHeight="tall">
-              A curated collection of official documentation, guides, and courses to help you prepare for the Claude Certified Architect Foundations exam.
+              A curated collection of official documentation, guides, and courses to help you prepare for the {cert.fullName} exam.
             </Text>
           </Box>
 

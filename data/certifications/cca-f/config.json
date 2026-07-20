@@ -1,0 +1,96 @@
+{
+  "id": "cca-f",
+  "fullName": "Claude Certified Architect – Foundations",
+  "shortName": "CCA-F",
+  "description": "Practice exam platform for the Claude Certified Architect Foundations (CCA-F) certification",
+
+  "domains": [
+    {
+      "id": "agentic-architecture",
+      "name": "Agentic Architecture & Orchestration",
+      "shortName": "Agentic Arch.",
+      "weight": 27,
+      "color": "#7C6EFA",
+      "textColor": { "_light": "#3f51b5", "_dark": "#9f92ec" },
+      "badgeBg": { "_light": "rgba(124, 110, 250, 0.08)", "_dark": "rgba(124, 110, 250, 0.15)" },
+      "badgeBorder": { "_light": "rgba(124, 110, 250, 0.22)", "_dark": "rgba(124, 110, 250, 0.3)" },
+      "solidBg": "#5C4EFA",
+      "solidText": "#ffffff"
+    },
+    {
+      "id": "tool-design-mcp",
+      "name": "Tool Design & MCP Integration",
+      "shortName": "Tool/MCP",
+      "weight": 18,
+      "color": "#FA8C6E",
+      "textColor": { "_light": "#c83b14", "_dark": "#fa9a80" },
+      "badgeBg": { "_light": "rgba(250, 140, 110, 0.08)", "_dark": "rgba(250, 140, 110, 0.15)" },
+      "badgeBorder": { "_light": "rgba(250, 140, 110, 0.22)", "_dark": "rgba(250, 140, 110, 0.3)" },
+      "solidBg": "#F25C37",
+      "solidText": "#ffffff"
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code Configuration & Workflows",
+      "shortName": "Claude Code",
+      "weight": 20,
+      "color": "#6ECFFA",
+      "textColor": { "_light": "#006c8c", "_dark": "#85d7fa" },
+      "badgeBg": { "_light": "rgba(110, 207, 250, 0.09)", "_dark": "rgba(110, 207, 250, 0.15)" },
+      "badgeBorder": { "_light": "rgba(110, 207, 250, 0.26)", "_dark": "rgba(110, 207, 250, 0.35)" },
+      "solidBg": "#00B4D8",
+      "solidText": "#ffffff"
+    },
+    {
+      "id": "prompt-engineering",
+      "name": "Prompt Engineering & Structured Output",
+      "shortName": "Prompt Eng.",
+      "weight": 20,
+      "color": "#F0D06E",
+      "textColor": { "_light": "#805b00", "_dark": "#f3db8b" },
+      "badgeBg": { "_light": "rgba(240, 208, 110, 0.09)", "_dark": "rgba(240, 208, 110, 0.15)" },
+      "badgeBorder": { "_light": "rgba(240, 208, 110, 0.26)", "_dark": "rgba(240, 208, 110, 0.35)" },
+      "solidBg": "#E5A900",
+      "solidText": "#0f172a"
+    },
+    {
+      "id": "context-management",
+      "name": "Context Management & Reliability",
+      "shortName": "Context Mgmt.",
+      "weight": 15,
+      "color": "#A06EFA",
+      "textColor": { "_light": "#6f2bc8", "_dark": "#b996fb" },
+      "badgeBg": { "_light": "rgba(160, 110, 250, 0.08)", "_dark": "rgba(160, 110, 250, 0.15)" },
+      "badgeBorder": { "_light": "rgba(160, 110, 250, 0.22)", "_dark": "rgba(160, 110, 250, 0.3)" },
+      "solidBg": "#904EFA",
+      "solidText": "#ffffff"
+    }
+  ],
+
+  "passThreshold": 720,
+
+  "examMode": {
+    "durationSeconds": 7200,
+    "focusDurationSeconds": 3600,
+    "domainTargets": {
+      "agentic-architecture": 16,
+      "tool-design-mcp": 11,
+      "claude-code": 12,
+      "prompt-engineering": 12,
+      "context-management": 9
+    },
+    "questionsFile": "data/questions.json"
+  },
+
+  "advancedMode": {
+    "durationSeconds": 7200,
+    "domainTargets": {
+      "agentic-architecture": 15,
+      "tool-design-mcp": 9,
+      "claude-code": 12,
+      "prompt-engineering": 12,
+      "context-management": 12
+    },
+    "questionsFile": "data/advanced-questions.json"
+  }
+}

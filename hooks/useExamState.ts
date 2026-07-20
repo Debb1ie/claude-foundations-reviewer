@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Question, ExamMode, Domain, ExamResults } from '@/types/exam';
 import { DOMAINS, isAnswerCorrect } from '@/types/exam';
 import questionsData from '@/data/questions.json';
+import { getActiveCertification } from '@/lib/certifications';
 
 interface ExamStore {
   questions: Question[];
@@ -45,17 +46,17 @@ function shuffleArray<T>(arr: T[]): T[] {
   return shuffled;
 }
 
-const EXAM_DURATION = 120 * 60;
-const FOCUS_DURATION = 60 * 60;
+const cert = getActiveCertification();
+
+const EXAM_DURATION = cert.examMode.durationSeconds;
+const FOCUS_DURATION = cert.examMode.focusDurationSeconds;
 
 const typedQuestions = questionsData as Question[];
 
-const EXAM_DOMAIN_TARGETS: Record<Domain, number> = {
-  D1: 16, D2: 11, D3: 12, D4: 12, D5: 9,
-};
+const EXAM_DOMAIN_TARGETS: Record<Domain, number> = cert.examMode.domainTargets;
 
 function pickQuestionsForExam(): Question[] {
-  const domains = ['D1', 'D2', 'D3', 'D4', 'D5'] as Domain[];
+  const domains = DOMAINS.map((d) => d.id);
   const result: Question[] = [];
   for (const domain of domains) {
     const pool = typedQuestions.filter((q) => q.domain === domain);
@@ -210,7 +211,7 @@ export const useExamStore = create<ExamStore>()(
     const unanswered = questions.filter((_, i) => answers[i] === null).length;
     const pct = Math.round((correctCount / totalQuestions) * 100);
     const scaledScore = Math.round(100 + (pct / 100) * 900);
-    const passed = scaledScore >= 720;
+    const passed = scaledScore >= cert.passThreshold;
 
     const domainBreakdown: Record<string, { correct: number; total: number }> = {};
     DOMAINS.forEach((d) => {

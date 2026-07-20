@@ -1,3 +1,6 @@
+import type { DomainId } from '@/types/certification';
+import { getActiveCertification } from '@/lib/certifications';
+
 export interface Question {
   id: string;
   text: string;
@@ -28,7 +31,12 @@ export function isAnswerCorrect(q: Question, userAnswer: number | number[] | nul
   return typeof userAnswer === 'number' && userAnswer === q.correctAnswer;
 }
 
-export type Domain = 'D1' | 'D2' | 'D3' | 'D4' | 'D5';
+// Domain is now a plain string id (kebab-case slug, e.g. 'agentic-architecture')
+// sourced from the active certification's config, rather than a hardcoded
+// 'D1'-'D5' union. Kept as a named type (instead of switching every call
+// site to DomainId directly) so existing imports of `Domain` don't need to
+// change.
+export type Domain = DomainId;
 
 export interface DomainInfo {
   id: Domain;
@@ -38,53 +46,27 @@ export interface DomainInfo {
   color: string;
 }
 
-export const DOMAINS: DomainInfo[] = [
-  { id: 'D1', name: 'Agentic Architecture & Orchestration', shortName: 'Agentic Arch.', weight: 27, color: '#7C6EFA' },
-  { id: 'D2', name: 'Tool Design & MCP Integration', shortName: 'Tool/MCP', weight: 18, color: '#FA8C6E' },
-  { id: 'D3', name: 'Claude Code Configuration & Workflows', shortName: 'Claude Code', weight: 20, color: '#6ECFFA' },
-  { id: 'D4', name: 'Prompt Engineering & Structured Output', shortName: 'Prompt Eng.', weight: 20, color: '#F0D06E' },
-  { id: 'D5', name: 'Context Management & Reliability', shortName: 'Context Mgmt.', weight: 15, color: '#A06EFA' },
-];
+const activeCert = getActiveCertification();
 
-export const DOMAIN_TEXT_COLORS: Record<Domain, { _light: string; _dark: string }> = {
-  D1: { _light: '#3f51b5', _dark: '#9f92ec' }, // Deep Indigo / Soft Purple
-  D2: { _light: '#c83b14', _dark: '#fa9a80' }, // Vivid Coral / Soft Coral
-  D3: { _light: '#006c8c', _dark: '#85d7fa' }, // Deep Cyan / Soft Blue
-  D4: { _light: '#805b00', _dark: '#f3db8b' }, // Dark Gold / Soft Gold
-  D5: { _light: '#6f2bc8', _dark: '#b996fb' }, // Deep Purple / Soft Violet
-};
+export const DOMAINS: DomainInfo[] = activeCert.domains.map((d) => ({
+  id: d.id,
+  name: d.name,
+  shortName: d.shortName,
+  weight: d.weight,
+  color: d.color,
+}));
 
-export const DOMAIN_BADGE_BGS: Record<Domain, { _light: string; _dark: string }> = {
-  D1: { _light: 'rgba(124, 110, 250, 0.08)', _dark: 'rgba(124, 110, 250, 0.15)' },
-  D2: { _light: 'rgba(250, 140, 110, 0.08)', _dark: 'rgba(250, 140, 110, 0.15)' },
-  D3: { _light: 'rgba(110, 207, 250, 0.09)', _dark: 'rgba(110, 207, 250, 0.15)' },
-  D4: { _light: 'rgba(240, 208, 110, 0.09)', _dark: 'rgba(240, 208, 110, 0.15)' },
-  D5: { _light: 'rgba(160, 110, 250, 0.08)', _dark: 'rgba(160, 110, 250, 0.15)' },
-};
+function domainRecord<T>(pick: (d: (typeof activeCert.domains)[number]) => T): Record<Domain, T> {
+  const record: Record<string, T> = {};
+  activeCert.domains.forEach((d) => { record[d.id] = pick(d); });
+  return record;
+}
 
-export const DOMAIN_BADGE_BORDERS: Record<Domain, { _light: string; _dark: string }> = {
-  D1: { _light: 'rgba(124, 110, 250, 0.22)', _dark: 'rgba(124, 110, 250, 0.3)' },
-  D2: { _light: 'rgba(250, 140, 110, 0.22)', _dark: 'rgba(250, 140, 110, 0.3)' },
-  D3: { _light: 'rgba(110, 207, 250, 0.26)', _dark: 'rgba(110, 207, 250, 0.35)' },
-  D4: { _light: 'rgba(240, 208, 110, 0.26)', _dark: 'rgba(240, 208, 110, 0.35)' },
-  D5: { _light: 'rgba(160, 110, 250, 0.22)', _dark: 'rgba(160, 110, 250, 0.3)' },
-};
-
-export const DOMAIN_SOLID_BGS: Record<Domain, string> = {
-  D1: '#5C4EFA', // Vibrant Indigo
-  D2: '#F25C37', // Vibrant Coral/Orange
-  D3: '#00B4D8', // Vibrant Cyan/Blue
-  D4: '#E5A900', // Vibrant Gold/Yellow
-  D5: '#904EFA', // Vibrant Purple
-};
-
-export const DOMAIN_SOLID_TEXT: Record<Domain, string> = {
-  D1: '#ffffff',
-  D2: '#ffffff',
-  D3: '#ffffff',
-  D4: '#0f172a', // Slate-900 for dark gold contrast
-  D5: '#ffffff',
-};
+export const DOMAIN_TEXT_COLORS: Record<Domain, { _light: string; _dark: string }> = domainRecord((d) => d.textColor);
+export const DOMAIN_BADGE_BGS: Record<Domain, { _light: string; _dark: string }> = domainRecord((d) => d.badgeBg);
+export const DOMAIN_BADGE_BORDERS: Record<Domain, { _light: string; _dark: string }> = domainRecord((d) => d.badgeBorder);
+export const DOMAIN_SOLID_BGS: Record<Domain, string> = domainRecord((d) => d.solidBg);
+export const DOMAIN_SOLID_TEXT: Record<Domain, string> = domainRecord((d) => d.solidText);
 
 export type ExamMode = 'exam' | 'review' | 'zen' | 'focus';
 

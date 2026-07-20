@@ -2,11 +2,14 @@ import type { Metadata } from 'next';
 import { Providers } from '@/components/Providers';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { Header } from '@/components/Header';
+import { getActiveCertification } from '@/lib/certifications';
 import './globals.css';
 
+const cert = getActiveCertification();
+
 export const metadata: Metadata = {
-  title: 'CCA-F Exam Platform | Claude Certified Architect',
-  description: 'Practice exam platform for the Claude Certified Architect Foundations (CCA-F) certification',
+  title: `${cert.shortName} Exam Platform | ${cert.fullName}`,
+  description: cert.description,
 };
 
 export default function RootLayout({

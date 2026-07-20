@@ -5,21 +5,14 @@ const questions = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'data', 'questions.json'), 'utf-8')
 );
 
-const DOMAIN_NAMES = {
-  D1: 'Agentic Architecture & Orchestration',
-  D2: 'Tool Design & MCP Integration',
-  D3: 'Claude Code Configuration & Workflows',
-  D4: 'Prompt Engineering & Structured Output',
-  D5: 'Context Management & Reliability',
-};
+const cert = require(path.join(__dirname, '..', 'data', 'certifications', 'cca-f', 'config.json'));
 
-const DOMAIN_COLORS = {
-  D1: '#7C6EFA',
-  D2: '#FA8C6E',
-  D3: '#6ECFFA',
-  D4: '#F0D06E',
-  D5: '#A06EFA',
-};
+const DOMAIN_NAMES = {};
+const DOMAIN_COLORS = {};
+for (const d of cert.domains) {
+  DOMAIN_NAMES[d.id] = d.name;
+  DOMAIN_COLORS[d.id] = d.color;
+}
 
 const grouped = {};
 for (const q of questions) {
@@ -27,8 +20,8 @@ for (const q of questions) {
   grouped[q.domain].push(q);
 }
 
-let md = `# CCA-F Question Bank
-> Claude Certified Architect — Foundations Exam
+let md = `# ${cert.shortName} Question Bank
+> ${cert.fullName} Exam
 > Exported on ${new Date().toISOString().split('T')[0]}
 > Total Questions: ${questions.length}
 
@@ -73,7 +66,7 @@ let html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CCA-F Question Bank</title>
+<title>${cert.shortName} Question Bank</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -153,8 +146,8 @@ let html = `<!DOCTYPE html>
 </head>
 <body>
 <div class="container">
-  <h1>CCA-F Question Bank</h1>
-  <p class="meta">Claude Certified Architect — Foundations Exam &middot; ${questions.length} questions &middot; Exported ${new Date().toISOString().split('T')[0]}</p>
+  <h1>${cert.shortName} Question Bank</h1>
+  <p class="meta">${cert.fullName} Exam &middot; ${questions.length} questions &middot; Exported ${new Date().toISOString().split('T')[0]}</p>
 `;
 
 for (const [domain, qs] of Object.entries(grouped)) {

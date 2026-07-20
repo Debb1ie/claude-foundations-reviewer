@@ -14,6 +14,9 @@ import {
 } from '@chakra-ui/react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { requestAppFullscreen } from '@/lib/fullscreen';
+import { getActiveCertification } from '@/lib/certifications';
+
+const cert = getActiveCertification();
 import { useExamStore } from '@/hooks/useExamState';
 import { useAdvancedExamStore } from '@/hooks/useAdvancedExamState';
 import { useRouter } from 'next/navigation';
@@ -114,7 +117,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   Claude you Ace?
                 </Heading>
                 <Text color="gray.600" fontSize="lg" lineHeight="tall">
-                  Select your practice mode below to begin studying for the Claude Certified Architect Foundations exam.
+                  Select your practice mode below to begin studying for the {cert.fullName} exam.
                 </Text>
               </Box>
             </motion.div>

@@ -19,21 +19,20 @@ import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
 import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
+import { getActiveCertification } from '@/lib/certifications';
 
+const activeCertification = getActiveCertification();
+
+// Compact display labels for this view's grid/badge UI -- shorter than
+// DOMAINS[].name, distinct from DOMAINS[].shortName. Keyed directly by
+// domain id (slug) now that both question banks share one domain
+// taxonomy; no more D1-D5 translation needed.
 const DOMAIN_NAMES: Record<string, string> = {
-  D1: 'Agentic Architecture',
-  D2: 'Tool Design & MCP',
-  D3: 'Claude Code',
-  D4: 'Prompt Engineering',
-  D5: 'Context Management',
-};
-
-const DOMAIN_STRING_TO_KEY: Record<string, 'D1' | 'D2' | 'D3' | 'D4' | 'D5'> = {
-  'agentic-architecture': 'D1',
-  'tool-design-mcp': 'D2',
-  'claude-code': 'D3',
-  'prompt-engineering': 'D4',
-  'context-management': 'D5',
+  'agentic-architecture': 'Agentic Architecture',
+  'tool-design-mcp': 'Tool Design & MCP',
+  'claude-code': 'Claude Code',
+  'prompt-engineering': 'Prompt Engineering',
+  'context-management': 'Context Management',
 };
 
 const DIFFICULTY_COLORS = {
@@ -46,7 +45,7 @@ const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 const QUICK_RESOURCES = [
   {
     label: 'Official Docs',
-    title: 'CCA-F Exam Guide',
+    title: `${activeCertification.shortName} Exam Guide`,
     description: 'Official PDF covering all exam domains, weights, and format.',
     url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
   },
@@ -221,7 +220,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 Advanced Practice
               </Badge>
               <Heading as="h1" size="2xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-                CCA-F Advanced Practice
+                {activeCertification.shortName} Advanced Practice
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
                 60 scenario-based questions covering all 5 exam domains.
@@ -339,7 +338,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
   const { getScore, questions, answers, flagged, startTime, endTime, questionTimeSpent } = useAdvancedExamStore();
   const { correct, total, pct } = getScore();
   const scaledScore = Math.round(100 + (pct / 100) * 900);
-  const passed = scaledScore >= 720;
+  const passed = scaledScore >= activeCertification.passThreshold;
   const [showReview, setShowReview] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
   const [activeSource, setActiveSource] = useState<AdvancedQuestion | null>(null);
@@ -383,7 +382,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
   ];
 
   const domainBreakdown = DOMAINS.map((d) => {
-    const qs = questions.filter((q) => (DOMAIN_STRING_TO_KEY[q.domain] ?? q.domain) === d.id);
+    const qs = questions.filter((q) => q.domain === d.id);
     const correctCount = qs.filter((q) => {
       const idx = questions.indexOf(q);
       return answers[idx] === q.correctAnswer;
@@ -721,7 +720,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                             >
                               Q{q.number}
                             </Badge>
-                            <Badge bg={DOMAIN_SOLID_BGS[DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1']} color={DOMAIN_SOLID_TEXT[DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1']}
+                            <Badge bg={DOMAIN_SOLID_BGS[q.domain]} color={DOMAIN_SOLID_TEXT[q.domain]}
                               px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
                               {q.domain}
                             </Badge>
@@ -947,7 +946,7 @@ function QuestionView() {
   const timerIsLow = secondsLeft < 300 && secondsLeft > 0;
 
   const q: AdvancedQuestion = questions[currentQuestion];
-  const domainKey = DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1';
+  const domainKey = q.domain;
   const userAnswer = answers[currentQuestion];
   const isFlagged = flagged[currentQuestion];
   const answered = userAnswer !== null;
@@ -1768,7 +1767,7 @@ function BulkReviewScreen() {
           {/* Questions checklist */}
           <VStack gap={4} align="stretch">
             {questions.map((q, i) => {
-              const domainKey = DOMAIN_STRING_TO_KEY[q.domain] ?? 'D1';
+              const domainKey = q.domain;
               const userAnswer = answers[i];
               const isFlaggedQ = flagged[i];
               const isUnanswered = userAnswer === null;

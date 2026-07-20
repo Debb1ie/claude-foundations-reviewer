@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import advancedQuestionsData from '@/data/advanced-questions.json';
+import type { DomainId } from '@/types/certification';
+import { getActiveCertification } from '@/lib/certifications';
 
 export interface AdvancedQuestion {
   id: string;
   number: number;
-  domain: 'D1' | 'D2' | 'D3' | 'D4' | 'D5';
+  domain: DomainId;
   difficulty: '2x' | '3x';
   text: string;
   options: string[];
@@ -48,16 +50,13 @@ interface AdvancedExamStore {
   getScore: () => { correct: number; total: number; pct: number };
 }
 
-export const TOTAL_SECONDS = 7200; // 2 hours max
+const cert = getActiveCertification();
 
-// Fixed per-domain question counts, summing to 60 (matches the real exam's ~2hr scope)
-const targetPerDomain: Record<string, number> = {
-  'agentic-architecture': 15,
-  'tool-design-mcp': 9,
-  'claude-code': 12,
-  'prompt-engineering': 12,
-  'context-management': 12,
-};
+export const TOTAL_SECONDS = cert.advancedMode.durationSeconds;
+
+// Per-domain question counts, summing to the mode's total (matches the
+// real exam's ~2hr scope). Sourced from the active certification config.
+const targetPerDomain: Record<string, number> = cert.advancedMode.domainTargets;
 
 // Fisher-Yates, generic.
 function shuffleArray<T>(items: T[]): T[] {

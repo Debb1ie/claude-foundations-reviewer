@@ -11,7 +11,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The correct approach is to check the <code>stop_reason</code> field in the API response. When <code>stop_reason</code> is <code>end_turn</code>, the model has finished and is not requesting any tool calls. When it is <code>tool_use</code>, the model is requesting to call a tool and the loop should continue. Fixed iteration counts or content length heuristics are brittle and do not reflect the model's actual state.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.1",
         "source": "Exam Guide §Task 1.1"
     },
@@ -27,7 +27,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Tool results must be appended as a <code>tool_result</code> content block within the user turn that follows the assistant message that issued the <code>tool_use</code>. This maintains the correct turn structure and allows the model to correlate the result with the specific tool call via its <code>tool_use_id</code>. Labeling it as an ad-hoc text-prefixed message instead of a proper <code>tool_result</code> block (as in the other options) breaks this structure and can confuse the model's understanding of who said what.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.2",
         "source": "Exam Guide §Task 1.2"
     },
@@ -43,7 +43,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Parallel subagent execution is achieved by issuing multiple <code>Task</code> tool calls in a single coordinator response. Each <code>Task</code> invocation spawns an independent subagent that runs concurrently. This is far more efficient than sequential execution when tasks have no dependencies. The coordinator should then collect and synthesize results after all parallel tasks complete.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.3",
         "source": "Exam Guide §Task 1.3"
     },
@@ -59,7 +59,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The anti-pattern is unconditionally routing every request through the billing agent first, regardless of what the request is actually about. A coordinator should use classification to direct requests only to relevant agents. Forcing every request through the billing agent as a mandatory first step creates unnecessary latency, token consumption, and potential error surface area for the 75% of requests that have nothing to do with billing. The correct approach is intent-based routing where the coordinator classifies the request and dispatches only to relevant agents.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.4",
         "source": "Exam Guide §Task 1.4"
     },
@@ -75,7 +75,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Context isolation between subagents is critical. The coordinator should explicitly pass relevant findings to the synthesis agent via the task description or tool call parameters. This maintains clean separation of concerns, prevents context pollution, and ensures each agent receives only the information it needs. Direct access to other agents' histories or shared mutable state creates coupling and can lead to context degradation.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.5",
         "source": "Exam Guide §Task 1.5"
     },
@@ -91,7 +91,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "For a coordinator to spawn subagents using the <code>Task</code> tool, that tool must be explicitly listed in the coordinator's <code>allowedTools</code> configuration. Without this, the coordinator's request to delegate is silently ignored or rejected. This is a common misconfiguration. The solution is to ensure the coordinator's tool configuration includes the <code>Task</code> tool.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.6",
         "source": "Exam Guide §Task 1.6"
     },
@@ -107,7 +107,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "A programmatic prerequisite gate (via a <code>PreToolUse</code> hook or validation layer) that checks compliance conditions before allowing financial operations is essential for PCI compliance. Relying solely on model instructions is insufficient for regulatory requirements. The gate should verify conditions like identity verification, amount limits, and audit logging requirements before allowing any financial tool execution.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.7",
         "source": "Exam Guide §Task 1.7"
     },
@@ -123,7 +123,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "A proper handoff summary must include: <strong>customer details</strong> (identity, account info), <strong>root cause</strong> (what led to the issue), <strong>actions taken</strong> (what has already been attempted or resolved), and <strong>commitments made</strong> (any promises or expectations set with the customer). This ensures the receiving team has full context without needing to re-read raw conversation logs, enabling efficient case continuation.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.8",
         "source": "Exam Guide §Task 1.8"
     },
@@ -139,7 +139,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "A <code>PostToolUse</code> hook is the correct mechanism for transforming tool results after execution. By normalizing timestamps in this hook, you ensure consistent formatting before results reach the model or downstream agents. This keeps formatting logic centralized and maintainable, rather than relying on individual agents to comply or performing ad-hoc conversions.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.9",
         "source": "Exam Guide §Task 1.9"
     },
@@ -155,7 +155,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "A <code>PreToolUse</code> hook is the correct interception mechanism. It runs before the tool executes, can inspect the tool parameters (like refund amount), and can block the call, redirect to an approval flow, or log the attempt. This provides a <strong>programmatic guard</strong> that cannot be bypassed by the model, unlike prompt instructions which the model might ignore or misinterpret.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.10",
         "source": "Exam Guide §Task 1.10"
     },
@@ -171,7 +171,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Dynamic decomposition is the correct pattern for open-ended investigation tasks. The agent should autonomously break down the vague request into concrete, actionable sub-tasks (e.g., 'check CPU usage', 'analyze query latency', 'review error rates'). This demonstrates <strong>proactive architectural judgment</strong> rather than requiring human clarification at every step. The decomposition should be explicit in the agent's reasoning so the user can see and validate the plan.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.11",
         "source": "Exam Guide §Task 1.11"
     },
@@ -187,7 +187,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "The correct pattern is <strong>per-file local analysis</strong> (examining each file individually for issues) followed by <strong>cross-file integration</strong> (identifying patterns, inconsistencies, and architectural concerns across files). This two-pass approach avoids context window overflow while still capturing system-level issues. Single-pass approaches lose cross-file context, and random sampling risks missing critical issues.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.12",
         "source": "Exam Guide §Task 1.12"
     },
@@ -203,7 +203,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Using <code>--resume</code> restores the previous session context, but the developer should explicitly inform the agent that the configuration file has changed. The agent can then re-read the file and adapt its understanding. Automatic detection of external file changes is not guaranteed, and starting a new session loses all progress. Explicit communication about changes is essential.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.13",
         "source": "Exam Guide §Task 1.13"
     },
@@ -219,7 +219,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<code>fork_session</code> is designed for exploring divergent approaches from the same baseline. It creates independent session branches that share the initial context but can diverge in different directions. This is ideal for architectural exploration where you want to compare multiple approaches without affecting the original session or losing the baseline context. Git branches alone do not capture the conversational context.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.14",
         "source": "Exam Guide §Task 1.14"
     },
@@ -235,7 +235,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Multi-concern requests should be decomposed into <strong>parallel investigations</strong>. Each concern (styling, rate limiting, connection pooling) can be investigated independently by separate subagents or focused analysis passes. After parallel investigation, the coordinator synthesizes findings into a unified implementation plan. This is far more efficient than sequential processing and reduces total time.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.15",
         "source": "Exam Guide §Task 1.15"
     },
@@ -251,7 +251,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Phase transition summarization</strong> is the correct pattern. Between major phases (discovery to deep-dive), the agent should produce a structured summary of findings and a clear plan for the next phase. This provides a <strong>checkpoint</strong> for the user to review, approve, or redirect before significant additional work begins. It balances autonomy with appropriate human oversight.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.16",
         "source": "Exam Guide §Task 1.16"
     },
@@ -267,7 +267,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The key is to <strong>expand tool descriptions</strong> to include detailed guidance on when and when not to use each tool. Descriptions should include concrete usage examples, clear differentiation from similar tools, and explicit exclusion criteria. Simply renaming tools does not help the model distinguish between them. Good descriptions act as documentation embedded in the tool definition.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.1",
         "source": "Exam Guide §Task 2.1"
     },
@@ -283,7 +283,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Each subagent should receive only the tools scoped to its specific domain. <strong>Scoped tool access</strong> per subagent prevents confusion, reduces the chance of calling the wrong tool, and keeps each agent focused on its responsibility. Giving every tool to every agent increases the cognitive load on the model and raises the risk of inappropriate tool selection.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.2",
         "source": "Exam Guide §Task 2.2"
     },
@@ -299,7 +299,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "Structured error responses with an <code>errorCategory</code> field enable the coordinator to apply appropriate recovery strategies: <strong>transient</strong> errors should be retried with backoff, <strong>validation</strong> errors should fix the input, and <strong>business</strong> errors should escalate to a human. Generic error messages deprive the coordinator of the context needed for intelligent recovery.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.3",
         "source": "Exam Guide §Task 2.3"
     },
@@ -315,7 +315,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Exponential backoff</strong> with a reasonable maximum delay and retry count is the standard pattern for transient errors. It starts with short delays and increases exponentially (e.g., 1s, 2s, 4s, 8s), giving the system time to recover while not overwhelming it with retries. Immediate retries in a tight loop can exacerbate the problem, and a single fixed-delay retry may not be sufficient.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.4",
         "source": "Exam Guide §Task 2.4"
     },
@@ -331,7 +331,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "A scoped cross-role tool (<code>verify_fact</code>) that is available only to the synthesis agent provides the precise capability needed without exposing unnecessary tools. This follows the <strong>principle of least privilege</strong>: each agent gets only the tools it needs. The synthesis agent needs verification ability but does not need raw search or analysis tools.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.5",
         "source": "Exam Guide §Task 2.5"
     },
@@ -347,7 +347,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "MCP server configuration follows a layering strategy: <code>.mcp.json</code> at the project root is shared via version control for team-wide tools, while <code>~/.claude.json</code> (or <code>~/.claude/settings.json</code>) contains personal additions. Settings are merged with project-level settings taking priority for shared config and user-level settings for personal additions.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.6",
         "source": "Exam Guide §Task 2.6"
     },
@@ -363,7 +363,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "To compete effectively with built-in tools, the MCP tool description must be enhanced to <strong>clearly articulate its advantages</strong>. Explain what it does better, what additional analysis it provides, and in what scenarios it should be preferred. The model selects tools based on descriptions, so a more informative description directly influences selection behavior.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.7",
         "source": "Exam Guide §Task 2.7"
     },
@@ -379,7 +379,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "The <code>Grep</code> tool is designed for searching file contents across a codebase. It performs regex pattern matching across files, which is exactly what this scenario requires. <code>Glob</code> matches file paths, not contents. <code>Read</code> can only handle individual files and would be extremely inefficient for a codebase of this size.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.8",
         "source": "Exam Guide §Task 2.8"
     },
@@ -395,7 +395,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The <code>Glob</code> tool is designed specifically for file path pattern matching. A glob pattern like <code>**/*.{test,spec}.ts</code> will efficiently match all test and spec files regardless of directory depth. <code>Grep</code> searches file <em>contents</em>, not paths, making it unsuitable for this task.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.9",
         "source": "Exam Guide §Task 2.9"
     },
@@ -411,7 +411,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "When Edit cannot find a unique match, the correct fallback is to use <strong>Read</strong> to read the portion of the file containing the target line, then use <strong>Write</strong> to rewrite the file with the change incorporated (or use Edit with expanded surrounding context to disambiguate). Write with the full file content ensures the change is made precisely where needed.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.10",
         "source": "Exam Guide §Task 2.10"
     },
@@ -427,7 +427,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "A <code>PostToolUse</code> hook can intercept tool results and <strong>filter excessive fields</strong> before the result is added to the conversation. This preserves context window space by eliminating irrelevant data. The hook runs after the tool executes but before the result is presented to the model, making it transparent and efficient.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.11",
         "source": "Exam Guide §Task 2.11"
     },
@@ -443,7 +443,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "The user-level <code>CLAUDE.md</code> (typically at <code>~/.claude/CLAUDE.md</code>) is <strong>not version-controlled</strong> and is intended for personal preferences. Team conventions belong in the project-level <code>CLAUDE.md</code> which is checked into version control. This layering allows individual customization without affecting the team standard.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.1",
         "source": "Exam Guide §Task 3.1"
     },
@@ -459,7 +459,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The <code>@import</code> syntax allows modular CLAUDE.md configuration by importing content from separate files (e.g., <code>@import ./style-guide.md</code>). This enables teams to maintain focused, independently-editable files that are composed together at load time. This improves maintainability, reduces merge conflicts, and follows good software modularity principles.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.2",
         "source": "Exam Guide §Task 3.2"
     },
@@ -475,7 +475,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Project-scoped commands should be placed in the <code>.claude/commands/</code> directory. Commands placed there become available to Claude Code within that project context. They can be invoked by name and support <strong>structured execution</strong> with defined inputs and outputs, making them more reliable than prompt-based command execution.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.3",
         "source": "Exam Guide §Task 3.3"
     },
@@ -491,7 +491,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "The <code>context: fork</code> frontmatter directive in a skill's configuration ensures each invocation creates an isolated session fork. This prevents context leakage between invocations, ensures clean state for each use, and maintains the main session's context uncontaminated by skill operations. It is the proper mechanism for output isolation.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.4",
         "source": "Exam Guide §Task 3.4"
     },
@@ -507,7 +507,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The <code>.claude/rules/</code> directory supports files with <strong>YAML frontmatter</strong> that specify path patterns. Rules are conditionally applied when the current file matches the specified paths. This is the correct mechanism for context-sensitive, conditional rules that activate only when relevant to the current task.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.5",
         "source": "Exam Guide §Task 3.5"
     },
@@ -523,7 +523,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "For simple, single-file changes with clearly bounded impact, <strong>direct execution</strong> is the most appropriate mode. Plan mode adds unnecessary overhead for trivial changes that do not require architectural analysis. The developer should match the execution mode to the complexity of the task.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.6",
         "source": "Exam Guide §Task 3.6"
     },
@@ -539,7 +539,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Plan mode</strong> is the correct choice for large-scale multi-file restructuring. It allows the agent to first analyze the current architecture, design the target structure, identify dependencies, and present a plan to the developer. After plan approval, execution can proceed with confidence. Direct execution on complex restructurings risks incomplete or inconsistent changes.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.7",
         "source": "Exam Guide §Task 3.7"
     },
@@ -555,7 +555,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "Concrete <strong>before/after examples</strong> are more effective than abstract formatting instructions. Showing the model examples of what correct output looks like for different scenarios anchors its understanding. This is particularly important for structured output where the model needs to map abstract rules to concrete formats consistently.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.8",
         "source": "Exam Guide §Task 3.8"
     },
@@ -571,7 +571,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "The <strong>interview pattern</strong> involves asking targeted questions about edge cases, constraints, and business rules before any coding begins. This surfaces requirements that the developer may not have explicitly stated (like 'what happens to subscriptions on account deletion?'). It prevents wasted effort on implementations that miss critical requirements and is more efficient than iterative refinement.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.9",
         "source": "Exam Guide §Task 3.9"
     },
@@ -587,7 +587,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The <code>-p</code> or <code>--print</code> flag runs Claude Code in <strong>non-interactive mode</strong>, which reads input from stdin and prints output to stdout without entering an interactive loop. This is designed for CI/CD pipelines and automated workflows where no human interaction is available.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.10",
         "source": "Exam Guide §Task 3.10"
     },
@@ -603,7 +603,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Including <strong>prior review findings in the context</strong> enables the agent to perform deduplication. By knowing what was previously reported, the agent can skip already-fixed issues and focus only on new or remaining concerns. This requires passing the previous review output as part of the input context for the re-run.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.11",
         "source": "Exam Guide §Task 3.11"
     },
@@ -619,7 +619,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The <strong>Message Batches API</strong> is designed for non-blocking workflows where results can be collected later. It accepts batch submissions and processes them asynchronously, which is ideal for tasks with flexible SLAs. Synchronous APIs would block the main workflow, and streaming does not inherently support deferred collection.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.12",
         "source": "Exam Guide §Task 3.12"
     },
@@ -635,7 +635,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "Explicit categorical criteria are essential for effective PR reviews. The criteria should list <strong>what to report</strong> (functional bugs, security vulnerabilities, API compatibility breaks, performance issues) and <strong>what to skip</strong> (formatting preferences, naming style choices, minor refactoring suggestions). This focuses the review on high-value findings and reduces noise that causes review fatigue.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.1",
         "source": "Exam Guide §Task 4.1"
     },
@@ -651,7 +651,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "The vague instruction 'check for edge cases' should be replaced with <strong>explicit criteria</strong>. For example, specify 'check for contradiction between source and target fields' or 'verify values at minimum and maximum numeric boundaries'. The model performs better with specific, actionable instructions than with abstract concepts that may have ambiguous interpretations.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.2",
         "source": "Exam Guide §Task 4.2"
     },
@@ -667,7 +667,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "When instructions alone fail to produce consistent output, <strong>few-shot examples</strong> are the most effective solution. Providing 2-3 concrete examples of correctly formatted reports anchors the model's output to the expected pattern. Examples work better than additional instructions because they demonstrate rather than describe the expected format.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.3",
         "source": "Exam Guide §Task 4.3"
     },
@@ -683,7 +683,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Schema fields should be designed as <strong>nullable</strong> when source documents may not contain the information, preventing the model from fabricating values to satisfy required fields. Making the purchase order number field explicitly nullable in the schema definition with clear description guidance tells the model that null is an acceptable and expected value when the information is absent from the source document.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.4",
         "source": "Exam Guide §Task 4.4"
     },
@@ -699,7 +699,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Schema enforcement <strong>prevents syntax errors</strong> (invalid JSON, wrong types, missing required fields) but <strong>does not prevent semantic errors</strong>. The model could return the correct structure with incorrect values: a wrong invoice number, an incorrectly calculated total, or a date that does not match the document. Semantic validation requires additional verification steps beyond schema checking.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.5",
         "source": "Exam Guide §Task 4.5"
     },
@@ -715,7 +715,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Forced tool selection</strong> via <code>tool_choice: {type: 'tool', name: 'extract_invoice'}</code> ensures the model must call the specified tool. This overrides the model's default behavior and guarantees structured output through the tool. Prompt instructions alone can be ignored by the model, but tool_choice with 'tool' type is programmatic and cannot be bypassed.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.6",
         "source": "Exam Guide §Task 4.6"
     },
@@ -731,7 +731,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "When format errors occur, the agent should <strong>retry with error feedback</strong>. Include the malformed output and a description of the error (e.g., 'The JSON had a trailing comma after the last array element. Please fix and retry.'). The model can typically correct its output when given specific error feedback. This recovery loop is more efficient than manual reprocessing.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.7",
         "source": "Exam Guide §Task 4.7"
     },
@@ -747,7 +747,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Retries with error feedback are ineffective when the required information is <strong>simply not present</strong> in the source document. No amount of retrying will extract a tax ID that was never printed on the invoice. The system should detect this situation by validating that the required fields actually exist in the source before retrying, and handle missing data gracefully (e.g., mark as 'not available' rather than retrying endlessly).",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.8",
         "source": "Exam Guide §Task 4.8"
     },
@@ -763,7 +763,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "A <strong>batch submission strategy</strong> with a 24-hour maximum window is appropriate. Batch processing allows submitting all 10,000 reports at once with results available within 24 hours, well within the 36-hour SLA. This is far more efficient than sequential processing and avoids rate limiting issues. The window should be configured to ensure completion before the SLA deadline.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.9",
         "source": "Exam Guide §Task 4.9"
     },
@@ -779,7 +779,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The <strong>Message Batches API</strong> is designed for non-blocking, asynchronous processing with deferred result collection. It is <strong>inappropriate for blocking/pre-merge workflows</strong> where results are needed synchronously to gate a pipeline. For blocking workflows, use synchronous API calls or streaming to get results inline before proceeding with the merge decision.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.10",
         "source": "Exam Guide §Task 4.10"
     },
@@ -795,7 +795,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Self-review within the same session suffers from <strong>confirmation bias</strong> and <strong>shared context blindness</strong> Ã¢â‚¬â€ the agent is operating with the same assumptions that led to the original implementation. An <strong>independent instance</strong> (separate session or separate agent) with a fresh perspective and no shared assumptions is significantly more effective at identifying issues and edge cases.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.11",
         "source": "Exam Guide §Task 4.11"
     },
@@ -811,7 +811,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "A <strong>multi-pass architecture</strong> separates concerns across different passes: one pass focuses on general implementation correctness, and a separate pass focuses specifically on edge case identification. Each pass has a focused objective and criteria. This separation produces more thorough coverage than trying to handle all concerns in a single pass, where attention is divided.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.12",
         "source": "Exam Guide §Task 4.12"
     },
@@ -827,7 +827,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Tool results with <strong>excessive fields consume tokens disproportionately</strong>, crowding out space for model reasoning and conversation history. With 100KB of results per query, 5 queries consume 500KB of the context window, leaving very little room for analysis. This is a classic context management problem where tool output size must be controlled to preserve room for reasoning.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.1",
         "source": "Exam Guide §Task 5.1"
     },
@@ -843,7 +843,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "A <strong>persistent structured case facts block</strong> ensures critical transactional data (customer ID, amount, account number, transaction status) is preserved accurately across turns. Conversation history can accumulate and change focus, but a structured facts block in the system prompt or as a dedicated context section maintains authoritative data that the model can always reference.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.2",
         "source": "Exam Guide §Task 5.2"
     },
@@ -859,7 +859,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "An explicit customer demand for a human is a <strong>mandatory escalation trigger</strong>. The agent must not negotiate, ignore, or override this request. The correct behavior is to immediately trigger the escalation process, provide a clear handoff summary, and gracefully transition the customer to a human agent. Respecting this boundary is both a design requirement and a regulatory consideration in many jurisdictions.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.3",
         "source": "Exam Guide §Task 5.3"
     },
@@ -875,7 +875,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Policy exceptions and gaps require escalation</strong>, not improvisation. The agent must not create new policies or interpret reasonable-sounding requests as authorization. When there is no clear policy coverage, the correct action is to escalate to a human who has the authority to make exceptions or set new policy. Creating policies or improvising solutions outside defined boundaries is a serious design flaw leading to unpredictable behavior.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.4",
         "source": "Exam Guide §Task 5.4"
     },
@@ -891,7 +891,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Generic error responses ('Operation failed') hide the <strong>specific error context</strong> that the coordinator needs for intelligent recovery. Without knowing whether the error was transient (network timeout - retryable), validation (invalid account - fix input), or business (limit exceeded - escalate), the coordinator cannot determine the correct recovery action. Structured error responses with categories and details are essential for effective error recovery.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.5",
         "source": "Exam Guide §Task 5.5"
     },
@@ -907,7 +907,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Context degradation is a known challenge in long-running sessions. <strong>Scratchpad files</strong> serve as external memory that persists key findings, decisions, and state outside the conversation context. The agent can write structured summaries to scratchpad files periodically and read them back to refresh context. This is more reliable than relying on the conversation history which may be compressed or partly lost.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.6",
         "source": "Exam Guide §Task 5.6"
     },
@@ -923,7 +923,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Before reducing review thresholds, you must first establish accuracy metrics through <strong>segment-level accuracy validation</strong>. Measure the agent's accuracy on different data segments, compare against human review, and only reduce review coverage after achieving confidence thresholds. Premature reduction without validation risks quality degradation that may go undetected.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.7",
         "source": "Exam Guide §Task 5.7"
     },
@@ -939,7 +939,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Claim-source mappings</strong> prevent attribution loss during synthesis. Each finding should be explicitly tagged with its source (e.g., 'Analysis by Agent A found: ...'). This enables verification, provides traceability, and allows the reader (or downstream processes) to assess the reliability of each claim. Without source mappings, synthesized reports lose provenance information critical for trust and verification.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.8",
         "source": "Exam Guide §Task 5.8"
     },
@@ -955,7 +955,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "When sources conflict, the correct approach is to <strong>annotate both with attribution</strong> rather than arbitrarily selecting one value or computing a misleading average. The synthesis should present: 'Agent A (using DataDog) reports 200ms average; Agent B (using CloudWatch) reports 450ms average. This discrepancy may be due to different measurement periods or tooling differences.' This preserves the nuance and allows the reader to understand the context of each claim.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.9",
         "source": "Exam Guide §Task 5.9"
     },
@@ -971,7 +971,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "A <strong>hub-and-spoke architecture</strong> with a central coordinator provides controlled routing, centralized context management, and organized result synthesis. The key benefit is preventing <strong>unconstrained agent-to-agent communication</strong>, which can lead to context pollution, runaway conversations, and unpredictable behavior. The coordinator acts as a controlled gateway and synthesis point.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.17",
         "source": "Exam Guide §Task 1.17"
     },
@@ -987,7 +987,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "A <code>PreToolUse</code> hook is the centralized mechanism for intercepting tool calls <strong>before execution</strong>. It runs automatically on every tool invocation, can log parameters, perform validation, and block or modify the call if needed. This provides a consistent audit trail without modifying individual tools and cannot be bypassed by the model.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.18",
         "source": "Exam Guide §Task 1.18"
     },
@@ -1003,7 +1003,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Task decomposition</strong> follows a structured sequence: (1) analyze the complex request to understand its components, (2) decompose into well-defined, independent subtasks with clear specifications and acceptance criteria, (3) assign each subtask to the appropriate subagent via the <code>Task</code> tool, and (4) synthesize individual results into a coherent final output. This pattern maximizes parallelism while maintaining quality control.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.19",
         "source": "Exam Guide §Task 1.19"
     },
@@ -1019,7 +1019,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Named sessions</strong> provide the ability to save conversation state and resume across CLI sessions. This is essential for long-running investigations where the work naturally spans multiple sessions. Named sessions persist the entire conversation context, including tool results and the model's reasoning state, enabling interruption-free resumption.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.20",
         "source": "Exam Guide §Task 1.20"
     },
@@ -1035,7 +1035,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The correct error handling pattern is to <strong>catch subagent failures gracefully</strong>: log the error with full context, allow other independent subagents to continue processing, and report the failure to the user with sufficient context for resolution. This avoids both the extreme of crashing the entire system and the opposite extreme of silently ignoring failures.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.21",
         "source": "Exam Guide §Task 1.21"
     },
@@ -1051,7 +1051,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The agent SDK configuration includes settings like <code>max_tool_rounds</code> or <code>max_consecutive_tool_calls</code> that set a <strong>hard limit</strong> on how many sequential tool calls an agent can make without producing a text response. This is a safety guard against runaway tool usage and token waste. It is enforced programmatically, unlike prompt instructions which are advisory.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.22",
         "source": "Exam Guide §Task 1.22"
     },
@@ -1067,7 +1067,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Conversation history management</strong> requires a thoughtful strategy: (1) summarize older turns that are no longer immediately relevant, (2) prune verbose tool results that have served their purpose, (3) maintain a <strong>structured facts block</strong> for critical information that must persist, and (4) use sliding window approaches where appropriate. Simple deletion of oldest messages risks losing important context.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.23",
         "source": "Exam Guide §Task 1.23"
     },
@@ -1083,7 +1083,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The correct pattern is a <strong>structured agent handoff</strong> where the triage agent passes a comprehensive summary to the billing specialist. This summary should include: findings from the technical investigation, customer details, actions already taken, commitments made, and the specific billing issue that needs resolution. This ensures continuity without requiring the customer to repeat information or losing context.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.24",
         "source": "Exam Guide §Task 1.24"
     },
@@ -1099,7 +1099,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>State persistence</strong> involves saving the current transaction state to external storage so it can be restored after interruption. This includes: which steps have been completed, what data was collected, and what the next action should be. Upon resumption, this state is loaded and provided to the model. For multi-step transactions, especially those involving financial operations, losing state is unacceptable.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.25",
         "source": "Exam Guide §Task 1.25"
     },
@@ -1115,7 +1115,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Agent observability</strong> should be implemented at the agent SDK or framework level, providing centralized structured logging of: agent decisions (what the model chose and why), tool usage patterns (which tools, how often, success/failure), error rates, and timing information. This is far more maintainable than adding logging to individual tools and provides consistent, searchable output for debugging and analysis.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.26",
         "source": "Exam Guide §Task 1.26"
     },
@@ -1131,7 +1131,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "The determining factor is <strong>task dependencies</strong>. When subagents have dependent chains (B needs A's output, C needs B's output), sequential execution is required. Parallel execution is only appropriate for truly independent tasks. Forcing parallel execution on dependent tasks leads to coordination problems and rework. The architect must analyze the dependency graph before deciding.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.27",
         "source": "Exam Guide §Task 1.27"
     },
@@ -1147,7 +1147,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Dynamic subagent selection</strong> based on query complexity is the correct pattern. Simple queries should be handled directly by the coordinator without spawning subagents (avoiding overhead). Complex queries should trigger appropriate subagent allocation. This balances efficiency with thoroughness and avoids the waste of over-engineering simple requests or under-resourcing complex ones.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.28",
         "source": "Exam Guide §Task 1.28"
     },
@@ -1163,7 +1163,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Agent memory and context retention</strong> requires a defense-in-depth approach: (1) maintain a <strong>structured facts block</strong> within the current context for active information, (2) write detailed findings to <strong>external scratchpad files</strong> periodically, and (3) use summarization to compress older turns while preserving key data. Redundancy is important because context management mechanisms may lose information.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.29",
         "source": "Exam Guide §Task 1.29"
     },
@@ -1179,7 +1179,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "A <code>PostToolUse</code> hook is the correct mechanism for <strong>transforming tool results</strong> after execution but before they reach the model. It normalizes results into a consistent structure regardless of the source tool. This ensures the model always receives data in the expected format and keeps transformation logic centralized rather than distributed across tool implementations.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.30",
         "source": "Exam Guide §Task 1.30"
     },
@@ -1195,7 +1195,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Agentic loop safety guards</strong> should be configured in the agent SDK settings. This includes maximum tool call limits per session, maximum consecutive tool calls, and maximum token usage. These are <strong>programmatic limits</strong> enforced by the SDK, not advisory instructions. When exceeded, the session terminates gracefully with a clear reason.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.31",
         "source": "Exam Guide §Task 1.31"
     },
@@ -1211,7 +1211,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "Tool call interception via <code>PreToolUse</code> hooks is the appropriate mechanism for <strong>security validation</strong>. The hook runs before the tool executes and can inspect parameters for injection patterns, block suspicious calls, sanitize inputs, or log the attempt. Programmatic validation in the hook layer is more reliable than relying on the model to detect injection attempts.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.32",
         "source": "Exam Guide §Task 1.32"
     },
@@ -1227,7 +1227,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>SSE (Server-Sent Events)</strong> transport is the appropriate choice when the MCP server needs to be accessible over a network, serving multiple clients remotely. <strong>stdio</strong> transport is limited to local processes where the client spawns the server as a subprocess. SSE enables client-server communication over HTTP, which is necessary for remote and multi-client scenarios.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.12",
         "source": "Exam Guide §Task 2.12"
     },
@@ -1243,7 +1243,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Tools should be distributed across MCP servers by <strong>domain</strong>, grouping related tools together. This follows the principle of <strong>cohesion</strong>: tools that are often used together should be in the same server for efficient discovery and configuration. Overly granular servers (one per tool) create configuration overhead, while monolithic servers mix unrelated concerns.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.13",
         "source": "Exam Guide §Task 2.13"
     },
@@ -1259,7 +1259,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Tool names should follow <strong>consistent naming conventions</strong> that make their purpose and differentiation clear. Using prefixes or namespaces (e.g., <code>user:get_profile</code> vs <code>user:get_orders</code>) and avoiding synonyms (get, fetch, retrieve) reduces confusion. Consistent naming improves discoverability for both human developers and the model, which selects tools based on names and descriptions.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.14",
         "source": "Exam Guide §Task 2.14"
     },
@@ -1275,7 +1275,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>MCP authentication and security</strong> requires: (1) authentication to verify the identity of the calling client, (2) authorization to ensure the caller has permission for the specific tool, (3) least-privilege access where each agent only gets the tools it needs, and (4) audit logging of all tool invocations. MCP servers that access sensitive data must not assume network-level security is sufficient.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.15",
         "source": "Exam Guide §Task 2.15"
     },
@@ -1291,7 +1291,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "Built-in tools like <code>Edit</code> are general-purpose and can struggle with <strong>ambiguous matches</strong> (e.g., many similar lines, complex replacements). They lack domain-specific logic. Custom MCP tools can provide more <strong>targeted functionality</strong> with application-specific validation and error handling. The architect should use built-in tools for general operations and custom tools for domain-specific needs.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.16",
         "source": "Exam Guide §Task 2.16"
     },
@@ -1307,7 +1307,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Tool result size management</strong> requires a multi-layered approach: (1) implement pagination at the tool level so the model can request data in manageable chunks, (2) use a <code>PostToolUse</code> hook to summarize or transform verbose results into concise statistics, and (3) design tools that return only the data the model needs, not raw unprocessed datasets.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.17",
         "source": "Exam Guide §Task 2.17"
     },
@@ -1323,7 +1323,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Tool description writing best practices</strong> require: detailed descriptions including <strong>usage scenarios</strong> (when to use this tool), <strong>input/output descriptions</strong> (what parameters are needed and what the result looks like), and <strong>differentiation hints</strong> (how this tool differs from similar ones). Brief descriptions like 'Finds files' do not give the model enough information to make accurate selections.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.18",
         "source": "Exam Guide §Task 2.18"
     },
@@ -1339,7 +1339,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Error propagation from MCP servers</strong> should use the MCP protocol's structured error response format. The response should include an error code, a <strong>category</strong> (transient, validation, or internal), and a human-readable description. This allows the calling agent to determine the appropriate recovery action. Crashing the server or hiding errors are both inappropriate.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.19",
         "source": "Exam Guide §Task 2.19"
     },
@@ -1355,7 +1355,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>MCP server lifecycle management</strong> requires: (1) versioned endpoints to avoid breaking existing clients, (2) backward compatibility for tool interfaces, (3) graceful shutdown that lets in-flight requests complete, (4) startup health checks, and (5) possibly a discovery mechanism so clients can learn about server availability. Production MCP servers cannot be treated as ad-hoc processes.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.20",
         "source": "Exam Guide §Task 2.20"
     },
@@ -1371,7 +1371,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Tool versioning</strong> should follow the principle of <strong>forward and backward compatibility</strong>. New parameters should be added as <strong>optional with sensible defaults</strong> so existing callers continue to work unchanged. The tool description should be updated to document the new capability. Creating entirely new tools for every change leads to proliferation and confusion.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.21",
         "source": "Exam Guide §Task 2.21"
     },
@@ -1387,7 +1387,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "The <strong>MCP protocol message format</strong> follows a request-response pattern: (1) initialization and capabilities negotiation, where the server advertises its tools, (2) tool call requests from the client with parameters, and (3) tool result responses from the server with structured data or error messages. This follows JSON-RPC conventions with specific MCP-defined message types for tool discovery and invocation.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.22",
         "source": "Exam Guide §Task 2.22"
     },
@@ -1403,7 +1403,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The <strong>CLAUDE.md hierarchy</strong> follows a specificity-based priority: <strong>directory-level</strong> overrides <strong>project-level</strong>, which overrides <strong>user-level</strong>. This allows teams to set base conventions at the project level while allowing more specific overrides in subdirectories. User-level settings are the baseline and are overridden by more specific project or directory settings.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.1",
         "source": "Exam Guide §Task 3.1"
     },
@@ -1419,7 +1419,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Custom slash command creation and sharing</strong> is done through the <code>.claude/commands/</code> directory at the project level. These command scripts are version-controlled, making them <strong>shareable with the entire team</strong> through the repository. They support structured inputs and outputs, making them more powerful and reliable than prompt-based workflows or shell aliases.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.2",
         "source": "Exam Guide §Task 3.2"
     },
@@ -1435,7 +1435,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Skill development</strong> uses <code>SKILL.md</code> with YAML frontmatter that defines the skill's metadata, including <code>context: fork</code> for isolation. The skill body contains specialized instructions. When invoked, the skill runs in its own forked context, keeping the main session uncontaminated. This is the proper mechanism for creating reusable, isolated capabilities.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.3",
         "source": "Exam Guide §Task 3.3"
     },
@@ -1451,7 +1451,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Batch processing</strong> with parallel <code>Task</code> tool invocations is the correct approach for independent file transformations. Multiple files can be processed concurrently by spawning parallel subagent tasks, dramatically reducing total wall-clock time. Sequential processing would take 100 minutes, while 10 parallel tasks could complete in approximately 10 minutes.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.6",
         "source": "Exam Guide §Task 3.6"
     },
@@ -1467,7 +1467,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "For monorepos, use <strong>directory-level configuration</strong> and <strong>conditional rules</strong> via <code>.claude/rules/</code> with path-pattern frontmatter. This allows each package to have its own conventions, tools, and rules that activate only when working within that package. Duplicating rules in separate CLAUDE.md files creates maintenance burden, and a single global configuration is too coarse.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.7",
         "source": "Exam Guide §Task 3.7"
     },
@@ -1483,7 +1483,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "The <code>.claude/settings.json</code> file at the <strong>user level</strong> (typically <code>~/.claude/settings.json</code>) contains global configuration that applies across all projects. This is the correct location for user-wide preferences like default model selection, temperature settings, and output preferences. Project-level settings override user-level settings for project-specific configuration.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.8",
         "source": "Exam Guide §Task 3.8"
     },
@@ -1499,7 +1499,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Agent SDK configuration</strong> should be tailored to each use case. The chat assistant needs: lower temperature for consistency, streaming for real-time responses, and potentially a faster but less capable model. The batch system needs: higher parallelism for throughput, non-streaming for efficiency, and batch processing capabilities. One-size-fits-all configuration does not optimize for different requirements.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.9",
         "source": "Exam Guide §Task 3.9"
     },
@@ -1515,7 +1515,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Claude Code authentication and API key management</strong> should use environment variables (like <code>ANTHROPIC_API_KEY</code>) or the Claude Code settings system. API keys must <strong>never be committed to version control</strong> or stored in project configuration files that are shared. Each developer should have their own key or keys should be managed through a secure secrets manager.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.10",
         "source": "Exam Guide §Task 3.10"
     },
@@ -1531,7 +1531,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>File change management and diff handling</strong> should follow a structured review process: (1) review the diff for each file to understand what changed and why, (2) ask for explanations of specific modifications if needed, (3) request modifications for changes that look incorrect or suboptimal, and (4) selectively accept changes. Blind acceptance is risky; blanket rejection wastes effort.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.11",
         "source": "Exam Guide §Task 3.11"
     },
@@ -1547,7 +1547,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Claude Code in CI/CD pipelines</strong> requires strict security: (1) use the <code>-p</code> flag for non-interactive mode, (2) grant <strong>minimal permissions</strong> needed for the task, (3) restrict file system access to the repository, (4) <strong>never expose secrets</strong> to the agent's context, and (5) ensure the agent cannot access production environments. CI/CD is a high-risk environment for agent execution.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.12",
         "source": "Exam Guide §Task 3.12"
     },
@@ -1563,7 +1563,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Claude Code permissions and security</strong> settings support configuring file system access controls, including allow lists and deny lists. This programmatically prevents the agent from reading or writing specific files or directories. This is essential for projects containing secrets, configuration files, or other sensitive data that should not be exposed to the agent.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.13",
         "source": "Exam Guide §Task 3.13"
     },
@@ -1579,7 +1579,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Custom hooks and event handlers</strong> provided by the agent SDK (<code>PreToolUse</code>, <code>PostToolUse</code>) are the correct mechanism for running logic before and after tool executions. These hooks are centralized, apply to all tools automatically, and cannot be bypassed. They support logging, validation, transformation, and interception use cases without modifying individual tool implementations.",
-        "domain": "D3",
+        "domain": "claude-code",
         "task": "Task 3.14",
         "source": "Exam Guide §Task 3.14"
     },
@@ -1595,7 +1595,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>System prompt design principles</strong> require role-specific prompts that clearly define: (1) the agent's <strong>purpose and role</strong> in the system, (2) its <strong>capabilities and tools</strong>, (3) its <strong>limitations and boundaries</strong> (what it should not do), and (4) <strong>behavioral guidelines</strong> for interaction. Each agent needs a prompt tailored to its function. A one-size-fits-all approach leads to role confusion and boundary violations.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.1",
         "source": "Exam Guide §Task 4.1"
     },
@@ -1611,7 +1611,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "Using proper <strong>user turn vs assistant turn</strong> message roles is essential for the model to correctly attribute information. The <code>user</code> role represents human-provided information, the <code>assistant</code> role represents the model's own previous responses, and the <code>system</code> role provides instructions. This role structure is fundamental to the model's understanding of conversation context and who said what.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.2",
         "source": "Exam Guide §Task 4.2"
     },
@@ -1627,7 +1627,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>XML tagging for structured prompts</strong> uses descriptive tags like <code>&lt;instructions&gt;</code>, <code>&lt;context&gt;</code>, <code>&lt;examples&gt;</code>, and <code>&lt;output-format&gt;</code> to clearly delineate sections. This improves the model's ability to parse and reference different parts of the prompt. XML tags are well-understood by the model and provide clear section boundaries that support reference (e.g., 'following the format specified in &lt;output-format&gt;').",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.3",
         "source": "Exam Guide §Task 4.3"
     },
@@ -1643,7 +1643,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Chain-of-thought prompting</strong> encourages the model to break down complex reasoning into explicit steps before arriving at conclusions. This produces more accurate results for multi-step analysis tasks and makes the reasoning transparent. The model should be prompted to show its analytical process, consider alternatives, and then present conclusions with supporting evidence.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.4",
         "source": "Exam Guide §Task 4.4"
     },
@@ -1659,7 +1659,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Multi-turn conversation management</strong> requires maintaining the structured conversation history (user and assistant messages) across turns. The agent needs to understand the full context, handle topic shifts gracefully, and manage the context window by summarizing older turns or pruning irrelevant content. Discarding history or treating each turn independently loses the conversational context needed for coherent responses.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.5",
         "source": "Exam Guide §Task 4.5"
     },
@@ -1675,7 +1675,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Prompt injection prevention</strong> requires: (1) <strong>validate and sanitize user inputs</strong> before they reach the model, (2) constrain the model's behavior through the system prompt with explicit boundaries, (3) <strong>never expose tool names or capabilities</strong> in user-visible responses, (4) use input/output guards that filter suspicious patterns, and (5) implement the principle of least privilege for tool access.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.6",
         "source": "Exam Guide §Task 4.6"
     },
@@ -1691,7 +1691,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "For deterministic output, set <strong>temperature to 0</strong> (or very close to 0) and <strong>top_p to 1</strong>. Temperature controls the randomness of token selection: 0 makes the model always choose the most likely token, producing consistent output. Top_p is an alternative sampling method; setting it to 1 disables its effect. For creative tasks, higher values are appropriate, but for deterministic code generation, low temperature is correct.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.7",
         "source": "Exam Guide §Task 4.7"
     },
@@ -1707,7 +1707,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Max tokens and output length management</strong> requires setting the <code>max_tokens</code> parameter to the desired limit. This tells the API to stop generating once the limit is reached. Additionally, consider using <strong>stop sequences</strong> to terminate generation at natural break points. Post-generation truncation should be a last resort as it may cut off mid-sentence.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.8",
         "source": "Exam Guide §Task 4.8"
     },
@@ -1723,7 +1723,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Stop sequences</strong> are one or more strings that, when generated by the model, signal the API to stop producing further tokens. For code generation, using stop sequences like <code>```</code> or <code>\\n```</code> halts generation at the end of the code block. This is more precise than <code>max_tokens</code> truncation and ensures the output ends at a clean boundary.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.9",
         "source": "Exam Guide §Task 4.9"
     },
@@ -1739,7 +1739,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "<strong>Streaming responses</strong> are the correct approach for real-time interactive experiences. Streaming delivers tokens incrementally as they are generated, allowing the UI to display partial results immediately. This provides a responsive user experience. Full-response waiting creates noticeable latency, and pre-generation is impractical for open-ended completions.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.10",
         "source": "Exam Guide §Task 4.10"
     },
@@ -1755,7 +1755,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Response format consistency</strong> requires a multi-layered approach: (1) use <code>tool_use</code> with a <strong>strict JSON schema</strong> for programmatic enforcement, (2) provide <strong>few-shot examples</strong> showing the exact expected output, and (3) reinforce with <strong>system prompt instructions</strong>. No single technique is perfectly reliable, but the combination provides defense in depth.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.11",
         "source": "Exam Guide §Task 4.11"
     },
@@ -1771,7 +1771,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Evaluation and testing of prompts</strong> requires a systematic methodology: (1) curate a test dataset representative of real inputs with expected outputs, (2) run prompt variants against this dataset, (3) measure metrics like accuracy, consistency, and format compliance, and (4) compare results statistically. This data-driven approach prevents subjective bias and ensures changes are genuinely improvements.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.12",
         "source": "Exam Guide §Task 4.12"
     },
@@ -1787,7 +1787,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Context window limits and management</strong> require proactive planning: (1) estimate token counts for documents, tool results, and conversation history, (2) <strong>prioritize critical information</strong> in a structured facts block, (3) summarize verbose content, and (4) prune low-value history. Blind truncation of oldest content may lose critical information that the model still needs.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.10",
         "source": "Exam Guide §Task 5.10"
     },
@@ -1803,7 +1803,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Token counting and estimation</strong> should use a tokenizer library that matches the model's tokenizer (e.g., <code>claude-tokenizer</code> or Anthropic's token counting API). This provides accurate pre-call estimates, enabling proactive context management. Character-based heuristics or word-based estimates can be inaccurate, especially for code or structured data. Post-hoc checking is too late for prevention.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.11",
         "source": "Exam Guide §Task 5.11"
     },
@@ -1819,7 +1819,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Conversation summarization strategies</strong> should produce <strong>topic-specific summaries</strong> rather than generic compression. Each thread of investigation should be condensed into its key findings, decisions, and action items. This preserves the structured knowledge while removing verbose tool outputs and redundant exchanges. Single generic summaries lose too much context, and simple deletion risks losing important information.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.12",
         "source": "Exam Guide §Task 5.12"
     },
@@ -1835,7 +1835,7 @@
         ],
         "correctAnswer": 0,
         "explanation": "The <strong>'lost in the middle' effect</strong> is a well-documented phenomenon where language models show reduced accuracy for information positioned in the middle of the context window, compared to information at the beginning (primacy effect) and end (recency effect). Mitigations include: placing critical information at the start or end, using structured formats, and performing targeted retrieval rather than relying on the model to scan the full context.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.13",
         "source": "Exam Guide §Task 5.13"
     },
@@ -1851,7 +1851,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Context pruning techniques</strong> should remove verbose raw data after it has served its purpose, replacing it with concise summaries of the conclusions drawn. This frees context window space while preserving the insights the model needs for ongoing reasoning. Simple deletion without summarization loses valuable conclusions, while retaining all raw data wastes precious context space.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.14",
         "source": "Exam Guide §Task 5.14"
     },
@@ -1867,7 +1867,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "<strong>Information provenance and source tracking</strong> requires each finding to be tagged with metadata throughout the pipeline: originating agent, timestamp, methodology used, and confidence level. This enables downstream consumers to verify claims, assess reliability, and trace information back to its origin. Without provenance metadata, synthesized information loses its audit trail and cannot be effectively verified.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.15",
         "source": "Exam Guide §Task 5.15"
     },
@@ -1883,7 +1883,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Reliability patterns for production systems</strong> include: (1) <strong>retry with backoff</strong> for transient failures, (2) <strong>idempotent operations</strong> to safely retry without side effects, (3) <strong>circuit breakers</strong> to stop hammering failing services, (4) <strong>dead-letter queues</strong> for items that cannot be processed, and (5) comprehensive logging for debugging. Production AI systems need the same reliability infrastructure as traditional production services.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.16",
         "source": "Exam Guide §Task 5.16"
     },
@@ -1899,7 +1899,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Fallback and degradation strategies</strong> should maintain system availability: (1) <strong>queue requests</strong> during outages with clear status tracking, (2) process queued items when service recovers, (3) notify customers of potential delays, (4) optionally use a simpler fallback model if available. This ensures the system remains functional even when the primary AI service is unavailable, maintaining business continuity.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.17",
         "source": "Exam Guide §Task 5.17"
     },
@@ -1915,7 +1915,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "<strong>Human-in-the-loop review workflows</strong> implement a threshold-based escalation: below the threshold ($50K), the AI processes autonomously with appropriate speed and efficiency. At or above the threshold, the AI prepares a comprehensive analysis package and routes it to a human for final decision. This balances efficiency for routine cases with appropriate oversight for high-risk decisions. Leaving the escalation decision to the AI's judgment is unreliable for regulatory compliance.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.18",
         "source": "Exam Guide §Task 5.18"
     },
@@ -1935,7 +1935,7 @@
         ],
         "correctAnswer": 2,
         "explanation": "The correct principles are <strong>context isolation</strong> and <strong>least-privilege tool assignment</strong>. Each subagent should receive <strong>only the context and tools relevant to its task</strong> (option 2) to prevent distraction and reduce token costs. Subagents must <strong>maintain context isolation</strong> from each other (option 0) to avoid information leakage and context pollution. Passing full conversation history (option 1) would dilute focus and waste tokens. A shared tool pool (option 3) violates least-privilege principles.",
-        "domain": "D1",
+        "domain": "agentic-architecture",
         "task": "Task 1.13",
         "source": "Exam Guide §Task 1.13"
     },
@@ -1955,7 +1955,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "For remote MCP deployments, <strong>SSE (Server-Sent Events)</strong> transport is appropriate (option 3) because it enables client-server communication over HTTP across network segments. <strong>Authentication and authorization</strong> are essential (option 2) when MCP servers access sensitive resources, including identity verification, least-privilege tool scoping, and audit logging. stdio transport (option 1) only works for local subprocesses. Disabling security (option 0) is never acceptable for production systems.",
-        "domain": "D2",
+        "domain": "tool-design-mcp",
         "task": "Task 2.10",
         "source": "Exam Guide §Task 2.10"
     },
@@ -1975,7 +1975,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>JSON schema enforcement via tool_use</strong> (option 1) guarantees the output structure matches downstream expectations. <strong>Nullable optional fields</strong> (option 0) prevent the model from fabricating values when information is absent from the source document. A single system prompt (option 2) is insufficient for reliable structured output. High temperature (option 3) reduces output consistency and increases hallucination risk.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.5",
         "source": "Exam Guide §Task 4.5"
     },
@@ -1995,7 +1995,7 @@
         ],
         "correctAnswer": 1,
         "explanation": "<strong>Exponential backoff retry</strong> (option 1) is the standard pattern for transient errors, starting with short delays and increasing between attempts. <strong>Circuit breakers</strong> (option 0) prevent cascading failures by stopping calls to a failing endpoint, allowing it time to recover, then gradually resuming traffic. Discarding requests (option 2) causes data loss. Escalating every error (option 3) is impractical and floods operators with non-critical alerts.",
-        "domain": "D5",
+        "domain": "context-management",
         "task": "Task 5.19",
         "source": "Exam Guide §Task 5.19"
     },
@@ -2015,7 +2015,7 @@
         ],
         "correctAnswer": 3,
         "explanation": "Effective PR reviews should focus on <strong>functional bugs and security issues</strong> (option 3) and <strong>API compatibility and performance regressions</strong> (option 2). These are high-value findings that directly impact code quality and system stability. Formatting preferences (option 0) should be enforced by automated linters, not reviewer comments. Flagging every potential refactoring (option 1) creates review fatigue and drowns out critical issues.",
-        "domain": "D4",
+        "domain": "prompt-engineering",
         "task": "Task 4.6",
         "source": "Exam Guide §Task 4.6"
     }
