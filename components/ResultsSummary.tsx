@@ -17,6 +17,7 @@ import { useExamStore } from '@/hooks/useExamState';
 import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { getActiveCertification } from '@/lib/certifications';
+import { PasserTips } from '@/components/PasserTips';
 
 const cert = getActiveCertification();
 
@@ -147,7 +148,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                   fontWeight={700}
                   fontFamily="mono"
                 >
-                  {results.passed ? 'PASSED CERTIFICATION' : 'PRACTICE MORE'}
+                  {results.passed ? 'PASSED MOCK EXAMS' : 'PRACTICE MORE'}
                 </Badge>
 
                 <Text
@@ -217,6 +218,11 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                   Restart Simulator
                 </Button>
               </Box>
+            </motion.div>
+
+            {/* Tips from those who passed */}
+            <motion.div variants={itemVariants}>
+              <PasserTips />
             </motion.div>
 
             {/* Domain Breakdown Card */}

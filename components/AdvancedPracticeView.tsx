@@ -20,6 +20,7 @@ import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
 import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
 import { getActiveCertification } from '@/lib/certifications';
+import { PasserTips } from '@/components/PasserTips';
 
 const activeCertification = getActiveCertification();
 
@@ -424,7 +425,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 fontWeight={700}
                 fontFamily="mono"
               >
-                {passed ? 'PASSED CERTIFICATION' : 'PRACTICE MORE'}
+                {passed ? 'PASSED MOCK EXAMS' : 'PRACTICE MORE'}
               </Badge>
 
               <Text
@@ -485,6 +486,8 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 Restart Simulator
               </Button>
             </Box>
+
+            <PasserTips />
 
             {showFastFlag && (
               <Box
