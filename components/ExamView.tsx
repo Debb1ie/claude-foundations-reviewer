@@ -22,16 +22,8 @@ import {
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
+import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const DOMAIN_COLORS: Record<Domain, string> = {
-  D1: '#7C6EFA',  // Agentic Arch.
-  D2: '#FA8C6E',  // Tool/MCP
-  D3: '#6ECFFA',  // Claude Code
-  D4: '#F0D06E',  // Prompt Eng.
-  D5: '#A06EFA',  // Context Mgmt.
-};
 
 const MODE_LABELS = {
   exam: { title: 'Timed Exam Mode', timer: true, showExplanations: false },
@@ -215,7 +207,6 @@ export function ExamView() {
 
   const answeredCount = answers.filter((a) => a !== null).length;
   const isTimed = showTimer;
-  const domainColor = DOMAIN_COLORS[q.domain as Domain] || '#7C6EFA';
 
   const maxAnsweredIdx = answers.reduce<number>((max, ans, i) => ans !== null ? Math.max(max, i) : max, -1);
 

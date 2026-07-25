@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { useExamStore } from '@/hooks/useExamState';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
+import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { getActiveCertification } from '@/lib/certifications';
 import { PasserTips } from '@/components/PasserTips';
@@ -85,14 +85,6 @@ const InfoIcon = () => (
     <line x1="12" y1="8" x2="12.01" y2="8"></line>
   </svg>
 );
-
-const DOMAIN_COLORS: Record<Domain, string> = {
-  D1: '#7C6EFA',  // Agentic Arch.
-  D2: '#FA8C6E',  // Tool/MCP
-  D3: '#6ECFFA',  // Claude Code
-  D4: '#F0D06E',  // Prompt Eng.
-  D5: '#A06EFA',  // Context Mgmt.
-};
 
 interface ResultsSummaryProps {
   onRestart: () => void;
@@ -387,7 +379,6 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                   
                   {results.incorrectQuestions.map((item, idx) => {
                     const q = item.question;
-                    const domainColor = DOMAIN_COLORS[q.domain as Domain] || '#7C6EFA';
                     const domainInfo = DOMAINS.find((d) => d.id === q.domain);
                     
                     return (

@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
-import { DOMAINS, type Domain, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
+import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 const containerVariants: Variants = {
@@ -36,14 +36,6 @@ const containerVariants: Variants = {
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 120, damping: 16 } }
-};
-
-const DOMAIN_COLORS: Record<Domain, string> = {
-  D1: '#7C6EFA',  // Agentic Arch.
-  D2: '#FA8C6E',  // Tool/MCP
-  D3: '#6ECFFA',  // Claude Code
-  D4: '#F0D06E',  // Prompt Eng.
-  D5: '#A06EFA',  // Context Mgmt.
 };
 
 export function ReviewOverview() {
@@ -140,7 +132,6 @@ export function ReviewOverview() {
             {/* Questions checklist */}
             <VStack gap={4} align="stretch">
               {questions.map((q, i) => {
-                const domainColor = DOMAIN_COLORS[q.domain as Domain] || '#7C6EFA';
                 const domainInfo = DOMAINS.find((d) => d.id === q.domain);
                 const userAnswer = answers[i];
                 const isFlagged = flagged[i];
