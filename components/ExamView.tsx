@@ -10,19 +10,11 @@ import {
   Button,
   Badge,
   Progress,
-  DialogRoot,
-  DialogBackdrop,
-  DialogPositioner,
-  DialogContent,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
-  DialogTitle,
   SimpleGrid,
 } from '@chakra-ui/react';
 import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
-import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_BADGE_BORDERS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
+import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MODE_LABELS = {
@@ -67,22 +59,6 @@ const ClockIcon = () => (
   </svg>
 );
 
-const CheckIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    width="14"
-    height="14"
-    stroke="currentColor"
-    strokeWidth="2"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ flexShrink: 0 }}
-  >
-    <polyline points="20 6 9 17 4 12"></polyline>
-  </svg>
-);
-
 const InfoIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -107,8 +83,6 @@ export function ExamView() {
     currentQuestion,
     answers,
     mode,
-    isComplete,
-    isReviewing,
     timeRemaining,
     setAnswer,
     goToQuestion,
@@ -135,14 +109,14 @@ export function ExamView() {
     stopTimerRef.current = timer.stop;
   }, [timer.start, timer.stop]);
 
-  const initialTimeRef = useRef(timeRemaining);
-  
+  const [initialTime] = useState(timeRemaining);
+
   useEffect(() => {
-    if (mode && MODE_LABELS[mode]?.timer && initialTimeRef.current > 0) {
-      startTimerRef.current(initialTimeRef.current);
+    if (mode && MODE_LABELS[mode]?.timer && initialTime > 0) {
+      startTimerRef.current(initialTime);
     }
     return () => stopTimerRef.current();
-  }, [mode]);
+  }, [mode, initialTime]);
 
   const handleExit = () => {
     exitingRef.current = true;
@@ -400,7 +374,7 @@ export function ExamView() {
           </HStack>
 
           {showTimer && (
-            <Progress.Root value={timer.secondsLeft > 0 ? (timer.secondsLeft / timeRemaining) * 100 : 0} mt={2.5} size="xs">
+            <Progress.Root value={timer.secondsLeft > 0 ? (timer.secondsLeft / initialTime) * 100 : 0} mt={2.5} size="xs">
               <Progress.Track bg="border">
                 <Progress.Range
                   bg={timer.isLow ? 'error.500' : 'brand.600'}
@@ -593,8 +567,8 @@ export function ExamView() {
                     let borderColor = 'border';
                     let bgColor = 'transparent';
                     let keyBg = 'transparent';
-                    let keyBorderColor: any = { _light: 'gray.300', _dark: 'rgba(255, 255, 255, 0.16)' };
-                    let keyTextColor: any = { _light: 'gray.500', _dark: 'gray.400' };
+                    let keyBorderColor: string | { _light: string; _dark: string } = { _light: 'gray.300', _dark: 'rgba(255, 255, 255, 0.16)' };
+                    let keyTextColor: string | { _light: string; _dark: string } = { _light: 'gray.500', _dark: 'gray.400' };
 
                     if (showAnswerFeedback && isReviewChecked) {
                       if (isCorrectOption) {

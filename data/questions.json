@@ -794,7 +794,7 @@
             "Self-review is only viable when conducted by a different model variant that was not involved in generating the original implementation"
         ],
         "correctAnswer": 1,
-        "explanation": "Self-review within the same session suffers from <strong>confirmation bias</strong> and <strong>shared context blindness</strong> Ã¢â‚¬â€ the agent is operating with the same assumptions that led to the original implementation. An <strong>independent instance</strong> (separate session or separate agent) with a fresh perspective and no shared assumptions is significantly more effective at identifying issues and edge cases.",
+        "explanation": "Self-review within the same session suffers from <strong>confirmation bias</strong> and <strong>shared context blindness</strong> — the agent is operating with the same assumptions that led to the original implementation. An <strong>independent instance</strong> (separate session or separate agent) with a fresh perspective and no shared assumptions is significantly more effective at identifying issues and edge cases.",
         "domain": "prompt-engineering",
         "task": "Task 4.11",
         "source": "Exam Guide §Task 4.11"
