@@ -387,7 +387,7 @@ export function ExamView() {
       </Box>
 
       {/* Main Content Area */}
-      <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column">
+      <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column" justifyContent="center">
         {/* Mobile-only Collapsible Question Map Panel */}
         <AnimatePresence>
           {mobileNavOpen && (
@@ -418,7 +418,7 @@ export function ExamView() {
           )}
         </AnimatePresence>
 
-        <HStack align="stretch" gap={6} flex={1} wrap="wrap">
+        <HStack align="stretch" gap={6} wrap="wrap">
           {/* LEFT PANEL: The Question details (70% width on desktop) */}
           <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }} pb={{ base: 28, md: 0 }}>
             <Box

@@ -956,7 +956,6 @@ function QuestionView() {
   const totalAnswered = answers.filter((a) => a !== null).length;
   const unanswered = questions.length - totalAnswered;
   const flaggedCount = flagged.filter(Boolean).length;
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   if (!q) return null;
 
@@ -1388,7 +1387,7 @@ function QuestionView() {
       </Box>
 
       {/* Main content */}
-      <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column">
+      <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column" justifyContent="center">
         {/* Mobile collapsible question map */}
         <AnimatePresence>
           {mobileNavOpen && (
@@ -1418,7 +1417,7 @@ function QuestionView() {
           )}
         </AnimatePresence>
 
-        <HStack align="stretch" gap={6} flex={1} wrap="wrap">
+        <HStack align="stretch" gap={6} wrap="wrap">
           {/* LEFT: Question + Options */}
           <VStack gap={4} align="stretch" flex={{ base: '100%', md: 2 }} pb={{ base: 28, md: 0 }}>
             <Box
@@ -1497,8 +1496,8 @@ function QuestionView() {
                         const borderColor = isSelected ? 'brand.500' : 'border';
                         const bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
                         const keyBg = isSelected ? 'brand.600' : 'transparent';
-                        const keyBorderColor: any = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
-                        const keyTextColor: any = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
+                        const keyBorderColor: string | { _light: string; _dark: string } = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
+                        const keyTextColor: string | { _light: string; _dark: string } = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
 
                         return (
                           <Box
