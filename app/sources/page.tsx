@@ -86,6 +86,18 @@ const SOURCES = [
     description: `An unofficial guide to help you prepare for the ${cert.fullName} certification.`,
     url: 'https://claudecertifications.com/claude-certified-architect/exam-guide',
     category: 'Community Resources'
+  },
+  {
+    title: 'Claude Certification Guide - Diagnostic',
+    description: 'A diagnostic tool to help you assess your readiness and identify gaps before taking the certification exam.',
+    url: 'https://claudecertificationguide.com/learn/diagnostic',
+    category: 'Community Resources'
+  },
+  {
+    title: 'CCAF Reference',
+    description: 'A community-built reference guide covering key concepts for the Claude Certified Architect - Foundations certification.',
+    url: 'https://ccaf-reference.vercel.app/',
+    category: 'Community Resources'
   }
 ];
 
