@@ -14,20 +14,24 @@ import {
   Progress,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
+import {
+  useProfessionalExamStore,
+  isMultiSelect,
+  isMatching,
+  isAnswerCorrect,
+  type ProfessionalQuestion,
+  type ProfessionalAnswer,
+  TOTAL_SECONDS,
+  TOTAL_QUESTIONS,
+  PER_QUESTION_TIME_LIMIT_SECONDS,
+  FAST_ANSWER_FLOOR_SECONDS,
+} from '@/hooks/useProfessionalExamState';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
 import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
-import { getActiveCertification } from '@/lib/certifications';
 import { PasserTips } from '@/components/PasserTips';
 
-const activeCertification = getActiveCertification();
-
-// Compact display labels for this view's grid/badge UI -- shorter than
-// DOMAINS[].name, distinct from DOMAINS[].shortName. Keyed directly by
-// domain id (slug) now that both question banks share one domain
-// taxonomy; no more D1-D5 translation needed.
 const DOMAIN_NAMES: Record<string, string> = {
   'agentic-architecture': 'Agentic Architecture',
   'tool-design-mcp': 'Tool Design & MCP',
@@ -36,175 +40,24 @@ const DOMAIN_NAMES: Record<string, string> = {
   'context-management': 'Context Management',
 };
 
-const DIFFICULTY_COLORS = {
-  '2x': { bg: 'rgba(250, 140, 110, 0.12)', border: 'rgba(250, 140, 110, 0.35)', text: '#c83b14' },
-  '3x': { bg: 'rgba(160, 110, 250, 0.12)', border: 'rgba(160, 110, 250, 0.35)', text: '#6f2bc8' },
-};
+const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E'];
 
-const OPTION_LABELS = ['A', 'B', 'C', 'D'];
-
-const QUICK_RESOURCES = [
-  {
-    label: 'Official Docs',
-    title: `${activeCertification.shortName} Exam Guide`,
-    description: 'Official PDF covering all exam domains, weights, and format.',
-    url: 'https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf',
-  },
-  {
-    label: 'Essentials',
-    title: 'Claude Partner Network Path',
-    description: 'Official Skilljar learning path required for certification.',
-    url: 'https://anthropic.skilljar.com/page/claude-partner-network-learning-path',
-  },
-  {
-    label: 'Courses',
-    title: 'Learn Anthropic (Skilljar)',
-    description: "Anthropic's official platform with all Claude courses and modules.",
-    url: 'https://learn.anthropic.com/',
-  },
-  {
-    label: 'Guides',
-    title: 'Prompt Engineering Guide',
-    description: 'Best practices and strategies for writing effective Claude prompts.',
-    url: 'https://docs.anthropic.com/en/docs/prompt-engineering',
-  },
-];
-
-// Renders sourceExcerpt with sourceHighlight wrapped in a <mark>. Since this is our
-// own DOM (not a cross-origin page), the highlight always works — no dependency on
-// browser support or the external page still containing the exact phrase.
-function renderHighlightedExcerpt(excerpt: string, highlight?: string) {
-  if (!highlight) return excerpt;
-  const idx = excerpt.indexOf(highlight);
-  if (idx === -1) return excerpt;
-  return (
-    <>
-      {excerpt.slice(0, idx)}
-      <Box
-        as="mark"
-        bg="rgba(250, 204, 21, 0.45)"
-        color="inherit"
-        px="2px"
-        borderRadius="sm"
-        _dark={{ bg: 'rgba(250, 204, 21, 0.3)' }}
-      >
-        {highlight}
-      </Box>
-      {excerpt.slice(idx + highlight.length)}
-    </>
-  );
+function isSelected(userAnswer: ProfessionalAnswer, idx: number): boolean {
+  if (userAnswer === null) return false;
+  return Array.isArray(userAnswer) ? userAnswer.includes(idx) : userAnswer === idx;
 }
 
-function SourceModal({ question, onClose }: { question: AdvancedQuestion | null; onClose: () => void }) {
-  return (
-    <AnimatePresence>
-      {question && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(10,14,40,0.72)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '24px',
-          }}
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ scale: 0.94, opacity: 0, y: 12 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.94, opacity: 0, y: 12 }}
-            transition={{ duration: 0.2 }}
-            style={{ width: '100%', maxWidth: '480px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Box
-              bg="rgba(255,255,255,0.97)"
-              _dark={{ bg: 'rgba(20,30,58,0.98)' }}
-              borderRadius="2xl"
-              border="1px solid rgba(255,255,255,0.35)"
-              boxShadow="0 24px 64px rgba(10,14,40,0.35)"
-              overflow="hidden"
-              p={6}
-            >
-              <HStack justify="space-between" align="flex-start" mb={3}>
-                <Text fontSize="xs" fontWeight={800} color="brand.600" fontFamily="mono" letterSpacing="0.03em"
-                  _dark={{ color: 'brand.300' }}>
-                  {question.sourceLabel ?? 'Source'}
-                </Text>
-                <Box
-                  as="button"
-                  onClick={onClose}
-                  color="gray.400"
-                  _hover={{ color: 'gray.600' }}
-                  aria-label="Close"
-                  lineHeight={1}
-                  fontSize="lg"
-                >
-                  ✕
-                </Box>
-              </HStack>
-
-              {question.sourceExcerpt ? (
-                <Box
-                  p={4}
-                  bg="rgba(57,73,171,0.05)"
-                  borderRadius="lg"
-                  borderLeft="3px solid rgba(57,73,171,0.3)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.4)' }}
-                >
-                  <Text fontSize="sm" color="gray.700" lineHeight="tall" fontStyle="italic" _dark={{ color: 'gray.200' }}>
-                    &ldquo;{renderHighlightedExcerpt(question.sourceExcerpt, question.sourceHighlight)}&rdquo;
-                  </Text>
-                </Box>
-              ) : (
-                <Text fontSize="sm" color="gray.500">
-                  No excerpt available for this source yet — open the full page below to review it.
-                </Text>
-              )}
-
-              <HStack justify="space-between" align="center" mt={5} pt={4} borderTop="1px solid rgba(0,0,0,0.06)"
-                _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                <Button size="sm" variant="outline" borderColor="brand.300" color="brand.600" fontWeight={700}
-                  borderRadius="lg" onClick={onClose}>
-                  Close
-                </Button>
-                {question.sourceUrl && (
-                  <Link
-                    href={question.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    display="inline-flex"
-                    alignItems="center"
-                    gap={1}
-                    fontSize="xs"
-                    fontWeight={700}
-                    color="brand.500"
-                    _dark={{ color: 'brand.300' }}
-                    _hover={{ color: 'brand.700', textDecoration: 'underline' }}
-                  >
-                    Open full page
-                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                  </Link>
-                )}
-              </HStack>
-            </Box>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+// A matching question is "fully assigned" once every row has a non-null pick
+// -- that's the gate for enabling the Confirm Matches button.
+function isMatchingFilled(q: ProfessionalQuestion, userAnswer: ProfessionalAnswer): boolean {
+  if (!Array.isArray(userAnswer)) return false;
+  const pairCount = q.pairs?.length ?? 0;
+  return userAnswer.length === pairCount && userAnswer.every((v) => v !== null);
 }
 
 function StartScreen({ onStart }: { onStart: () => void }) {
-  const domainCounts: Record<string, number> = { D1: 15, D2: 9, D3: 12, D4: 12, D5: 12 };
+  const total = TOTAL_QUESTIONS;
+
   return (
     <Box minH="100vh" bg="transparent">
       <Container maxW="container.md" py={[8, 14]}>
@@ -218,40 +71,15 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 px={3} py={1} borderRadius="full" fontSize="xs" fontWeight={700} mb={4}
                 _dark={{ color: '#b996fb', bg: 'rgba(160,110,250,0.18)' }}
               >
-                Advanced Practice (CCAF)
+                Professional Mode (CCARP)
               </Badge>
               <Heading as="h1" size="2xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-                Advanced Practice (CCAF)
+                Professional Mode (CCARP)
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
-                60 scenario-based questions covering all 5 exam domains.
-                2-hour timed — answers and explanations revealed after you finish.
+                {total} scenario-based questions, including select-two and scenario matching items.
+                Timed — answers and explanations revealed after you finish.
               </Text>
-            </Box>
-
-            <Box
-              p={6}
-              bg="rgba(255, 255, 255, 0.45)"
-              backdropFilter="blur(12px)"
-              borderRadius="xl"
-              border="1px solid rgba(255, 255, 255, 0.35)"
-              boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.04)"
-              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
-            >
-              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4}>Question Distribution</Text>
-              <SimpleGrid columns={[2, 3, 5]} gap={3}>
-                {DOMAINS.map((d) => (
-                  <Box key={d.id} p={3} borderRadius="lg" border="1px solid" borderColor="rgba(255,255,255,0.3)"
-                    bg="rgba(255,255,255,0.35)" _dark={{ bg: 'rgba(30,41,59,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                    <Badge bg={DOMAIN_SOLID_BGS[d.id]} color={DOMAIN_SOLID_TEXT[d.id]} px={2} py={0.5} borderRadius="md"
-                      fontSize="2xs" fontFamily="mono" fontWeight={700} mb={1.5} display="block" w="fit-content">
-                      {d.id}
-                    </Badge>
-                    <Text fontSize="xs" fontWeight={700} color="brand.700" lineHeight={1.3}>{DOMAIN_NAMES[d.id]}</Text>
-                    <Text fontSize="2xs" color="gray.500" mt={1}>{domainCounts[d.id]} questions</Text>
-                  </Box>
-                ))}
-              </SimpleGrid>
             </Box>
 
             <Box
@@ -264,8 +92,8 @@ function StartScreen({ onStart }: { onStart: () => void }) {
             >
               <SimpleGrid columns={[1, 3]} gap={4}>
                 {[
-                  { label: '60 Questions', sub: 'All 5 domains covered' },
-                  { label: '2-Hour Timer', sub: 'Matches real exam format' },
+                  { label: `${total} Questions`, sub: 'Single & multi-select' },
+                  { label: 'Timed', sub: 'Matches real exam pacing' },
                   { label: 'Scenario-Based', sub: 'Deep comprehension questions' },
                 ].map((item) => (
                   <Box key={item.label} textAlign="center">
@@ -317,35 +145,17 @@ function StartScreen({ onStart }: { onStart: () => void }) {
 
 type ReviewFilter = 'all' | 'correct' | 'incorrect' | 'flagged';
 
-// Plausible minimum reading+reasoning time per difficulty tier. Below
-// this floor, a correct answer is much more likely to be copied from
-// somewhere than actually worked out -- these questions are dense,
-// multi-paragraph scenarios, not quick recall lookups.
-const FAST_ANSWER_FLOOR_SECONDS: Record<'2x' | '3x', number> = {
-  '2x': 45,
-  '3x': 90,
-};
-
-// Hard per-question time limit -- the upper end of the expected reading
-// window. Once reached, the question auto-advances (skips), answered or
-// not, so lingering on one question to go look something up costs the
-// question rather than just costing time.
-const PER_QUESTION_TIME_LIMIT_SECONDS: Record<'2x' | '3x', number> = {
-  '2x': 60,
-  '3x': 105,
-};
-
 function ResultsScreen({ onReset }: { onReset: () => void }) {
-  const { getScore, questions, answers, flagged, startTime, endTime, questionTimeSpent } = useAdvancedExamStore();
+  const { getScore, questions, answers, locked, flagged, startTime, endTime, questionTimeSpent } = useProfessionalExamStore();
   const { correct, total, pct } = getScore();
-  const scaledScore = Math.round(100 + (pct / 100) * 900);
-  const passed = scaledScore >= activeCertification.passThreshold;
+  const passed = pct >= 72; // 720/1000 scaled-score threshold, expressed as a percentage
   const [showReview, setShowReview] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
-  const [activeSource, setActiveSource] = useState<AdvancedQuestion | null>(null);
 
-  const incorrectCount = answers.filter((a, i) => a !== null && a !== questions[i].correctAnswer).length;
-  const unansweredCount = answers.filter((a) => a === null).length;
+  // "Answered" means locked/confirmed -- a multi-select or matching question
+  // with a partial, never-confirmed selection still counts as unanswered.
+  const incorrectCount = questions.filter((q, i) => locked[i] && !isAnswerCorrect(q, answers[i])).length;
+  const unansweredCount = locked.filter((l) => !l).length;
   const flaggedCount = flagged.filter(Boolean).length;
   const timeTakenSeconds = startTime && endTime ? Math.round((endTime - startTime) / 1000) : 0;
   const timeDisplay = (() => {
@@ -354,23 +164,17 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
   })();
 
-  // Self-check flag, not a punishment: an answered question completed
-  // faster than the plausible reading floor for its difficulty tier.
-  const answeredIdx = answers.map((a, i) => (a !== null ? i : -1)).filter((i) => i !== -1);
-  const fastAnswered = answeredIdx.filter((i) => {
-    const floor = FAST_ANSWER_FLOOR_SECONDS[questions[i].difficulty];
-    const seconds = (questionTimeSpent[i] ?? 0) / 1000;
-    return seconds < floor;
-  });
+  const answeredIdx = locked.map((l, i) => (l ? i : -1)).filter((i) => i !== -1);
+  const fastAnswered = answeredIdx.filter((i) => (questionTimeSpent[i] ?? 0) / 1000 < FAST_ANSWER_FLOOR_SECONDS);
   const fastPct = answeredIdx.length > 0 ? fastAnswered.length / answeredIdx.length : 0;
-  const showFastFlag = correct >= 50 && answeredIdx.length >= 20 && fastPct > 0.5;
+  const showFastFlag = correct >= 40 && answeredIdx.length >= 20 && fastPct > 0.5;
 
   const filteredEntries = questions
     .map((q, idx) => ({ q, idx }))
     .filter(({ q, idx }) => {
-      const isCorrectQ = answers[idx] === q.correctAnswer;
+      const isCorrectQ = isAnswerCorrect(q, answers[idx]);
       if (reviewFilter === 'correct') return isCorrectQ;
-      if (reviewFilter === 'incorrect') return answers[idx] !== null && !isCorrectQ;
+      if (reviewFilter === 'incorrect') return locked[idx] && !isCorrectQ;
       if (reviewFilter === 'flagged') return flagged[idx];
       return true;
     });
@@ -386,10 +190,10 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
     const qs = questions.filter((q) => q.domain === d.id);
     const correctCount = qs.filter((q) => {
       const idx = questions.indexOf(q);
-      return answers[idx] === q.correctAnswer;
+      return isAnswerCorrect(q, answers[idx]);
     }).length;
     return { domain: d, correct: correctCount, total: qs.length };
-  });
+  }).filter((d) => d.total > 0);
 
   return (
     <Box minH="100vh" bg="transparent">
@@ -409,7 +213,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
             >
               <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em" mb={3}
                 _dark={{ color: 'brand.300' }}>
-                ADVANCED MODE (CCAF)
+                PROFESSIONAL MODE (CCARP)
               </Text>
               <Badge
                 size="md"
@@ -425,7 +229,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 fontWeight={700}
                 fontFamily="mono"
               >
-                {passed ? 'PASSED MOCK EXAMS' : 'PRACTICE MORE'}
+                {passed ? 'PASSED MOCK EXAM' : 'PRACTICE MORE'}
               </Badge>
 
               <Text
@@ -439,18 +243,14 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 {pct}%
               </Text>
 
-              <Text fontSize="xs" fontFamily="mono" color="gray.400" fontWeight={600} mt={2}>
-                Scaled Score Equivalent: ~{scaledScore}/1000 &middot; Passing Mark: 720
-              </Text>
-
               <Heading as="h2" size="md" fontWeight={700} mt={4} color="brand.700">
-                {passed ? 'Advanced Mock Exam Success!' : 'Keep Pushing Forward'}
+                {passed ? 'Professional Mock Exam Success!' : 'Keep Pushing Forward'}
               </Heading>
 
               <Text fontSize="sm" color="gray.600" lineHeight={1.7} mt={3} textAlign="left" px={[0, 2]}>
                 {passed
-                  ? "Congratulations on clearing the Advanced Mock Exam! This tier is deliberately harder than the standard practice set, so passing here is a strong signal you're ready. Keep in mind the actual proctored exam can still surprise you — stay sharp with the review kit and official Claude Partner Network resources so you carry this momentum all the way through."
-                  : "You're building real judgment by working through the hardest questions in the bank — this tier is intentionally tougher than standard practice, so don't read this score the way you'd read a regular one. Stay consistent with the review kit and official resources, and focus your next pass on the domains where you scored lowest below."}
+                  ? "Congratulations on clearing the Professional Mock Exam! This bank mixes single- and multi-select scenario questions, so passing here is a strong signal you're ready. Stay sharp with the review kit below so you carry this momentum through the real exam."
+                  : "You're building real judgment by working through this question bank -- multi-select items in particular reward reading every option carefully rather than stopping at the first plausible one. Review the domains where you scored lowest below before your next attempt."}
               </Text>
 
               <SimpleGrid columns={[2, 4]} gap={4} mt={6} pt={6} borderTop="1px solid" borderColor="border">
@@ -508,10 +308,8 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                     </Text>
                     <Text fontSize="xs" color="yellow.700" lineHeight={1.5} _dark={{ color: 'yellow.300' }}>
                       {Math.round(fastPct * 100)}% of the questions you answered were completed faster than the
-                      expected reading time for their difficulty (45s for standard questions, 90s for the harder
-                      tier). This isn't a penalty -- just a self-check: these are dense, multi-paragraph scenarios,
-                      so a score like this at this pace is worth a second look at whether every question was
-                      actually read in full.
+                      expected reading floor ({FAST_ANSWER_FLOOR_SECONDS}s). This isn&apos;t a penalty -- just a
+                      self-check worth a second look.
                     </Text>
                   </VStack>
                 </HStack>
@@ -557,7 +355,6 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
               </VStack>
             </Box>
 
-            {/* Recommended Resources — shown only on fail */}
             {!passed && (
               <Box
                 bg="rgba(255, 241, 241, 0.55)"
@@ -568,61 +365,17 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 borderRadius="2xl"
                 p={[6, 8]}
                 boxShadow="0 8px 32px 0 rgba(240, 90, 90, 0.06)"
+                textAlign="center"
               >
-                <HStack justify="space-between" align="center" mb={5} wrap="wrap" gap={3}>
-                  <VStack align="flex-start" gap={0.5}>
-                    <Heading as="h3" size="sm" fontWeight={700} color="error.700" _dark={{ color: 'red.300' }} letterSpacing="0.05em">
-                      RECOMMENDED RESOURCES
-                    </Heading>
-                    <Text fontSize="xs" color="gray.500">Start here to close the gap before your next attempt.</Text>
-                  </VStack>
-                  <Link as={NextLink} href="/sources" fontSize="xs" fontWeight={700} color="brand.600"
-                    _hover={{ color: 'brand.700', textDecoration: 'underline' }}>
-                    View all resources →
-                  </Link>
-                </HStack>
-                <SimpleGrid columns={[1, 2]} gap={4}>
-                  {QUICK_RESOURCES.map((r) => (
-                    <Link
-                      key={r.url}
-                      href={r.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      display="flex"
-                      flexDirection="column"
-                      p={4}
-                      borderRadius="xl"
-                      border="1.5px solid"
-                      borderColor="rgba(255, 255, 255, 0.4)"
-                      bg="rgba(255, 255, 255, 0.55)"
-                      backdropFilter="blur(10px)"
-                      _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
-                      transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
-                      _hover={{
-                        borderColor: 'brand.400',
-                        bg: 'rgba(255,255,255,0.8)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
-                        textDecoration: 'none',
-                      }}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <HStack justify="space-between" mb={2}>
-                        <Badge px={2} py={0.5} borderRadius="full" bg="brand.100" color="brand.700"
-                          fontSize="2xs" fontWeight={700} fontFamily="mono">
-                          {r.label}
-                        </Badge>
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" color="var(--chakra-colors-gray-400)">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                          <polyline points="15 3 21 3 21 9"></polyline>
-                          <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                      </HStack>
-                      <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1}>{r.title}</Text>
-                      <Text fontSize="xs" color="gray.500" lineHeight={1.5}>{r.description}</Text>
-                    </Link>
-                  ))}
-                </SimpleGrid>
+                <Heading as="h3" size="sm" fontWeight={700} color="error.700" _dark={{ color: 'red.300' }} letterSpacing="0.05em" mb={3}>
+                  RECOMMENDED NEXT STEP
+                </Heading>
+                <Text fontSize="sm" color="gray.600" mb={4}>Start with the study resources before your next attempt.</Text>
+                <Link as={NextLink} href="/sources" style={{ textDecoration: 'none' }}>
+                  <Button bg="brand.600" color="white" fontWeight={700} _hover={{ bg: 'brand.700' }} borderRadius="xl" px={8}>
+                    View Resources
+                  </Button>
+                </Link>
               </Box>
             )}
 
@@ -655,7 +408,6 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
               </Button>
             </HStack>
 
-            {/* Answer Review Section */}
             <AnimatePresence>
               {showReview && (
                 <motion.div
@@ -699,8 +451,13 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                     )}
                     {filteredEntries.map(({ q, idx }) => {
                       const userAns = answers[idx];
-                      const isSkipped = userAns === null;
-                      const isCorrectQ = userAns === q.correctAnswer;
+                      const isSkipped = !locked[idx];
+                      const isCorrectQ = isAnswerCorrect(q, userAns);
+                      const matchingQ = isMatching(q);
+                      const correctSet = isMultiSelect(q) ? (q.correctAnswers ?? []) : [q.correctAnswer];
+                      const userSet: number[] = Array.isArray(userAns)
+                        ? userAns.filter((v): v is number => v !== null)
+                        : (userAns !== null ? [userAns] : []);
                       return (
                         <Box
                           key={q.id}
@@ -727,12 +484,24 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                               px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}>
                               {q.domain}
                             </Badge>
+                            {isMultiSelect(q) && (
+                              <Badge bg="purple.100" color="purple.800" px={2} borderRadius="md" fontSize="2xs"
+                                fontFamily="mono" fontWeight={700} _dark={{ bg: 'rgba(168,85,247,0.15)', color: 'purple.200' }}>
+                                SELECT TWO
+                              </Badge>
+                            )}
+                            {matchingQ && (
+                              <Badge bg="blue.100" color="blue.800" px={2} borderRadius="md" fontSize="2xs"
+                                fontFamily="mono" fontWeight={700} _dark={{ bg: 'rgba(59,130,246,0.15)', color: 'blue.200' }}>
+                                MATCHING
+                              </Badge>
+                            )}
                             <Text fontSize="xs" fontWeight={700} color={isSkipped ? 'gray.500' : isCorrectQ ? 'green.600' : 'red.500'}>
                               {isSkipped ? '○ Skipped' : isCorrectQ ? '✓ Correct' : '✗ Incorrect'}
                             </Text>
-                            {!isCorrectQ && !isSkipped && (
+                            {!matchingQ && !isCorrectQ && !isSkipped && (
                               <Text fontSize="xs" color="gray.500">
-                                Your answer: {OPTION_LABELS[userAns]} · Correct: {OPTION_LABELS[q.correctAnswer]}
+                                Your answer: {userSet.map((i) => OPTION_LABELS[i]).join(', ')} · Correct: {correctSet.map((i) => OPTION_LABELS[i]).join(', ')}
                               </Text>
                             )}
                           </HStack>
@@ -744,18 +513,30 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
                           {isSkipped ? (
                             <>
-                              <VStack gap={1.5} align="stretch" mb={3}>
-                                {q.options.map((opt, oidx) => (
-                                  <HStack key={oidx} gap={2} p={2.5} borderRadius="lg" border="1px solid" borderColor="transparent">
-                                    <Text fontSize="xs" fontWeight={800} fontFamily="mono" color="gray.400" minW={4}>
-                                      {OPTION_LABELS[oidx]}
-                                    </Text>
-                                    <Text fontSize="xs" color="gray.700" lineHeight="tall" flex={1} _dark={{ color: 'gray.300' }}>
-                                      {opt}
-                                    </Text>
-                                  </HStack>
-                                ))}
-                              </VStack>
+                              {matchingQ ? (
+                                <VStack gap={1.5} align="stretch" mb={3}>
+                                  {(q.pairs ?? []).map((p, pidx) => (
+                                    <HStack key={pidx} gap={2} p={2.5} borderRadius="lg" border="1px solid" borderColor="transparent">
+                                      <Text fontSize="xs" color="gray.700" lineHeight="tall" flex={1} _dark={{ color: 'gray.300' }}>
+                                        {p.requirement}
+                                      </Text>
+                                    </HStack>
+                                  ))}
+                                </VStack>
+                              ) : (
+                                <VStack gap={1.5} align="stretch" mb={3}>
+                                  {q.options.map((opt, oidx) => (
+                                    <HStack key={oidx} gap={2} p={2.5} borderRadius="lg" border="1px solid" borderColor="transparent">
+                                      <Text fontSize="xs" fontWeight={800} fontFamily="mono" color="gray.400" minW={4}>
+                                        {OPTION_LABELS[oidx]}
+                                      </Text>
+                                      <Text fontSize="xs" color="gray.700" lineHeight="tall" flex={1} _dark={{ color: 'gray.300' }}>
+                                        {opt}
+                                      </Text>
+                                    </HStack>
+                                  ))}
+                                </VStack>
+                              )}
                               <Box
                                 p={3}
                                 bg="rgba(148,163,184,0.08)"
@@ -764,16 +545,43 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                 _dark={{ bg: 'rgba(148,163,184,0.1)', borderColor: 'rgba(148,163,184,0.4)' }}
                               >
                                 <Text fontSize="xs" color="gray.500" lineHeight="tall">
-                                  You didn't answer this one, so the correct answer and explanation stay hidden — attempt it in a future session to see them.
+                                  You didn&apos;t answer this one, so the correct answer and explanation stay hidden — attempt it in a future session to see them.
                                 </Text>
                               </Box>
                             </>
                           ) : (
                           <>
+                          {matchingQ ? (
+                            <VStack gap={1.5} align="stretch" mb={3}>
+                              {(q.pairs ?? []).map((p, pidx) => {
+                                const picked = Array.isArray(userAns) ? userAns[pidx] : null;
+                                const rowCorrect = picked === p.correctOptionIndex;
+                                return (
+                                  <Box key={pidx} p={2.5} borderRadius="lg" border="1px solid"
+                                    bg={rowCorrect ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.07)'}
+                                    borderColor={rowCorrect ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.25)'}>
+                                    <Text fontSize="xs" fontWeight={600} color="gray.700" mb={1.5} lineHeight="tall" _dark={{ color: 'gray.200' }}>
+                                      {p.requirement}
+                                    </Text>
+                                    <HStack gap={2} fontSize="xs">
+                                      <Text color={rowCorrect ? 'green.600' : 'red.500'} fontWeight={700}>
+                                        Your match: {picked !== null && picked !== undefined ? q.options[picked] : '(none)'}
+                                      </Text>
+                                      {rowCorrect ? (
+                                        <Text color="green.500">✓</Text>
+                                      ) : (
+                                        <Text color="gray.500">· Correct: {q.options[p.correctOptionIndex]}</Text>
+                                      )}
+                                    </HStack>
+                                  </Box>
+                                );
+                              })}
+                            </VStack>
+                          ) : (
                           <VStack gap={1.5} align="stretch" mb={3}>
                             {q.options.map((opt, oidx) => {
-                              const isCorrectOpt = oidx === q.correctAnswer;
-                              const isSelectedOpt = oidx === userAns;
+                              const isCorrectOpt = correctSet.includes(oidx);
+                              const isSelectedOpt = userSet.includes(oidx);
                               return (
                                 <HStack
                                   key={oidx}
@@ -811,6 +619,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                               );
                             })}
                           </VStack>
+                          )}
 
                           <Box
                             p={3}
@@ -823,31 +632,6 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                             <Text fontSize="xs" color="gray.600" lineHeight="tall" _dark={{ color: 'gray.400' }}>
                               {q.explanation}
                             </Text>
-                            {q.sourceUrl && (
-                              <Box
-                                as="button"
-                                display="inline-flex"
-                                alignItems="center"
-                                gap={1}
-                                mt={2.5}
-                                pt={2}
-                                w="100%"
-                                borderTop="1px solid rgba(57,73,171,0.12)"
-                                fontSize="2xs"
-                                fontWeight={700}
-                                color="brand.500"
-                                _dark={{ color: 'brand.300' }}
-                                _hover={{ color: 'brand.700', textDecoration: 'underline' }}
-                                onClick={() => setActiveSource(q)}
-                              >
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                  <circle cx="12" cy="12" r="10"></circle>
-                                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                                {q.sourceLabel ?? 'View Source'}
-                              </Box>
-                            )}
                           </Box>
                           </>
                           )}
@@ -869,17 +653,17 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
           </VStack>
         </motion.div>
       </Container>
-      <SourceModal question={activeSource} onClose={() => setActiveSource(null)} />
     </Box>
   );
 }
 
 function QuestionView() {
   const {
-    questions, currentQuestion, answers, flagged,
-    setAnswer, nextQuestion, prevQuestion, goToQuestion,
+    questions, currentQuestion, answers, flagged, locked,
+    setAnswer, toggleMultiOption, setMatchingAnswer, lockCurrentAnswer,
+    nextQuestion, prevQuestion, goToQuestion,
     toggleFlag, complete, startReview, restartCurrentSession,
-  } = useAdvancedExamStore();
+  } = useProfessionalExamStore();
 
   const [isPaused, setIsPaused] = useState(false);
   const [finishDialogOpen, setFinishDialogOpen] = useState(false);
@@ -911,17 +695,10 @@ function QuestionView() {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPaused, complete]);
 
-  // Live "time on this question" stopwatch -- resets whenever the current
-  // question changes, so the learner can see their own pace in real time
-  // (not just the overall countdown), matching the per-question floors
-  // used for the fast-completion flag on the results screen. Once it
-  // reaches the hard per-question limit, the question auto-advances --
-  // answered or not -- rather than letting someone sit on one question
-  // indefinitely.
   useEffect(() => {
     setQuestionSeconds(0);
     if (isPaused) return;
-    const limit = PER_QUESTION_TIME_LIMIT_SECONDS[questions[currentQuestion].difficulty];
+    const limit = PER_QUESTION_TIME_LIMIT_SECONDS;
     const isLastQuestion = currentQuestion === questions.length - 1;
     questionIntervalRef.current = setInterval(() => {
       setQuestionSeconds((prev) => {
@@ -948,29 +725,36 @@ function QuestionView() {
   const timerDisplay = `${timerHours.toString().padStart(2, '0')}:${timerMinutes.toString().padStart(2, '0')}:${timerSeconds.toString().padStart(2, '0')}`;
   const timerIsLow = secondsLeft < 300 && secondsLeft > 0;
 
-  const q: AdvancedQuestion = questions[currentQuestion];
-  const domainKey = q.domain;
+  const q: ProfessionalQuestion = questions[currentQuestion];
+  const domainKey = q?.domain;
   const userAnswer = answers[currentQuestion];
   const isFlagged = flagged[currentQuestion];
-  const answered = userAnswer !== null;
-  const totalAnswered = answers.filter((a) => a !== null).length;
+  const answered = locked[currentQuestion];
+  const totalAnswered = locked.filter(Boolean).length;
   const unanswered = questions.length - totalAnswered;
   const flaggedCount = flagged.filter(Boolean).length;
 
   if (!q) return null;
 
-  const diffColors = DIFFICULTY_COLORS[q.difficulty];
+  const multiSelect = isMultiSelect(q);
+  const matchingQuestion = isMatching(q);
+  const maxSelect = q.correctAnswers?.length ?? Infinity;
+  const selectedCount = Array.isArray(userAnswer) ? userAnswer.length : 0;
+  const atMaxSelect = multiSelect && selectedCount >= maxSelect;
   const isLast = currentQuestion === questions.length - 1;
 
-  // Mirrors Exam Mode: the question map can only jump to an already-answered
-  // question or the next unanswered one — no skipping ahead to preview later questions.
-  const maxAnsweredIdx = answers.reduce<number>((max, a, i) => (a !== null ? Math.max(max, i) : max), -1);
+  const maxAnsweredIdx = locked.reduce<number>((max, l, i) => (l ? Math.max(max, i) : max), -1);
   const canNavigateTo = (idx: number) => idx <= maxAnsweredIdx + 1;
 
   const handleOptionClick = (idx: number) => {
-    // Once an answer is picked for a question, it's final — no changing your mind.
     if (answered) return;
-    setAnswer(idx);
+    if (multiSelect) toggleMultiOption(idx);
+    else setAnswer(idx);
+  };
+
+  const handleMatchClick = (pairIndex: number, optionIndex: number) => {
+    if (answered) return;
+    setMatchingAnswer(pairIndex, optionIndex);
   };
 
   const handleFinish = () => {
@@ -986,8 +770,7 @@ function QuestionView() {
   const renderQuestionGrid = () => (
     <Box display="flex" flexWrap="wrap" gap={1.5}>
       {questions.map((_, idx) => {
-        const ans = answers[idx];
-        const isAnsweredQ = ans !== null;
+        const isAnsweredQ = locked[idx];
         const isCurrent = idx === currentQuestion;
         const isFlaggedQ = flagged[idx];
         const isNavigable = canNavigateTo(idx);
@@ -1056,7 +839,6 @@ function QuestionView() {
         hideFullscreenPrompt={isPaused}
       />
 
-      {/* Per-question time limit reached -- auto-advanced */}
       <AnimatePresence>
         {showSkipNotice && (
           <motion.div
@@ -1080,7 +862,6 @@ function QuestionView() {
         )}
       </AnimatePresence>
 
-      {/* Pause overlay */}
       <AnimatePresence>
         {isPaused && (
           <motion.div
@@ -1192,7 +973,6 @@ function QuestionView() {
         )}
       </AnimatePresence>
 
-      {/* Finish confirmation dialog */}
       <AnimatePresence>
         {finishDialogOpen && (
           <motion.div
@@ -1227,7 +1007,7 @@ function QuestionView() {
               >
                 <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em" mb={2}
                   _dark={{ color: 'brand.300' }}>
-                  ADVANCED MODE (CCAF)
+                  PROFESSIONAL MODE (CCARP)
                 </Text>
                 <Heading size="md" fontWeight={700} color="brand.800" _dark={{ color: 'brand.200' }} mb={4}>
                   Finish Practice Session?
@@ -1267,7 +1047,7 @@ function QuestionView() {
           <HStack justify="space-between" align="center" wrap="wrap" gap={3}>
             <HStack gap={3}>
               <Text fontSize="sm" fontWeight={700} color="brand.700">
-                Advanced Practice (CCAF)
+                Professional Mode (CCARP)
               </Text>
               <HStack
                 gap={1.5}
@@ -1310,7 +1090,6 @@ function QuestionView() {
                 )}
               </HStack>
 
-              {/* Live time-on-this-question stopwatch, resets per question */}
               <HStack
                 gap={1.5}
                 px={3}
@@ -1329,16 +1108,16 @@ function QuestionView() {
                   fontSize="xs"
                   fontWeight={700}
                   color={
-                    questionSeconds >= PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] - 10
+                    questionSeconds >= PER_QUESTION_TIME_LIMIT_SECONDS - 10
                       ? 'red.500'
-                      : questionSeconds > FAST_ANSWER_FLOOR_SECONDS[q.difficulty]
+                      : questionSeconds > FAST_ANSWER_FLOOR_SECONDS
                       ? 'gray.600'
                       : 'orange.500'
                   }
                 >
                   {Math.floor(questionSeconds / 60)}:{(questionSeconds % 60).toString().padStart(2, '0')}
                   {' / '}
-                  {Math.floor(PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] / 60)}:{(PER_QUESTION_TIME_LIMIT_SECONDS[q.difficulty] % 60).toString().padStart(2, '0')}
+                  {Math.floor(PER_QUESTION_TIME_LIMIT_SECONDS / 60)}:{(PER_QUESTION_TIME_LIMIT_SECONDS % 60).toString().padStart(2, '0')}
                 </Text>
               </HStack>
             </HStack>
@@ -1388,7 +1167,6 @@ function QuestionView() {
 
       {/* Main content */}
       <Container maxW="container.xl" py={[4, 6]} flex={1} display="flex" flexDirection="column" justifyContent="center">
-        {/* Mobile collapsible question map */}
         <AnimatePresence>
           {mobileNavOpen && (
             <motion.div
@@ -1450,17 +1228,32 @@ function QuestionView() {
                         >
                           {q.domain}
                         </Badge>
-                        <Badge
-                          bg={diffColors.bg}
-                          color={diffColors.text}
-                          border="1px solid"
-                          borderColor={diffColors.border}
-                          px={2.5} py={0.5} borderRadius="md"
-                          fontSize="2xs" fontWeight={700}
-                          _dark={{ color: q.difficulty === '3x' ? '#b996fb' : '#fa9a80' }}
-                        >
-                          {q.difficulty} Difficulty
-                        </Badge>
+                        {multiSelect && (
+                          <Badge
+                            bg="purple.100"
+                            color="purple.800"
+                            border="1px solid"
+                            borderColor="purple.200"
+                            px={2.5} py={0.5} borderRadius="md"
+                            fontSize="2xs" fontWeight={700}
+                            _dark={{ bg: 'rgba(168,85,247,0.15)', color: 'purple.200', borderColor: 'rgba(168,85,247,0.3)' }}
+                          >
+                            SELECT TWO
+                          </Badge>
+                        )}
+                        {matchingQuestion && (
+                          <Badge
+                            bg="blue.100"
+                            color="blue.800"
+                            border="1px solid"
+                            borderColor="blue.200"
+                            px={2.5} py={0.5} borderRadius="md"
+                            fontSize="2xs" fontWeight={700}
+                            _dark={{ bg: 'rgba(59,130,246,0.15)', color: 'blue.200', borderColor: 'rgba(59,130,246,0.3)' }}
+                          >
+                            SCENARIO MATCHING
+                          </Badge>
+                        )}
                       </HStack>
                       <HStack gap={3}>
                         <Button
@@ -1488,72 +1281,160 @@ function QuestionView() {
                       {q.text}
                     </Heading>
 
-                    {/* Options */}
-                    <VStack gap={3} align="stretch">
-                      {q.options.map((opt, idx) => {
-                        const isSelected = userAnswer === idx;
-
-                        const borderColor = isSelected ? 'brand.500' : 'border';
-                        const bg = isSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
-                        const keyBg = isSelected ? 'brand.600' : 'transparent';
-                        const keyBorderColor: string | { _light: string; _dark: string } = isSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
-                        const keyTextColor: string | { _light: string; _dark: string } = isSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
-
-                        return (
-                          <Box
-                            key={idx}
-                            as="button"
-                            w="100%"
-                            display="flex"
-                            alignItems="flex-start"
-                            gap={3.5}
-                            p={4}
-                            borderRadius="xl"
-                            border="2px solid"
-                            borderColor={borderColor}
-                            bg={bg}
-                            backdropFilter="blur(8px)"
-                            cursor={answered ? 'default' : 'pointer'}
-                            transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                            textAlign="left"
-                            _dark={{
-                              bg: isSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
-                              borderColor: isSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
-                            }}
-                            _hover={!answered ? {
-                              borderColor: 'brand.400',
-                              bg: 'rgba(255,255,255,0.45)',
-                              _dark: { bg: 'rgba(30,41,59,0.5)' },
-                            } : {}}
-                            onClick={() => handleOptionClick(idx)}
-                          >
-                            <Box
-                              w="24px"
-                              h="24px"
-                              borderRadius="md"
-                              border="1.5px solid"
-                              borderColor={keyBorderColor}
-                              bg={keyBg}
-                              display="flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              flexShrink={0}
-                              color={keyTextColor}
-                              fontFamily="mono"
-                              fontSize="xs"
-                              fontWeight={700}
-                              mt="1px"
-                            >
-                              {OPTION_LABELS[idx]}
+                    {/* Options -- Scenario Matching gets its own per-row picker;
+                        single/multi share the flat clickable-list layout. */}
+                    {matchingQuestion ? (
+                      <VStack gap={4} align="stretch">
+                        {(q.pairs ?? []).map((pair, pairIdx) => {
+                          const picked = Array.isArray(userAnswer) ? userAnswer[pairIdx] : null;
+                          return (
+                            <Box key={pairIdx} p={3} borderRadius="lg" border="1px solid"
+                              borderColor="rgba(57,73,171,0.15)" bg="rgba(57,73,171,0.03)"
+                              _dark={{ bg: 'rgba(124,110,250,0.06)', borderColor: 'rgba(255,255,255,0.08)' }}>
+                              <Text fontSize="sm" fontWeight={600} color="brand.700" mb={2.5} lineHeight={1.5}
+                                _dark={{ color: 'gray.100' }}>
+                                {pair.requirement}
+                              </Text>
+                              <HStack gap={2} flexWrap="wrap">
+                                {q.options.map((opt, optIdx) => {
+                                  const rowSelected = picked === optIdx;
+                                  return (
+                                    <Box
+                                      key={optIdx}
+                                      as="button"
+                                      px={3} py={2}
+                                      borderRadius="lg"
+                                      border="1.5px solid"
+                                      borderColor={rowSelected ? 'brand.500' : 'border'}
+                                      bg={rowSelected ? 'brand.600' : 'transparent'}
+                                      color={rowSelected ? 'white' : 'gray.700'}
+                                      fontSize="xs"
+                                      fontWeight={rowSelected ? 700 : 500}
+                                      cursor={answered ? 'default' : 'pointer'}
+                                      transition="all 0.15s"
+                                      _dark={{ color: rowSelected ? 'white' : 'gray.300', borderColor: rowSelected ? 'brand.500' : 'rgba(255,255,255,0.12)' }}
+                                      _hover={!answered ? { borderColor: 'brand.400' } : {}}
+                                      onClick={() => handleMatchClick(pairIdx, optIdx)}
+                                    >
+                                      {opt}
+                                    </Box>
+                                  );
+                                })}
+                              </HStack>
                             </Box>
-                            <Text fontSize="sm" color="gray.700" fontWeight={isSelected ? 600 : 500}
-                              lineHeight={1.5} mt="1px" _dark={{ color: 'gray.200' }}>
-                              {opt}
-                            </Text>
-                          </Box>
-                        );
-                      })}
-                    </VStack>
+                          );
+                        })}
+                      </VStack>
+                    ) : (
+                      <VStack gap={3} align="stretch">
+                        {q.options.map((opt, idx) => {
+                          const optSelected = isSelected(userAnswer, idx);
+                          // Once a "Select TWO" question has its full quota
+                          // checked, the remaining unselected options close
+                          // (stop accepting clicks) until one is unchecked.
+                          const optClosed = atMaxSelect && !optSelected;
+
+                          const borderColor = optSelected ? 'brand.500' : 'border';
+                          const bg = optSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
+                          const keyBg = optSelected ? 'brand.600' : 'transparent';
+                          const keyBorderColor: string | { _light: string; _dark: string } = optSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
+                          const keyTextColor: string | { _light: string; _dark: string } = optSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
+                          const canClick = !answered && !optClosed;
+
+                          return (
+                            <Box
+                              key={idx}
+                              as="button"
+                              w="100%"
+                              display="flex"
+                              alignItems="flex-start"
+                              gap={3.5}
+                              p={4}
+                              borderRadius="xl"
+                              border="2px solid"
+                              borderColor={borderColor}
+                              bg={bg}
+                              opacity={optClosed ? 0.45 : 1}
+                              backdropFilter="blur(8px)"
+                              cursor={canClick ? 'pointer' : 'not-allowed'}
+                              transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                              textAlign="left"
+                              _dark={{
+                                bg: optSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
+                                borderColor: optSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
+                              }}
+                              _hover={canClick ? {
+                                borderColor: 'brand.400',
+                                bg: 'rgba(255,255,255,0.45)',
+                                _dark: { bg: 'rgba(30,41,59,0.5)' },
+                              } : {}}
+                              onClick={() => { if (canClick) handleOptionClick(idx); }}
+                            >
+                              <Box
+                                w="24px"
+                                h="24px"
+                                borderRadius="md"
+                                border="1.5px solid"
+                                borderColor={keyBorderColor}
+                                bg={keyBg}
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                flexShrink={0}
+                                color={keyTextColor}
+                                fontFamily="mono"
+                                fontSize="xs"
+                                fontWeight={700}
+                                mt="1px"
+                              >
+                                {optSelected && multiSelect ? '✓' : OPTION_LABELS[idx]}
+                              </Box>
+                              <Text fontSize="sm" color="gray.700" fontWeight={optSelected ? 600 : 500}
+                                lineHeight={1.5} mt="1px" _dark={{ color: 'gray.200' }}>
+                                {opt}
+                              </Text>
+                            </Box>
+                          );
+                        })}
+                      </VStack>
+                    )}
+
+                    {/* Multi-select and matching both need an explicit confirm
+                        step -- they stay editable until the learner locks in. */}
+                    {multiSelect && !answered && (
+                      <VStack align="flex-start" gap={1.5}>
+                        <Button
+                          size="sm"
+                          bg={selectedCount === maxSelect ? 'brand.600' : 'gray.300'}
+                          color="white"
+                          fontWeight={700}
+                          borderRadius="lg"
+                          disabled={selectedCount !== maxSelect}
+                          _hover={{ bg: 'brand.700' }}
+                          onClick={lockCurrentAnswer}
+                        >
+                          Confirm Selection
+                        </Button>
+                        <Text fontSize="2xs" color="gray.500" fontWeight={600}>
+                          {selectedCount} of {maxSelect} selected
+                        </Text>
+                      </VStack>
+                    )}
+                    {matchingQuestion && !answered && (
+                      <Button
+                        alignSelf="flex-start"
+                        size="sm"
+                        bg={isMatchingFilled(q, userAnswer) ? 'brand.600' : 'gray.300'}
+                        color="white"
+                        fontWeight={700}
+                        borderRadius="lg"
+                        disabled={!isMatchingFilled(q, userAnswer)}
+                        _hover={{ bg: 'brand.700' }}
+                        onClick={lockCurrentAnswer}
+                      >
+                        Confirm Matches
+                      </Button>
+                    )}
                   </VStack>
                 </motion.div>
               </AnimatePresence>
@@ -1643,7 +1524,6 @@ function QuestionView() {
 
                 {renderQuestionGrid()}
 
-                {/* Legend */}
                 <VStack gap={2} align="stretch" pt={4} borderTop="1px solid" borderColor="border">
                   <Text fontSize="2xs" color="gray.400" fontWeight={700} fontFamily="mono" mb={1}>
                     COLOR LEGEND
@@ -1675,13 +1555,13 @@ function QuestionView() {
 }
 
 function BulkReviewScreen() {
-  const { questions, answers, flagged, cancelReview, complete, restartCurrentSession } = useAdvancedExamStore();
+  const { questions, flagged, locked, cancelReview, complete, restartCurrentSession } = useProfessionalExamStore();
   const [submitOpen, setSubmitOpen] = useState(false);
   const { showTabWarning, showResetWarning, isFullscreen, flashBlackout } = useCaptureDeterrent({
     onSevereViolation: restartCurrentSession,
   });
 
-  const answeredCount = answers.filter((a) => a !== null).length;
+  const answeredCount = locked.filter(Boolean).length;
   const totalCount = questions.length;
   const unansweredCount = totalCount - answeredCount;
 
@@ -1708,7 +1588,6 @@ function BulkReviewScreen() {
         flashBlackout={flashBlackout}
       />
 
-      {/* Header */}
       <Box
         borderBottom="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
         bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
@@ -1720,7 +1599,7 @@ function BulkReviewScreen() {
             <VStack align="flex-start" gap={0}>
               <Text fontSize="2xs" fontFamily="mono" fontWeight={700} color="brand.400" letterSpacing="0.1em"
                 _dark={{ color: 'brand.300' }}>
-                ADVANCED MODE (CCAF)
+                PROFESSIONAL MODE (CCARP)
               </Text>
               <Text fontSize="sm" fontWeight={700} color="brand.700">Review</Text>
             </VStack>
@@ -1733,7 +1612,6 @@ function BulkReviewScreen() {
 
       <Container maxW="container.md" py={[6, 8]} flex={1}>
         <VStack gap={5} align="stretch">
-          {/* Warning banner */}
           <AnimatePresence>
             {unansweredCount > 0 && (
               <motion.div
@@ -1766,13 +1644,11 @@ function BulkReviewScreen() {
             )}
           </AnimatePresence>
 
-          {/* Questions checklist */}
           <VStack gap={4} align="stretch">
             {questions.map((q, i) => {
               const domainKey = q.domain;
-              const userAnswer = answers[i];
               const isFlaggedQ = flagged[i];
-              const isUnanswered = userAnswer === null;
+              const isUnanswered = !locked[i];
 
               return (
                 <Box
@@ -1832,7 +1708,6 @@ function BulkReviewScreen() {
         </VStack>
       </Container>
 
-      {/* Sticky footer */}
       <Box
         borderTop="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
         bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
@@ -1857,7 +1732,6 @@ function BulkReviewScreen() {
         </Container>
       </Box>
 
-      {/* Submit confirmation dialog */}
       <AnimatePresence>
         {submitOpen && (
           <motion.div
@@ -1919,9 +1793,9 @@ function BulkReviewScreen() {
   );
 }
 
-export function AdvancedPracticeView() {
+export function ProfessionalPracticeView() {
   const [mounted, setMounted] = useState(false);
-  const { isStarted, isComplete, isReviewing, start, reset } = useAdvancedExamStore();
+  const { isStarted, isComplete, isReviewing, start, reset } = useProfessionalExamStore();
 
   useEffect(() => { setMounted(true); }, []);
 
