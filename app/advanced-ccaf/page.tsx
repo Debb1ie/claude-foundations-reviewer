@@ -10,6 +10,6 @@ export const metadata: Metadata = {
   description: `${advancedQuestionsData.length} advanced-level ${cert.shortName} practice questions covering all ${cert.domains.length} exam domains.`,
 };
 
-export default function AdvancedPage() {
+export default function AdvancedCcafPage() {
   return <AdvancedPracticeView />;
 }

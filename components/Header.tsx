@@ -17,7 +17,7 @@ export function Header() {
   if (!mounted) return null;
 
   // Completely hide header on any active exam pages, advanced practice, or professional practice view
-  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced') || pathname?.startsWith('/professional');
+  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced-ccaf') || pathname?.startsWith('/professional-ccarp');
   if (isExam) {
     return null;
   }

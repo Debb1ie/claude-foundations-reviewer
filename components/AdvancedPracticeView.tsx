@@ -20,6 +20,7 @@ import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
 import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
 import { getActiveCertification } from '@/lib/certifications';
+import { requestAppFullscreen } from '@/lib/fullscreen';
 import { PasserTips } from '@/components/PasserTips';
 
 const activeCertification = getActiveCertification();
@@ -1923,10 +1924,14 @@ export function AdvancedPracticeView() {
   const [mounted, setMounted] = useState(false);
   const { isStarted, isComplete, isReviewing, start, reset } = useAdvancedExamStore();
 
-  useEffect(() => { setMounted(true); }, []);
+  // A fresh visit to this route -- typed URL, bookmark, refresh, or coming
+  // back from /home -- always lands on the intro screen rather than
+  // resuming a stale session. This only runs once per mount, so it never
+  // fires again after the learner clicks Start Practice below.
+  useEffect(() => { reset(); setMounted(true); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!mounted) return null;
-  if (!isStarted) return <StartScreen onStart={() => start()} />;
+  if (!isStarted) return <StartScreen onStart={() => { requestAppFullscreen(); start(); }} />;
   if (isReviewing) return <BulkReviewScreen />;
   if (isComplete) return <ResultsScreen onReset={() => { reset(); start(); }} />;
   return <QuestionView />;

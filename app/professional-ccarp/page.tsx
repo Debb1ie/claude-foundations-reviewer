@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   description: `${professionalQuestionsData.length} Professional-level (CCARP) practice questions, including select-two and scenario matching.`,
 };
 
-export default function ProfessionalPage() {
+export default function ProfessionalCcarpPage() {
   return <ProfessionalPracticeView />;
 }

@@ -13,13 +13,9 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { requestAppFullscreen } from '@/lib/fullscreen';
 import { getActiveCertification } from '@/lib/certifications';
 
 const cert = getActiveCertification();
-import { useExamStore } from '@/hooks/useExamState';
-import { useAdvancedExamStore } from '@/hooks/useAdvancedExamState';
-import { useProfessionalExamStore } from '@/hooks/useProfessionalExamState';
 import { useRouter } from 'next/navigation';
 import NextLink from 'next/link';
 import React from 'react';
@@ -94,18 +90,18 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
   const [showAdvancedWarning, setShowAdvancedWarning] = React.useState(false);
   const [showProfessionalWarning, setShowProfessionalWarning] = React.useState(false);
 
+  // Navigates to the mode's own landing page, which is always the real
+  // gate -- it shows the intro/rules screen and only starts the timed,
+  // fullscreen session (and requests fullscreen) once its own Start
+  // Practice button is clicked there.
   const beginAdvancedPractice = () => {
     setShowAdvancedWarning(false);
-    requestAppFullscreen();
-    useAdvancedExamStore.getState().start();
-    router.push('/advanced');
+    router.push('/advanced-ccaf');
   };
 
   const beginProfessionalPractice = () => {
     setShowProfessionalWarning(false);
-    requestAppFullscreen();
-    useProfessionalExamStore.getState().start();
-    router.push('/professional');
+    router.push('/professional-ccarp');
   };
 
   return (
