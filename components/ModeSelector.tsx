@@ -429,7 +429,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         Advanced Practice (CCAF)
                       </Heading>
                       <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
-                        60 challenging questions across all domains. Push your limits.
+                        60 challenging questions covering all Claude Certified Architect – Foundations exam domains.
                       </Text>
                     </Box>
 
