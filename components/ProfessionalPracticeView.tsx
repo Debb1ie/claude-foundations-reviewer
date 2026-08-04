@@ -55,8 +55,20 @@ function isMatchingFilled(q: ProfessionalQuestion, userAnswer: ProfessionalAnswe
   return userAnswer.length === pairCount && userAnswer.every((v) => v !== null);
 }
 
+// Static counts for the current 63-question bank (43 single, 14 select-two,
+// 6 scenario matching), broken out by the domain each question is tagged
+// with. Recompute this if the question bank's composition changes.
+const PROFESSIONAL_DOMAIN_COUNTS: Record<string, number> = {
+  'agentic-architecture': 5,
+  'tool-design-mcp': 11,
+  'claude-code': 5,
+  'prompt-engineering': 6,
+  'context-management': 36,
+};
+
 function StartScreen({ onStart }: { onStart: () => void }) {
   const total = TOTAL_QUESTIONS;
+  const timerMinutes = Math.round(TOTAL_SECONDS / 60);
 
   return (
     <Box minH="100vh" bg="transparent">
@@ -77,9 +89,35 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 Professional Mode (CCARP)
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
-                {total} scenario-based questions, including select-two and scenario matching items.
+                {total} scenario-based questions covering single-answer, select-two, and scenario matching items.
                 Timed — answers and explanations revealed after you finish.
               </Text>
+            </Box>
+
+            <Box
+              p={6}
+              bg="rgba(255, 255, 255, 0.45)"
+              backdropFilter="blur(12px)"
+              borderRadius="xl"
+              border="1px solid rgba(255, 255, 255, 0.35)"
+              boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.04)"
+              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+            >
+              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4} textAlign="center">Question Distribution</Text>
+              <SimpleGrid columns={[2, 3, 5]} gap={3} justifyContent="center">
+                {DOMAINS.map((d) => (
+                  <Box key={d.id} p={3} borderRadius="lg" border="1px solid" borderColor="rgba(255,255,255,0.3)"
+                    bg="rgba(255,255,255,0.35)" textAlign="center"
+                    _dark={{ bg: 'rgba(30,41,59,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}>
+                    <Badge bg={DOMAIN_SOLID_BGS[d.id]} color={DOMAIN_SOLID_TEXT[d.id]} px={2} py={0.5} borderRadius="md"
+                      fontSize="2xs" fontFamily="mono" fontWeight={700} mb={1.5} display="block" w="fit-content" mx="auto">
+                      {d.id}
+                    </Badge>
+                    <Text fontSize="xs" fontWeight={700} color="brand.700" lineHeight={1.3}>{DOMAIN_NAMES[d.id]}</Text>
+                    <Text fontSize="2xs" color="gray.500" mt={1}>{PROFESSIONAL_DOMAIN_COUNTS[d.id] ?? 0} questions</Text>
+                  </Box>
+                ))}
+              </SimpleGrid>
             </Box>
 
             <Box
@@ -92,8 +130,8 @@ function StartScreen({ onStart }: { onStart: () => void }) {
             >
               <SimpleGrid columns={[1, 3]} gap={4}>
                 {[
-                  { label: `${total} Questions`, sub: 'Single & multi-select' },
-                  { label: 'Timed', sub: 'Matches real exam pacing' },
+                  { label: `${total} Questions`, sub: 'Single, select-two & matching' },
+                  { label: `~${timerMinutes} Min Timer`, sub: 'Matches real exam pacing' },
                   { label: 'Scenario-Based', sub: 'Deep comprehension questions' },
                 ].map((item) => (
                   <Box key={item.label} textAlign="center">

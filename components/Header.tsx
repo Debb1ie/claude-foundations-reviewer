@@ -16,8 +16,8 @@ export function Header() {
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
-  // Completely hide header on any active exam pages or advanced practice view
-  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced');
+  // Completely hide header on any active exam pages, advanced practice, or professional practice view
+  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced') || pathname?.startsWith('/professional');
   if (isExam) {
     return null;
   }
