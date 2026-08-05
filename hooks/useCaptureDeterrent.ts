@@ -3,9 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { requestAppFullscreen, isAppFullscreen } from '@/lib/fullscreen';
 
 interface CaptureDeterrentOptions {
-  /** Called when the learner leaves fullscreen -- the one signal treated
-   *  as a real violation rather than a warning. Typically wipes answers
-   *  and restarts from question 1. */
+  /** Called on a severe violation -- leaving fullscreen OR switching away
+   *  from the tab. Typically wipes answers and restarts from question 1. */
   onSevereViolation: () => void;
   /** Whether to request/enforce fullscreen at all. Default true. */
   enforceFullscreen?: boolean;
@@ -63,11 +62,16 @@ export function useCaptureDeterrent({ onSevereViolation, enforceFullscreen = tru
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
+      // PrintScreen alone stays a soft warning -- it doesn't necessarily
+      // mean the learner left the tab or exam.
       if (e.key === 'PrintScreen') triggerTabWarning();
     };
-    const handleBlur = () => triggerTabWarning();
+    // Switching tabs, alt-tabbing, or minimizing is now a full violation,
+    // same severity as leaving fullscreen -- both mean the learner stopped
+    // looking at the exam.
+    const handleBlur = () => triggerFullReset();
     const handleVisibilityChange = () => {
-      if (document.hidden) triggerTabWarning();
+      if (document.hidden) triggerFullReset();
     };
     const handleFullscreenChange = () => {
       const fs = isAppFullscreen();
@@ -81,6 +85,21 @@ export function useCaptureDeterrent({ onSevereViolation, enforceFullscreen = tru
     document.addEventListener('visibilitychange', handleVisibilityChange);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Belt-and-suspenders: some browser/embedding combinations don't fire
+    // fullscreenchange reliably for every exit path (e.g. the OS-level
+    // Escape handling on some Windows builds). Poll as a backup so a exit
+    // that the event misses still gets caught within ~1s.
+    const pollId = setInterval(() => {
+      const fs = isAppFullscreen();
+      setIsFullscreen((prev) => {
+        if (!fs && prev && enforceFullscreen) triggerFullReset();
+        return fs;
+      });
+    }, 1000);
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
@@ -88,6 +107,9 @@ export function useCaptureDeterrent({ onSevereViolation, enforceFullscreen = tru
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+      clearInterval(pollId);
     };
   }, [onSevereViolation, enforceFullscreen]);
 

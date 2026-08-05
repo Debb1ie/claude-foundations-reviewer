@@ -21,7 +21,7 @@ export function CaptureDeterrentOverlay({
   showResetWarning,
   isFullscreen,
   flashBlackout,
-  resetMessage = 'Fullscreen exited — progress reset, starting over from Question 1',
+  resetMessage = 'Fullscreen exited or tab switched — progress reset, starting over from Question 1',
   hideFullscreenPrompt = false,
 }: {
   showTabWarning: boolean;
@@ -46,10 +46,11 @@ export function CaptureDeterrentOverlay({
         )}
       </AnimatePresence>
 
-      {/* Mild warning: tab switch / PrintScreen / window blur -- no penalty */}
+      {/* Mild warning: PrintScreen only -- tab switches and fullscreen exits
+          are now full violations (see showResetWarning below), not this. */}
       <AnimatePresence>
         {showTabWarning && (
-          <motion.div style={{ position: 'fixed', top: 16, left: 0, right: 0, zIndex: 10000, display: 'flex', justifyContent: 'center' }}>
+          <motion.div style={{ position: 'fixed', top: 16, left: 0, right: 0, zIndex: 60000, display: 'flex', justifyContent: 'center' }}>
             <motion.div
               initial={{ opacity: 0, y: -20, x: 0 }}
               animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
@@ -60,7 +61,7 @@ export function CaptureDeterrentOverlay({
                 display="flex" alignItems="center" justifyContent="center" gap={2.5}>
                 <WarningIcon />
                 <Text fontSize="sm" fontWeight={700}>
-                  Tab switch / screen capture detected — stay on this tab
+                  Screen capture attempt detected
                 </Text>
               </Box>
             </motion.div>
@@ -71,7 +72,7 @@ export function CaptureDeterrentOverlay({
       {/* Severe warning: fullscreen exited -- full penalty */}
       <AnimatePresence>
         {showResetWarning && (
-          <motion.div style={{ position: 'fixed', top: 16, left: 0, right: 0, zIndex: 10000, display: 'flex', justifyContent: 'center' }}>
+          <motion.div style={{ position: 'fixed', top: 16, left: 0, right: 0, zIndex: 60000, display: 'flex', justifyContent: 'center' }}>
             <motion.div
               initial={{ opacity: 0, y: -20, x: 0 }}
               animate={{ opacity: 1, y: 0, x: [0, -10, 10, -8, 8, -5, 5, 0] }}
@@ -88,7 +89,12 @@ export function CaptureDeterrentOverlay({
         )}
       </AnimatePresence>
 
-      {/* Not-in-fullscreen prompt */}
+      {/* Not-in-fullscreen LOCK: a full-viewport backdrop that blocks every
+          click to the exam underneath -- not just a reminder button.
+          Leaving fullscreen already wiped progress via triggerFullReset;
+          this makes sure nothing can be answered again until the learner
+          is actually back in fullscreen, instead of letting them keep
+          going in a normal browser window. */}
       {!hideFullscreenPrompt && (
         <AnimatePresence>
           {!isFullscreen && (
@@ -96,20 +102,43 @@ export function CaptureDeterrentOverlay({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{ position: 'fixed', bottom: 20, left: 0, right: 0, zIndex: 9999, display: 'flex', justifyContent: 'center' }}
+              style={{
+                position: 'fixed', inset: 0, zIndex: 50000,
+                background: 'rgba(10,14,40,0.82)',
+                backdropFilter: 'blur(6px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '24px',
+              }}
             >
-              <Button
-                size="sm"
-                bg="gray.800"
-                color="white"
-                fontWeight={700}
-                borderRadius="full"
-                boxShadow="0 8px 24px rgba(0,0,0,0.3)"
-                _hover={{ bg: 'gray.900' }}
-                onClick={() => requestAppFullscreen()}
+              <Box
+                bg="rgba(255,255,255,0.97)"
+                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                borderRadius="2xl"
+                border="1px solid rgba(255,255,255,0.35)"
+                boxShadow="0 24px 64px rgba(10,14,40,0.35)"
+                p={[6, 7]}
+                maxW="440px"
+                textAlign="center"
               >
-                Not in fullscreen — click to re-enter
-              </Button>
+                <Text fontSize="sm" fontWeight={800} color="red.600" _dark={{ color: 'red.300' }} mb={2}>
+                  Exam locked — not in fullscreen
+                </Text>
+                <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.300' }} mb={5} lineHeight="tall">
+                  You can&apos;t answer or navigate questions while outside fullscreen. Re-enter fullscreen to keep going.
+                </Text>
+                <Button
+                  size="md"
+                  bg="brand.600"
+                  color="white"
+                  fontWeight={700}
+                  borderRadius="lg"
+                  boxShadow="0 8px 24px rgba(0,0,0,0.3)"
+                  _hover={{ bg: 'brand.700' }}
+                  onClick={() => requestAppFullscreen()}
+                >
+                  Re-enter fullscreen
+                </Button>
+              </Box>
             </motion.div>
           )}
         </AnimatePresence>

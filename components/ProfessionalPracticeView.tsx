@@ -23,9 +23,11 @@ import {
   type ProfessionalAnswer,
   TOTAL_SECONDS,
   TOTAL_QUESTIONS,
+  POOL_SIZE,
   PER_QUESTION_TIME_LIMIT_SECONDS,
   FAST_ANSWER_FLOOR_SECONDS,
 } from '@/hooks/useProfessionalExamState';
+import professionalQuestionsData from '@/data/professional-questions.json';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
@@ -56,16 +58,14 @@ function isMatchingFilled(q: ProfessionalQuestion, userAnswer: ProfessionalAnswe
   return userAnswer.length === pairCount && userAnswer.every((v) => v !== null);
 }
 
-// Static counts for the current 63-question bank (43 single, 14 select-two,
-// 6 scenario matching), broken out by the domain each question is tagged
-// with. Recompute this if the question bank's composition changes.
-const PROFESSIONAL_DOMAIN_COUNTS: Record<string, number> = {
-  'agentic-architecture': 5,
-  'tool-design-mcp': 11,
-  'claude-code': 5,
-  'prompt-engineering': 6,
-  'context-management': 36,
-};
+// Computed from the full pool (not the per-attempt sample) since each
+// attempt only draws TOTAL_QUESTIONS of POOL_SIZE at random -- this shows
+// what the bank as a whole covers, not any one session's exact breakdown.
+const PROFESSIONAL_DOMAIN_COUNTS: Record<string, number> = (professionalQuestionsData as ProfessionalQuestion[])
+  .reduce((acc, q) => {
+    acc[q.domain] = (acc[q.domain] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
 function StartScreen({ onStart }: { onStart: () => void }) {
   const total = TOTAL_QUESTIONS;
@@ -90,7 +90,8 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 Professional Mode (CCARP)
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
-                {total} scenario-based questions covering single-answer, select-two, and scenario matching items.
+                {total} scenario-based questions covering single-answer, select-two, and scenario matching items,
+                randomly drawn from a {POOL_SIZE}-question bank each attempt.
                 Timed — answers and explanations revealed after you finish.
               </Text>
             </Box>
@@ -104,7 +105,10 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.04)"
               _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={4} textAlign="center">Question Distribution</Text>
+              <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1} textAlign="center">Question Bank Coverage</Text>
+              <Text fontSize="2xs" color="gray.500" mb={4} textAlign="center">
+                Across the full {POOL_SIZE}-question bank — your {total}-question attempt draws a random subset of these.
+              </Text>
               <SimpleGrid columns={[2, 3, 5]} gap={3} justifyContent="center">
                 {DOMAINS.map((d) => (
                   <Box key={d.id} p={3} borderRadius="lg" border="1px solid" borderColor="rgba(255,255,255,0.3)"

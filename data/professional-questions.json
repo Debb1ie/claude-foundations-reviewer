@@ -1085,5 +1085,641 @@
     ],
     "correctAnswer": 1,
     "explanation": "This is the one architecture that satisfies every requirement at once: RAG keeps answers current against frequently changing documents, MCP with pre-retrieval/pre-execution authorization respects department permissions and live data access, and prompt caching keeps operational cost down. A single long-context prompt, weekly fine-tuning, or stuffing data into CLAUDE.md each fail at least one requirement -- freshness, cost, or scale."
+  },
+  {
+    "id": "pro-064",
+    "number": 64,
+    "domain": "tool-design-mcp",
+    "type": "single",
+    "text": "A development team exposes a delete_customer_record tool through an MCP server used by a support-automation agent. Which control is MOST important before this tool executes?",
+    "options": [
+      "Log the deletion after it completes for later review.",
+      "Require explicit per-call confirmation and pre-execution authorization for destructive operations.",
+      "Increase the model's context window so it remembers more customer history.",
+      "Cache the tool's results to speed up repeated deletions."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Destructive operations need a hard gate before they run, not just a log after the fact -- explicit confirmation and authorization checks prevent an agent from deleting records based on a misread request. A bigger context window or caching results have nothing to do with authorizing a destructive action."
+  },
+  {
+    "id": "pro-065",
+    "number": 65,
+    "domain": "tool-design-mcp",
+    "type": "single",
+    "text": "An agent frequently calls the wrong tool because two tool descriptions overlap in wording. What is the MOST effective fix?",
+    "options": [
+      "Remove one of the two tools entirely.",
+      "Rewrite both tool descriptions to be more specific about when each applies, with distinguishing examples.",
+      "Increase the model's temperature so it explores more options.",
+      "Add more tools so the agent has more choices."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Tool-selection accuracy improves when descriptions clearly differentiate when each tool applies; removing a needed tool or adding more choices doesn't fix the ambiguity, and temperature has no bearing on which tool gets selected."
+  },
+  {
+    "id": "pro-066",
+    "number": 66,
+    "domain": "tool-design-mcp",
+    "type": "single",
+    "text": "An MCP tool that calls a legacy SOAP API has no input validation and occasionally receives malformed requests from the agent. What should be added FIRST?",
+    "options": [
+      "Input validation with structured error responses the agent can act on.",
+      "A larger Claude model to reduce mistakes.",
+      "Prompt caching for the tool's instructions.",
+      "A longer system prompt describing the SOAP schema in full."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Validating input at the tool boundary and returning a structured, actionable error is what lets the agent recover from a malformed request; swapping models, caching, or padding the prompt with schema text don't address the missing validation layer itself."
+  },
+  {
+    "id": "pro-067",
+    "number": 67,
+    "domain": "agentic-architecture",
+    "type": "single",
+    "text": "A research agent runs for several hours and occasionally crashes partway through due to transient network failures. Restarting means losing all prior progress. What architectural change addresses this BEST?",
+    "options": [
+      "Reduce the task's scope so it always finishes in under a minute.",
+      "Add checkpointing so the agent can resume from its last saved state instead of restarting from scratch.",
+      "Increase the model's context window to avoid crashes.",
+      "Disable the network calls that cause the crashes."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Checkpointing/resumable state is the standard way to make long-running agent work resilient to transient failures -- shrinking scope avoids the real task, and a bigger context window doesn't prevent network failures."
+  },
+  {
+    "id": "pro-068",
+    "number": 68,
+    "domain": "agentic-architecture",
+    "type": "single",
+    "text": "An agent handling independent research subtasks (competitor pricing, customer sentiment, market size) currently runs them one after another. None of the three subtasks depends on another's output. What should the architect recommend?",
+    "options": [
+      "Keep them sequential to simplify debugging.",
+      "Run the three independent subtasks in parallel.",
+      "Merge all three into a single subagent to reduce coordination overhead.",
+      "Add a fourth subtask to double-check the first three."
+    ],
+    "correctAnswer": 1,
+    "explanation": "When subtasks are genuinely independent, running them in parallel cuts wall-clock time directly with no added risk, since none needs another's output. Sequential execution just adds unnecessary latency, and merging them into one subagent removes the parallelism benefit entirely."
+  },
+  {
+    "id": "pro-069",
+    "number": 69,
+    "domain": "agentic-architecture",
+    "type": "single",
+    "text": "An autonomous agent occasionally calls the same failing tool dozens of times in a row before anyone notices. What is the MOST appropriate safeguard?",
+    "options": [
+      "A maximum retry cap that escalates to a human after repeated failures.",
+      "A larger Claude model that makes fewer mistakes.",
+      "Removing the failing tool from the agent's toolset permanently.",
+      "Increasing the per-request timeout so retries take longer."
+    ],
+    "correctAnswer": 0,
+    "explanation": "A hard retry cap with escalation stops a runaway loop before it burns through cost and time, and gets a human involved once automated retries clearly aren't working; a bigger model doesn't guarantee the external dependency stops failing, and a longer timeout makes each wasted retry slower, not fewer."
+  },
+  {
+    "id": "pro-070",
+    "number": 70,
+    "domain": "agentic-architecture",
+    "type": "single",
+    "text": "A company wants an agent that decides, at each step, which of several specialized tools to call next based on intermediate results, with no fixed sequence. Which design fits?",
+    "options": [
+      "A deterministic workflow with a fixed call order.",
+      "An autonomous agent that plans and selects tools dynamically.",
+      "A single prompt with every tool's documentation pasted in.",
+      "Long-context prompting only."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Deciding the next step dynamically based on intermediate results is exactly what an autonomous agent's planning loop is for; a deterministic workflow assumes a fixed order, which contradicts the requirement here."
+  },
+  {
+    "id": "pro-071",
+    "number": 71,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "A team wants Claude Code to automatically run the project's linter every time it edits a file, without relying on the model to remember to do so. What should they configure?",
+    "options": [
+      "A PostToolUse hook that runs the linter after file-editing tool calls.",
+      "A longer system prompt reminding Claude to lint after every edit.",
+      "Prompt caching for the linter's configuration file.",
+      "A Claude Skill that explains how the linter works."
+    ],
+    "correctAnswer": 0,
+    "explanation": "A PostToolUse hook runs deterministically after the matching tool call every time, regardless of whether the model remembers to ask for it -- reminders in a prompt or explanatory Skills both depend on the model choosing to comply, which isn't reliable for a \"every single time\" requirement."
+  },
+  {
+    "id": "pro-072",
+    "number": 72,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "An engineering org wants every team's Claude Code sessions to follow the same commit-message format, without each developer configuring it individually. Where should this live?",
+    "options": [
+      "Each developer's personal settings file.",
+      "A shared, version-controlled project-level CLAUDE.md committed to the repository.",
+      "A one-off instruction typed into each commit prompt.",
+      "A Claude Skill installed only on the release manager's machine."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A project-level CLAUDE.md committed to the repo is read by everyone who works in that repo, giving a consistent standard automatically; personal settings, one-off prompt text, and a single person's local Skill all fail to reach the rest of the team."
+  },
+  {
+    "id": "pro-073",
+    "number": 73,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "A platform team wants an MCP server's connection settings available to every Claude Code user in the organization, without each person configuring it manually. Which configuration scope fits?",
+    "options": [
+      "User-level settings on each individual's machine.",
+      "Enterprise/organization-managed MCP configuration.",
+      "A note in the README asking developers to add it themselves.",
+      "A Claude Skill describing the server's API."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Enterprise-managed configuration applies the same MCP connection settings across the whole organization without relying on each person to set it up individually; user-level settings, documentation, and Skills all require manual, per-person setup."
+  },
+  {
+    "id": "pro-074",
+    "number": 74,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "A developer asks Claude Code to 'clean up this file' with no further detail, and gets back a large, unfocused rewrite touching formatting, logic, and comments all at once. What is the MOST likely root cause?",
+    "options": [
+      "The model is incapable of small, scoped edits.",
+      "The instruction was too vague to bound the scope of the requested change.",
+      "Claude Code's context window was too large.",
+      "The project is missing a CLAUDE.md file."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A vague instruction like \"clean up this file\" leaves scope undefined, so the model reasonably interprets it broadly; the model is capable of scoped edits when asked for them, and neither context window size nor a missing CLAUDE.md determines how broadly a single vague request gets interpreted."
+  },
+  {
+    "id": "pro-075",
+    "number": 75,
+    "domain": "prompt-engineering",
+    "type": "single",
+    "text": "A data-extraction prompt asks Claude to return invoice fields as plain prose, and the downstream parser frequently fails to extract the right values. What change is MOST likely to fix this?",
+    "options": [
+      "Increase the temperature so responses vary more.",
+      "Ask for a structured format (e.g., XML tags or a defined schema) instead of prose.",
+      "Shorten the prompt to reduce token usage.",
+      "Switch to a smaller, faster model."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A structured, well-defined output format is what makes downstream parsing reliable; prose leaves formatting up to the model's discretion, which is exactly what's causing the parser failures. Temperature, prompt length, and model size don't address the structural mismatch."
+  },
+  {
+    "id": "pro-076",
+    "number": 76,
+    "domain": "prompt-engineering",
+    "type": "single",
+    "text": "A chatbot sends the same lengthy system instructions and product catalog with every request, and only the last user message actually changes turn to turn. What is the most direct way to cut the repeated cost?",
+    "options": [
+      "Increase the context window so more fits per request.",
+      "Structure the prompt so the static instructions and catalog form a cacheable prefix.",
+      "Reduce the number of user turns allowed per session.",
+      "Fine-tune a smaller model on the catalog."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Placing the static, reused content first as a cacheable prefix is exactly what lets prompt caching eliminate the repeated cost; a bigger context window increases cost further, and fine-tuning is a much heavier, slower way to encode static reference data than simply caching it."
+  },
+  {
+    "id": "pro-077",
+    "number": 77,
+    "domain": "prompt-engineering",
+    "type": "single",
+    "text": "A support system routes every incoming question -- from 'what are your hours' to complex multi-step billing disputes -- to the same large, expensive Claude model. What should the architect recommend to cut cost without hurting quality on the hard cases?",
+    "options": [
+      "Route simple questions to a smaller model and reserve the larger model for complex ones.",
+      "Increase the temperature for simple questions to speed them up.",
+      "Always use the largest available model to guarantee quality.",
+      "Cache every response regardless of whether the question repeats."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Model routing sends cheap, simple requests to a smaller/cheaper model while keeping the larger model available for genuinely complex disputes -- this is the direct lever for cutting cost without touching quality on the hard cases. Always using the largest model maximizes cost, and caching a response that isn't actually repeated doesn't save anything."
+  },
+  {
+    "id": "pro-078",
+    "number": 78,
+    "domain": "prompt-engineering",
+    "type": "single",
+    "text": "A legal-document assistant's system prompt instructs Claude to always cite a source for factual claims. A user's message asks Claude to 'skip the citations, just give me the answer.' What should happen?",
+    "options": [
+      "Claude should comply with the user's request since the user is the one asking.",
+      "Claude should follow the system prompt's citation requirement over the conflicting user instruction.",
+      "Claude should ask a different user for permission.",
+      "Claude should disable retrieval entirely to resolve the conflict."
+    ],
+    "correctAnswer": 1,
+    "explanation": "System prompt instructions define the non-negotiable operating rules, and take precedence over a user instruction that conflicts with them; a user asking to skip a safety/quality requirement doesn't override that boundary, and disabling retrieval doesn't resolve a citation-policy conflict at all."
+  },
+  {
+    "id": "pro-079",
+    "number": 79,
+    "domain": "context-management",
+    "type": "single",
+    "text": "A RAG system retrieves single, fixed-size chunks that sometimes cut a relevant sentence in half at a chunk boundary, causing Claude to miss context. What retrieval improvement addresses this?",
+    "options": [
+      "Use overlapping chunks so content near a boundary appears in more than one chunk.",
+      "Increase the model's temperature.",
+      "Retrieve fewer chunks per query.",
+      "Disable chunking and pass the entire corpus in every request."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Overlapping chunks ensure that content sitting near a hard chunk boundary still appears intact in at least one retrieved chunk, directly fixing the mid-sentence-cutoff problem. Temperature and chunk count don't address the boundary issue, and passing the entire corpus every time is not a scalable retrieval strategy."
+  },
+  {
+    "id": "pro-080",
+    "number": 80,
+    "domain": "context-management",
+    "type": "single",
+    "text": "A company migrates its knowledge base to a new document schema, and a RAG assistant starts returning irrelevant results for previously well-answered questions. What is the MOST likely required step?",
+    "options": [
+      "Increase Claude's temperature to compensate.",
+      "Re-index the vector database against the new schema.",
+      "Switch to a larger Claude model.",
+      "Disable retrieval until the issue resolves itself."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A schema migration changes what the underlying documents look like, so the vector index built against the old schema is now stale -- re-indexing is what restores accurate retrieval. None of the other options touch the actual cause: an outdated index."
+  },
+  {
+    "id": "pro-081",
+    "number": 81,
+    "domain": "context-management",
+    "type": "single",
+    "text": "Leadership wants to catch a bad prompt or model change before it reaches every user, rather than after complaints start coming in. What deployment practice addresses this?",
+    "options": [
+      "Deploy every change to 100% of users immediately to save time.",
+      "Use a canary or staged rollout with monitoring before full deployment.",
+      "Skip evaluation for minor prompt tweaks.",
+      "Remove versioning to simplify the release process."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A staged/canary rollout with monitoring exposes a bad change to a small slice of traffic first, catching problems before they reach everyone; deploying to 100% immediately is the opposite of catching issues early, and removing versioning removes the ability to roll back at all."
+  },
+  {
+    "id": "pro-082",
+    "number": 82,
+    "domain": "context-management",
+    "type": "single",
+    "text": "A financial-services AI assistant must ensure European customers' data is processed only within EU infrastructure due to regulatory requirements. Which architectural consideration is MOST important?",
+    "options": [
+      "Increase the context window for EU customers.",
+      "Data residency: deploying and processing within EU-based infrastructure.",
+      "Enable prompt caching for EU requests.",
+      "Use a larger model for EU customers only."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A hard requirement that data be processed within a specific region is a data-residency and deployment-architecture concern -- context window size, caching, and model size don't affect where data is actually processed."
+  },
+  {
+    "id": "pro-083",
+    "number": 83,
+    "domain": "context-management",
+    "type": "single",
+    "text": "After a prompt update, a chatbot starts citing sources that don't actually support its claims, though the citations look plausible. What does this indicate?",
+    "options": [
+      "The model's citations should be trusted since they are stylistically correct.",
+      "The system needs a verification step confirming cited sources actually support the claim being made.",
+      "Increasing temperature will fix the mismatch.",
+      "Disabling retrieval will improve citation accuracy."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A plausible-looking but unsupported citation is a hallucination wearing the appearance of grounding -- the fix is verifying that the citation content actually backs the claim, not simply trusting stylistic correctness. Increasing temperature makes hallucination worse, and disabling retrieval removes the one mechanism that could ground the claim at all."
+  },
+  {
+    "id": "pro-084",
+    "number": 84,
+    "domain": "context-management",
+    "type": "single",
+    "text": "An enterprise wants a single place that records why a RAG-based architecture was chosen over a long-context alternative, including the tradeoffs considered, for future engineers to reference. What should they produce?",
+    "options": [
+      "A product roadmap.",
+      "An Architecture Decision Record (ADR).",
+      "A marketing one-pager.",
+      "A user-facing FAQ."
+    ],
+    "correctAnswer": 1,
+    "explanation": "An ADR exists specifically to capture a decision, the alternatives weighed, and the reasoning, for future reference -- a roadmap, marketing material, and a user FAQ all serve different audiences and don't record decision rationale."
+  },
+  {
+    "id": "pro-085",
+    "number": 85,
+    "domain": "context-management",
+    "type": "single",
+    "text": "A newly deployed prompt version quietly starts producing lower-quality answers than the previous version, but nobody notices for two weeks because there is no baseline to compare against. What should have been in place?",
+    "options": [
+      "A stable evaluation baseline that new versions are automatically compared against.",
+      "A higher temperature setting to catch quality issues faster.",
+      "Manual, ad hoc spot-checks by whichever engineer is free that week.",
+      "Removing the previous version so there's nothing to compare to."
+    ],
+    "correctAnswer": 0,
+    "explanation": "An automatic, stable baseline comparison is what catches a quality regression close to when it happens, rather than two weeks later; ad hoc spot-checks are exactly what failed here, and removing the prior version destroys the only thing you'd compare against."
+  },
+  {
+    "id": "pro-086",
+    "number": 86,
+    "domain": "context-management",
+    "type": "single",
+    "text": "An AI platform experiences intermittent slow responses, but engineers can't tell whether the bottleneck is retrieval, the model call, or a downstream tool. What is missing?",
+    "options": [
+      "A larger Claude model.",
+      "Distributed tracing that breaks down latency by stage of the request.",
+      "A lower temperature setting.",
+      "Removing tool calls from the pipeline entirely."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Distributed tracing that shows how long each stage (retrieval, model call, tool call) takes is what lets engineers pinpoint where time is actually going; a bigger model or a different temperature don't provide any visibility, and removing tool calls removes functionality rather than diagnosing the bottleneck."
+  },
+  {
+    "id": "pro-087",
+    "number": 87,
+    "domain": "context-management",
+    "type": "single",
+    "text": "A healthcare AI platform's leadership wants assurance that high-risk clinical recommendations go through a documented approval process before reaching a patient's chart. What should be established?",
+    "options": [
+      "A governance approval workflow specifically for high-risk outputs.",
+      "A higher temperature setting for more diverse clinical suggestions.",
+      "Removing audit logs to simplify the chart review process.",
+      "Allowing the AI to write directly to the patient chart without review."
+    ],
+    "correctAnswer": 0,
+    "explanation": "A documented governance/approval workflow for high-risk outputs is precisely the control that ensures a human reviews a recommendation before it becomes part of a patient's record; the other options either add randomness or remove the very safeguards governance depends on."
+  },
+  {
+    "id": "pro-088",
+    "number": 88,
+    "domain": "tool-design-mcp",
+    "type": "single",
+    "text": "An MCP server exposes both read-only reporting tools and a tool that issues refunds. A recent audit finds that any authenticated user can call the refund tool. What is the MOST appropriate fix?",
+    "options": [
+      "Remove authentication entirely to simplify the server.",
+      "Apply role-based authorization so only authorized roles can call the refund tool.",
+      "Rename the refund tool to make it less obvious.",
+      "Cache refund requests to reduce load."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Authentication alone answers \"who is this,\" not \"what are they allowed to do\" -- role-based authorization is what restricts a sensitive tool like issuing refunds to the roles that should actually have it. Renaming the tool is security through obscurity and doesn't restrict access, and caching has nothing to do with authorization."
+  },
+  {
+    "id": "pro-089",
+    "number": 89,
+    "domain": "tool-design-mcp",
+    "type": "multi",
+    "text": "A team is hardening an MCP server that exposes internal inventory-management tools. Which TWO practices should be implemented?",
+    "options": [
+      "Authenticate every caller before granting tool access.",
+      "Log every tool call for audit purposes.",
+      "Allow anonymous access to speed up integration testing.",
+      "Store API keys directly in the agent's system prompt.",
+      "Disable logging to reduce storage costs."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Authenticating callers and keeping an audit log of tool calls are baseline MCP security practices that let you know who did what; anonymous access, prompt-embedded keys, and disabled logging are each a real security gap."
+  },
+  {
+    "id": "pro-090",
+    "number": 90,
+    "domain": "agentic-architecture",
+    "type": "multi",
+    "text": "A platform team is designing handoffs between specialized subagents in a multi-agent pipeline. Which TWO characteristics make a handoff reliable?",
+    "options": [
+      "Clearly scoped task boundaries for each subagent.",
+      "Structured handoff messages with explicit expected inputs/outputs.",
+      "Letting each subagent infer what the previous one meant.",
+      "Sharing one unscoped context window across all subagents.",
+      "Randomizing which subagent handles a given step."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Clear scope per subagent and structured, explicit handoff messages are what make a multi-agent pipeline predictable and debuggable; relying on inference, an unscoped shared context, or random assignment all introduce ambiguity that breaks down as the pipeline grows."
+  },
+  {
+    "id": "pro-091",
+    "number": 91,
+    "domain": "claude-code",
+    "type": "multi",
+    "text": "A team is deciding what belongs in a shared, version-controlled project-level CLAUDE.md versus a developer's personal configuration. Which TWO belong in the shared project file?",
+    "options": [
+      "Team-wide coding conventions and style rules.",
+      "Build and test commands specific to this repository.",
+      "One developer's personal editor theme preference.",
+      "A single engineer's local file-path shortcuts.",
+      "That engineer's private API key for a side project."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Coding conventions and repo-specific build/test commands are exactly what should be shared across everyone working in the repo; personal preferences, local shortcuts, and private credentials are individual to one developer and don't belong in a file the whole team reads."
+  },
+  {
+    "id": "pro-092",
+    "number": 92,
+    "domain": "prompt-engineering",
+    "type": "multi",
+    "text": "A team wants Claude's JSON output to reliably match a fixed schema for a downstream system. Which TWO approaches most directly improve reliability?",
+    "options": [
+      "Use a structured-output / tool-use mode that enforces the schema.",
+      "Provide an explicit schema definition in the prompt.",
+      "Increase the sampling temperature for more varied output.",
+      "Ask for the response in free-form prose and parse it with regex.",
+      "Shorten the prompt to reduce token usage."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "A structured-output mode that enforces the schema, combined with explicitly specifying that schema, are the two levers that most directly constrain the model toward valid output; higher temperature adds variance (the opposite of reliability), and free-form prose plus regex parsing is exactly the fragile pattern being replaced."
+  },
+  {
+    "id": "pro-093",
+    "number": 93,
+    "domain": "context-management",
+    "type": "multi",
+    "text": "An AI platform team wants a mature observability setup for diagnosing production issues. Which TWO components should be part of it?",
+    "options": [
+      "Distributed tracing across request stages.",
+      "Structured, queryable logs with request-level detail.",
+      "Deleting logs older than 24 hours to save cost.",
+      "Removing dashboards once the system is stable.",
+      "Turning off tracing in production to reduce overhead."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Tracing and structured logs are the two pillars that let engineers actually diagnose a production issue after the fact; aggressively deleting logs, removing dashboards, and disabling tracing in production all remove the visibility observability exists to provide."
+  },
+  {
+    "id": "pro-094",
+    "number": 94,
+    "domain": "context-management",
+    "type": "multi",
+    "text": "A company is establishing a governance process for an AI system that makes high-risk lending recommendations. Which TWO activities should be part of that process?",
+    "options": [
+      "A documented approval workflow for high-risk recommendations before they reach a customer.",
+      "Regular audits of model decisions against fair-lending requirements.",
+      "Increasing temperature to diversify recommendations.",
+      "Allowing the model to finalize approvals without review.",
+      "Disabling audit logging to speed up processing."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "An approval workflow and regular compliance audits are core governance activities for a high-risk, regulated use case like lending; raising temperature, letting the model finalize decisions alone, and disabling audit logs each remove a safeguard rather than add one."
+  },
+  {
+    "id": "pro-095",
+    "number": 95,
+    "domain": "tool-design-mcp",
+    "type": "multi",
+    "text": "A team is exposing a payroll adjustment tool through MCP. Which TWO safeguards are appropriate before allowing execution?",
+    "options": [
+      "Require explicit user confirmation before the tool executes.",
+      "Apply least-privilege access so only payroll-admin roles can call it.",
+      "Let any authenticated employee call it to reduce support tickets.",
+      "Skip logging to reduce noise.",
+      "Auto-execute without confirmation to save time."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Explicit confirmation plus role-restricted least-privilege access are the two controls that keep a sensitive payroll tool from executing on the wrong authority; broad access, skipped logging, and silent auto-execution each remove a safeguard that this kind of tool specifically needs."
+  },
+  {
+    "id": "pro-096",
+    "number": 96,
+    "domain": "prompt-engineering",
+    "type": "multi",
+    "text": "A support assistant's answers are inconsistent because the same question sometimes gets a thorough answer and sometimes a one-line answer, depending on how it's phrased. Which TWO prompt-engineering changes would improve consistency?",
+    "options": [
+      "Provide the model with a clear response-length and depth guideline in the system prompt.",
+      "Include a few worked examples showing the expected level of detail.",
+      "Increase temperature so answers vary more.",
+      "Remove the system prompt to let the model decide freely.",
+      "Randomize which examples are shown each time."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "An explicit guideline on expected depth, backed by a few concrete examples, gives the model a consistent target to match regardless of phrasing; higher temperature and randomized examples both increase variance, and removing the system prompt removes the one place consistent guidance would live."
+  },
+  {
+    "id": "pro-097",
+    "number": 97,
+    "domain": "context-management",
+    "type": "multi",
+    "text": "A team preparing an AI system for a regulatory audit needs to demonstrate that model outputs can be traced back to their inputs and sources. Which TWO practices support this?",
+    "options": [
+      "Maintaining audit logs that link each output to the inputs and retrieved sources that produced it.",
+      "Requiring citations for factual claims so sources can be checked.",
+      "Increasing temperature to generate more diverse audit samples.",
+      "Purging historical logs regularly to reduce storage.",
+      "Disabling source attribution to simplify responses."
+    ],
+    "correctAnswer": 0,
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "explanation": "Traceable audit logs and citation requirements are exactly what let an auditor connect an output back to what produced it; purging history and disabling attribution actively destroy the traceability being asked for, and temperature has nothing to do with traceability."
+  },
+  {
+    "id": "pro-098",
+    "number": 98,
+    "domain": "agentic-architecture",
+    "type": "matching",
+    "text": "Match each deployment scenario with the MOST appropriate architecture.",
+    "options": [
+      "Deterministic Workflow",
+      "Autonomous Agent",
+      "Multi-Agent Architecture"
+    ],
+    "pairs": [
+      {
+        "requirement": "Every deployment follows the exact same fixed sequence of steps, regardless of input",
+        "correctOptionIndex": 0
+      },
+      {
+        "requirement": "The system must decide which tools to call next based on changing intermediate results",
+        "correctOptionIndex": 1
+      },
+      {
+        "requirement": "The task naturally splits into specialized responsibilities that must coordinate",
+        "correctOptionIndex": 2
+      }
+    ],
+    "explanation": "\"Every deployment follows the exact same fixed sequence of steps, regardless of input\" -> Deterministic Workflow: A fixed, always-identical sequence is exactly what a deterministic workflow guarantees, with no room for runtime deviation. \"The system must decide which tools to call next based on changing intermediate results\" -> Autonomous Agent: Deciding the next tool call based on changing intermediate results is what an autonomous agent's planning loop is built for. \"The task naturally splits into specialized responsibilities that must coordinate\" -> Multi-Agent Architecture: Specialized responsibilities that must coordinate with each other is the core case a multi-agent architecture is designed to handle."
+  },
+  {
+    "id": "pro-099",
+    "number": 99,
+    "domain": "context-management",
+    "type": "matching",
+    "text": "Match each requirement with the MOST appropriate optimization.",
+    "options": [
+      "Model Routing",
+      "Prompt Caching",
+      "Retrieval-Augmented Generation (RAG)"
+    ],
+    "pairs": [
+      {
+        "requirement": "Send simple requests to a cheaper model and complex ones to a stronger model",
+        "correctOptionIndex": 0
+      },
+      {
+        "requirement": "Avoid re-billing for an identical system prompt sent with every request",
+        "correctOptionIndex": 1
+      },
+      {
+        "requirement": "Answer questions using a knowledge base that changes throughout the day",
+        "correctOptionIndex": 2
+      }
+    ],
+    "explanation": "\"Send simple requests to a cheaper model and complex ones to a stronger model\" -> Model Routing: Dispatching simple requests to a cheaper model and complex ones to a stronger model is the definition of model routing. \"Avoid re-billing for an identical system prompt sent with every request\" -> Prompt Caching: An identical system prompt repeated on every request is exactly the fixed, reused prefix that caching is built to avoid re-paying for. \"Answer questions using a knowledge base that changes throughout the day\" -> Retrieval-Augmented Generation (RAG): A knowledge base that changes throughout the day needs to be looked up at request time rather than baked into a static prompt."
+  },
+  {
+    "id": "pro-100",
+    "number": 100,
+    "domain": "tool-design-mcp",
+    "type": "matching",
+    "text": "Match each requirement with the MOST appropriate control.",
+    "options": [
+      "Role-Based Access Control (RBAC)",
+      "Least-Privilege Tool Permissions",
+      "Explicit User Confirmation"
+    ],
+    "pairs": [
+      {
+        "requirement": "Employees should only access tools relevant to their own department",
+        "correctOptionIndex": 0
+      },
+      {
+        "requirement": "A tool should be granted only the minimum capability it needs to do its job",
+        "correctOptionIndex": 1
+      },
+      {
+        "requirement": "A high-risk financial operation should never execute without a human explicitly approving it first",
+        "correctOptionIndex": 2
+      }
+    ],
+    "explanation": "\"Employees should only access tools relevant to their own department\" -> Role-Based Access Control (RBAC): Restricting tool access by department is exactly what role-based access control enforces. \"A tool should be granted only the minimum capability it needs to do its job\" -> Least-Privilege Tool Permissions: Granting only the minimum capability a tool needs is the least-privilege principle applied to tool design. \"A high-risk financial operation should never execute without a human explicitly approving it first\" -> Explicit User Confirmation: A high-risk operation that must never execute without a human approving it first needs an explicit confirmation gate, not just a permission check."
   }
 ]

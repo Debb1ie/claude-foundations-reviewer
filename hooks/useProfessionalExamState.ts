@@ -104,7 +104,12 @@ const PER_QUESTION_TIME_LIMIT_SECONDS = 75;
 export const FAST_ANSWER_FLOOR_SECONDS = 20;
 
 const allProfessional = professionalQuestionsData as ProfessionalQuestion[];
-export const TOTAL_QUESTIONS = allProfessional.length;
+// The bank (pool) is larger than any one sitting -- 100 authored questions --
+// but each attempt only draws SESSION_SIZE of them, freshly sampled and
+// shuffled, so consecutive attempts don't show the same 63 in the same order.
+const SESSION_SIZE = 63;
+export const TOTAL_QUESTIONS = Math.min(SESSION_SIZE, allProfessional.length);
+export const POOL_SIZE = allProfessional.length;
 export const TOTAL_SECONDS = TOTAL_QUESTIONS * PER_QUESTION_TIME_LIMIT_SECONDS;
 export { PER_QUESTION_TIME_LIMIT_SECONDS };
 
@@ -149,11 +154,12 @@ function recordElapsed(
   questionEnteredAt = now;
 }
 
-// Served in full every attempt -- this is the learner's own authored bank,
-// not a large pool to sample a subset from -- just reshuffled order + option
-// positions per attempt so it isn't trivially memorizable.
+// Randomly samples SESSION_SIZE questions out of the full pool, then
+// shuffles both question order and each question's option order -- so
+// consecutive attempts draw a different subset in a different order with
+// different option positions, instead of the same fixed set every time.
 function buildSession(): ProfessionalQuestion[] {
-  return shuffleArray(allProfessional).map(shuffleOptions);
+  return shuffleArray(allProfessional).slice(0, TOTAL_QUESTIONS).map(shuffleOptions);
 }
 
 export const useProfessionalExamStore = create<ProfessionalExamStore>()(

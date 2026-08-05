@@ -597,7 +597,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                 <VStack align="stretch" gap={3} mb={6}>
                   {[
                     'This runs in fullscreen. Leaving fullscreen wipes your answers and restarts you from Question 1.',
-                    'Switching tabs, alt-tabbing, or taking a screenshot triggers a warning banner.',
+                    'Switching tabs, alt-tabbing, or leaving fullscreen wipes your answers and restarts you from Question 1 -- same as leaving fullscreen. Taking a screenshot triggers a warning banner instead.',
                     'Each question has its own time limit -- 60s for standard questions, 105s for the harder tier. When it runs out, the question is skipped automatically, answered or not.',
                     'The review screen hides answer options and correct answers for anything you skip -- you only see what you actually attempted.',
                   ].map((line, i) => (
@@ -664,7 +664,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                 <VStack align="stretch" gap={3} mb={6}>
                   {[
                     'This runs in fullscreen. Leaving fullscreen wipes your answers and restarts you from Question 1.',
-                    'Switching tabs, alt-tabbing, or taking a screenshot triggers a warning banner.',
+                    'Switching tabs, alt-tabbing, or leaving fullscreen wipes your answers and restarts you from Question 1 -- same as leaving fullscreen. Taking a screenshot triggers a warning banner instead.',
                     'Some questions are multi-select ("Select TWO") -- pick exactly two, then hit Confirm Selection to lock it in. Once two are checked, the rest close until you uncheck one. Single-answer questions lock the moment you click.',
                     'Scenario Matching questions ask you to match each requirement to an option -- assign all rows, then hit Confirm Matches.',
                     'Each question has its own time limit. When it runs out, the question is skipped automatically, answered or not.',
