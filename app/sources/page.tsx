@@ -130,10 +130,7 @@ export default function SourcesPage() {
                   borderColor="rgba(255, 255, 255, 0.35)"
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{
-                    bg: "rgba(30, 41, 59, 0.45)",
-                    borderColor: "rgba(255, 255, 255, 0.08)"
-                  }}
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
                   borderRadius="xl"
                   p={6}
                   transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -142,7 +139,7 @@ export default function SourcesPage() {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.1)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.1)',
                     textDecoration: 'none'
                   }}
                   display="flex"
@@ -155,6 +152,7 @@ export default function SourcesPage() {
                       py={1}
                       borderRadius="full"
                       bg="brand.100"
+                      _dark={{ bg: 'rgba(204,120,92,0.15)', color: '#E5BA9E' }}
                       color="brand.700"
                       fontSize="xs"
                       fontWeight={700}
@@ -195,10 +193,7 @@ export default function SourcesPage() {
                   borderColor="rgba(255, 255, 255, 0.35)"
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{
-                    bg: "rgba(30, 41, 59, 0.45)",
-                    borderColor: "rgba(255, 255, 255, 0.08)"
-                  }}
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
                   borderRadius="xl"
                   p={6}
                   transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -207,7 +202,7 @@ export default function SourcesPage() {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.1)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.1)',
                     textDecoration: 'none'
                   }}
                   display="flex"
@@ -220,6 +215,7 @@ export default function SourcesPage() {
                       py={1}
                       borderRadius="full"
                       bg="brand.100"
+                      _dark={{ bg: 'rgba(204,120,92,0.15)', color: '#E5BA9E' }}
                       color="brand.700"
                       fontSize="xs"
                       fontWeight={700}

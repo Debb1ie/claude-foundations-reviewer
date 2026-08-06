@@ -140,10 +140,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   borderColor="rgba(255, 255, 255, 0.35)"
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{
-                    bg: "rgba(30, 41, 59, 0.45)",
-                    borderColor: "rgba(255, 255, 255, 0.08)"
-                  }}
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
                   borderRadius="xl"
                   p={5}
                   textAlign="left"
@@ -153,7 +150,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)',
                     textDecoration: 'none'
                   }}
                   display="flex"
@@ -165,13 +162,13 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Box
                         p={2.5}
                         borderRadius="lg"
-                        bg="rgba(57, 73, 171, 0.08)"
+                        bg="rgba(217, 119, 87, 0.08)"
                         border="1px solid"
-                        borderColor="rgba(57, 73, 171, 0.16)"
-                        color="brand.600"
+                        borderColor="rgba(217, 119, 87, 0.16)"
+                        color="brand.700"
                         transition="all 0.2s"
                         _dark={{
-                          bg: 'rgba(124, 110, 250, 0.15)',
+                          bg: 'rgba(217, 119, 87, 0.15)',
                           borderColor: 'rgba(255, 255, 255, 0.12)',
                           color: 'brand.300'
                         }}
@@ -206,7 +203,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       color="white"
                       fontWeight={700}
                       borderRadius="lg"
-                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                       transition="all 0.2s"
                     >
                       Browse Resources
@@ -228,22 +225,23 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       cursor="pointer"
                       border="2px solid"
                       borderColor={isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.35)'}
-                      bg={isSelected ? 'rgba(57, 73, 171, 0.06)' : 'rgba(255, 255, 255, 0.45)'}
+                      bg={isSelected ? 'rgba(217, 119, 87, 0.06)' : 'rgba(255, 255, 255, 0.45)'}
                       backdropFilter="blur(12px)"
                       _dark={{
-                        bg: isSelected ? 'rgba(124, 110, 250, 0.1)' : 'rgba(30, 41, 59, 0.45)',
-                        borderColor: isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.08)'
+                        bg: isSelected ? 'rgba(217, 119, 87, 0.1)' : 'rgba(35, 33, 32, 0.45)',
+                        borderColor: isSelected ? 'brand.500' : 'rgba(255, 255, 255, 0.08)',
+                        _hover: { bg: isSelected ? 'rgba(217, 119, 87, 0.16)' : 'rgba(50, 47, 45, 0.75)' },
                       }}
                       borderRadius="xl"
                       p={5}
                       textAlign="left"
                       transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                      boxShadow={isSelected ? '0 10px 25px -5px rgba(57,73,171,0.15)' : '0 8px 32px 0 rgba(31, 38, 135, 0.03)'}
+                      boxShadow={isSelected ? '0 10px 25px -5px rgba(193,95,60,0.15)' : '0 8px 32px 0 rgba(31, 38, 135, 0.03)'}
                       _hover={{
                         borderColor: isSelected ? 'brand.500' : 'brand.300',
-                        bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.65)',
+                        bg: isSelected ? 'rgba(217, 119, 87, 0.08)' : 'rgba(255, 255, 255, 0.65)',
                         transform: 'translateY(-3px)',
-                        boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)'
+                        boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)'
                       }}
                       display="flex"
                       flexDirection="column"
@@ -255,13 +253,13 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                           <Box
                             p={2.5}
                             borderRadius="lg"
-                            bg={isSelected ? 'brand.600' : 'rgba(57, 73, 171, 0.08)'}
+                            bg={isSelected ? 'brand.600' : 'rgba(217, 119, 87, 0.08)'}
                             border={isSelected ? 'none' : '1px solid'}
-                            borderColor={isSelected ? 'transparent' : 'rgba(57, 73, 171, 0.16)'}
+                            borderColor={isSelected ? 'transparent' : 'rgba(217, 119, 87, 0.16)'}
                             color={isSelected ? 'white' : 'brand.600'}
                             transition="all 0.2s"
                             _dark={isSelected ? {} : {
-                              bg: 'rgba(124, 110, 250, 0.15)',
+                              bg: 'rgba(217, 119, 87, 0.15)',
                               borderColor: 'rgba(255, 255, 255, 0.12)',
                               color: 'brand.300'
                             }}
@@ -269,7 +267,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                             {SVG_ICONS[mode.icon]}
                           </Box>
                           {isSelected && (
-                            <Badge bg="brand.100" color="brand.700" size="sm" borderRadius="full" px={2.5}>
+                            <Badge bg="brand.100" _dark={{ bg: 'rgba(204,120,92,0.15)', color: '#E5BA9E' }} color="brand.700" size="sm" borderRadius="full" px={2.5}>
                               Selected
                             </Badge>
                           )}
@@ -300,10 +298,10 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 mt={2}
                                 p={3}
                                 borderRadius="lg"
-                                bg="rgba(57, 73, 171, 0.04)"
+                                bg="rgba(217, 119, 87, 0.04)"
                                 border="1px solid"
-                                borderColor="rgba(57, 73, 171, 0.12)"
-                                _dark={{ bg: 'rgba(124, 110, 250, 0.08)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                                borderColor="rgba(217, 119, 87, 0.12)"
+                                _dark={{ bg: 'rgba(217, 119, 87, 0.08)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                               >
                                 <Text fontSize="2xs" fontWeight={700} color="gray.500" textTransform="uppercase" letterSpacing="0.06em" mb={2}>
                                   Timer
@@ -317,7 +315,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                     fontSize="xs"
                                     fontWeight={700}
                                     border="1.5px solid"
-                                    borderColor={examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
+                                    borderColor={examTimed ? 'brand.500' : 'rgba(217, 119, 87, 0.16)'}
                                     bg={examTimed ? 'brand.600' : 'transparent'}
                                     color={examTimed ? 'white' : 'gray.500'}
                                     transition="all 0.18s"
@@ -334,7 +332,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                     fontSize="xs"
                                     fontWeight={700}
                                     border="1.5px solid"
-                                    borderColor={!examTimed ? 'brand.500' : 'rgba(57, 73, 171, 0.16)'}
+                                    borderColor={!examTimed ? 'brand.500' : 'rgba(217, 119, 87, 0.16)'}
                                     bg={!examTimed ? 'brand.600' : 'transparent'}
                                     color={!examTimed ? 'white' : 'gray.500'}
                                     transition="all 0.18s"
@@ -353,7 +351,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 color="white"
                                 fontWeight={700}
                                 borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                                 transition="all 0.2s"
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -382,10 +380,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   borderColor="rgba(255, 255, 255, 0.35)"
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{
-                    bg: "rgba(30, 41, 59, 0.45)",
-                    borderColor: "rgba(255, 255, 255, 0.08)"
-                  }}
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
                   borderRadius="xl"
                   p={5}
                   textAlign="left"
@@ -395,7 +390,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)',
                   }}
                   display="flex"
                   flexDirection="column"
@@ -405,13 +400,13 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Box
                         p={2.5}
                         borderRadius="lg"
-                        bg="rgba(57, 73, 171, 0.08)"
+                        bg="rgba(217, 119, 87, 0.08)"
                         border="1px solid"
-                        borderColor="rgba(57, 73, 171, 0.16)"
-                        color="brand.600"
+                        borderColor="rgba(217, 119, 87, 0.16)"
+                        color="brand.700"
                         transition="all 0.2s"
                         _dark={{
-                          bg: 'rgba(124, 110, 250, 0.15)',
+                          bg: 'rgba(217, 119, 87, 0.15)',
                           borderColor: 'rgba(255, 255, 255, 0.12)',
                           color: 'brand.300'
                         }}
@@ -446,7 +441,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         color="white"
                         fontWeight={700}
                         borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => setShowAdvancedWarning(true)}
                       >
@@ -469,10 +464,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   borderColor="rgba(255, 255, 255, 0.35)"
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{
-                    bg: "rgba(30, 41, 59, 0.45)",
-                    borderColor: "rgba(255, 255, 255, 0.08)"
-                  }}
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
                   borderRadius="xl"
                   p={5}
                   textAlign="left"
@@ -482,7 +474,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     borderColor: 'brand.400',
                     bg: 'rgba(255, 255, 255, 0.65)',
                     transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(57, 73, 171, 0.12)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)',
                   }}
                   display="flex"
                   flexDirection="column"
@@ -492,13 +484,13 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Box
                         p={2.5}
                         borderRadius="lg"
-                        bg="rgba(57, 73, 171, 0.08)"
+                        bg="rgba(217, 119, 87, 0.08)"
                         border="1px solid"
-                        borderColor="rgba(57, 73, 171, 0.16)"
-                        color="brand.600"
+                        borderColor="rgba(217, 119, 87, 0.16)"
+                        color="brand.700"
                         transition="all 0.2s"
                         _dark={{
-                          bg: 'rgba(124, 110, 250, 0.15)',
+                          bg: 'rgba(217, 119, 87, 0.15)',
                           borderColor: 'rgba(255, 255, 255, 0.12)',
                           color: 'brand.300'
                         }}
@@ -533,7 +525,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         color="white"
                         fontWeight={700}
                         borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(57,73,171,0.35)' }}
+                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => setShowProfessionalWarning(true)}
                       >
@@ -546,7 +538,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             </SimpleGrid>
 
             <motion.div variants={itemVariants}>
-              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(30, 41, 59, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
+              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
                 <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
                   <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by Kenshin Juanico &amp; Precious Manucom from the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
                 </Text>
@@ -581,7 +573,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             >
               <Box
                 bg="rgba(255,255,255,0.97)"
-                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
                 borderRadius="2xl"
                 border="1px solid rgba(255,255,255,0.35)"
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"
@@ -648,7 +640,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             >
               <Box
                 bg="rgba(255,255,255,0.97)"
-                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
                 borderRadius="2xl"
                 border="1px solid rgba(255,255,255,0.35)"
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"

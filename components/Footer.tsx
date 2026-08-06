@@ -10,14 +10,14 @@ export function Footer() {
       bg="rgba(255, 255, 255, 0.45)"
       backdropFilter="blur(16px)"
       _dark={{
-        bg: "rgba(15, 23, 42, 0.45)",
+        bg: "rgba(26, 24, 23, 0.45)",
         borderColor: "rgba(255, 255, 255, 0.08)"
       }}
       mt="auto"
     >
       <Container maxW="container.lg" textAlign="center">
         <Text fontSize={{ base: "xs", md: "sm" }} color="brand.500" px={4} lineHeight="tall">
-          Made by <Link href="https://github.com/rocketwolf98" color="brand.600" fontWeight="semibold" target="_blank" rel="noopener noreferrer" outline="none" _focusVisible={{ boxShadow: "outline", borderRadius: "sm" }}>Kenshin Juanico</Link> &amp; <Text as="span" color="brand.600" fontWeight="semibold">Precious Manucom</Text> from DEVCON Jumpstart Internships Program - Cohort 4. For review purposes only.
+          Made by <Link href="https://github.com/rocketwolf98" color="brand.700" fontWeight="semibold" target="_blank" rel="noopener noreferrer" outline="none" _focusVisible={{ boxShadow: "outline", borderRadius: "sm" }}>Kenshin Juanico</Link> &amp; <Text as="span" color="brand.700" fontWeight="semibold">Precious Manucom</Text> from DEVCON Jumpstart Internships Program - Cohort 4. For review purposes only.
         </Text>
       </Container>
     </Box>

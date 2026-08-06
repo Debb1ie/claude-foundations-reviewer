@@ -61,7 +61,7 @@ export function ReviewOverview() {
         bg="rgba(255, 255, 255, 0.45)"
         backdropFilter="blur(16px)"
         _dark={{
-          bg: "rgba(15, 23, 42, 0.45)",
+          bg: "rgba(26, 24, 23, 0.45)",
           borderColor: "rgba(255, 255, 255, 0.08)"
         }}
         position="sticky"
@@ -103,6 +103,7 @@ export function ReviewOverview() {
                   <Box
                     p={4}
                     bg="orange.50"
+                    _dark={{ bg: 'rgba(204,120,92,0.1)', borderColor: 'rgba(204,120,92,0.35)' }}
                     border="1.5px solid"
                     borderColor="orange.200"
                     borderRadius="xl"
@@ -110,16 +111,18 @@ export function ReviewOverview() {
                     mb={4}
                   >
                     <HStack align="flex-start" gap={3}>
-                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#dd6b20" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                        <line x1="12" y1="9" x2="12" y2="13"></line>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                      </svg>
+                      <Box color="orange.600" _dark={{ color: 'brand.300' }} flexShrink={0} mt="2px">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                          <line x1="12" y1="9" x2="12" y2="13"></line>
+                          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                      </Box>
                       <VStack align="stretch" gap={0.5}>
-                        <Text fontSize="sm" fontWeight={700} color="orange.800">
+                        <Text fontSize="sm" fontWeight={700} color="orange.800" _dark={{ color: 'brand.200' }}>
                           Unanswered Questions Alert
                         </Text>
-                        <Text fontSize="xs" color="orange.700" lineHeight={1.5}>
+                        <Text fontSize="xs" color="orange.700" _dark={{ color: 'brand.300' }} lineHeight={1.5}>
                           You still have <strong>{unansweredCount}</strong> {unansweredCount === 1 ? 'question' : 'questions'} remaining without an answer. Please review them before final evaluation to ensure maximum score potential.
                         </Text>
                       </VStack>
@@ -147,7 +150,7 @@ export function ReviewOverview() {
                       bg={isUnanswered ? 'rgba(251, 191, 36, 0.05)' : 'rgba(255, 255, 255, 0.45)'}
                       backdropFilter="blur(12px)"
                       _dark={{
-                        bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(30, 41, 59, 0.45)',
+                        bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(35, 33, 32, 0.45)',
                         borderColor: isFlagged ? 'orange.400' : (isUnanswered ? 'orange.300' : 'rgba(255, 255, 255, 0.08)')
                       }}
                       border="1.5px solid"
@@ -189,11 +192,11 @@ export function ReviewOverview() {
                             </Badge>
                           )}
                           {isUnanswered ? (
-                            <Badge bg="red.50" color="red.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="red.100">
+                            <Badge bg="red.50" _dark={{ bg: "rgba(199,69,42,0.15)", color: "#E8998A", borderColor: "rgba(199,69,42,0.35)" }} color="red.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="red.100">
                               UNANSWERED
                             </Badge>
                           ) : (
-                            <Badge bg="brand.50" color="brand.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="brand.100">
+                            <Badge bg="brand.50" _dark={{ bg: "rgba(204,120,92,0.15)", color: "#E5BA9E", borderColor: "rgba(204,120,92,0.35)" }} color="brand.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="brand.100">
                               COMPLETED
                             </Badge>
                           )}
@@ -213,7 +216,7 @@ export function ReviewOverview() {
                               key={oi}
                               p={2.5}
                               borderRadius="lg"
-                              bg={isUserAnswer ? 'rgba(57,73,171,0.06)' : 'transparent'}
+                              bg={isUserAnswer ? 'rgba(193,95,60,0.06)' : 'transparent'}
                               border="1px solid"
                               borderColor={isUserAnswer ? 'brand.200' : 'transparent'}
                               gap={3}
@@ -280,7 +283,7 @@ export function ReviewOverview() {
         bg="rgba(255, 255, 255, 0.45)"
         backdropFilter="blur(16px)"
         _dark={{
-          bg: "rgba(15, 23, 42, 0.45)",
+          bg: "rgba(26, 24, 23, 0.45)",
           borderColor: "rgba(255, 255, 255, 0.08)"
         }}
         position="sticky"
@@ -349,7 +352,7 @@ export function ReviewOverview() {
                 bg="rgba(255, 255, 255, 0.88)"
                 backdropFilter="blur(20px)"
                 _dark={{
-                  bg: "rgba(15, 23, 42, 0.88)",
+                  bg: "rgba(26, 24, 23, 0.88)",
                   borderColor: "rgba(255, 255, 255, 0.12)"
                 }}
                 w="100%"
@@ -379,7 +382,7 @@ export function ReviewOverview() {
                     </HStack>
                   )}
                 </Text>
-                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" wrap="wrap" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
                   <Button variant="outline" size="sm" onClick={() => setSubmitOpen(false)} fontWeight={600} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
                     Cancel
                   </Button>

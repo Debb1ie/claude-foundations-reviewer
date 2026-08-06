@@ -72,7 +72,7 @@ export function PasserTips() {
       bg="rgba(255, 255, 255, 0.45)"
       backdropFilter="blur(16px)"
       _dark={{
-        bg: 'rgba(15, 23, 42, 0.45)',
+        bg: 'rgba(26, 24, 23, 0.45)',
         borderColor: 'rgba(255, 255, 255, 0.08)',
       }}
       border="1px solid"
@@ -96,14 +96,14 @@ export function PasserTips() {
             <Box
               p={4}
               borderRadius="lg"
-              bg="rgba(57, 73, 171, 0.05)"
-              border="1px solid rgba(57, 73, 171, 0.12)"
-              _dark={{ bg: 'rgba(124, 110, 250, 0.08)', borderColor: 'rgba(255,255,255,0.08)' }}
+              bg="rgba(217, 119, 87, 0.05)"
+              border="1px solid rgba(217, 119, 87, 0.12)"
+              _dark={{ bg: 'rgba(217, 119, 87, 0.08)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <Text fontSize="sm" color="gray.700" _dark={{ color: 'gray.200' }} lineHeight={1.6} mb={2}>
                 &ldquo;{tip.text}&rdquo;
               </Text>
-              <Text fontSize="xs" fontWeight={700} color="brand.600" fontFamily="mono">
+              <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono">
                 — {tip.author}
               </Text>
             </Box>

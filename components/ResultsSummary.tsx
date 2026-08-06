@@ -116,7 +116,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                 bg="rgba(255, 255, 255, 0.45)"
                 backdropFilter="blur(16px)"
                 _dark={{
-                  bg: "rgba(15, 23, 42, 0.45)",
+                  bg: "rgba(26, 24, 23, 0.45)",
                   borderColor: "rgba(255, 255, 255, 0.08)"
                 }}
                 border="1.5px solid"
@@ -179,19 +179,19 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                 {/* Quick Stats Grid */}
                 <SimpleGrid columns={[2, 4]} gap={4} mt={6} pt={6} borderTop="1px solid" borderColor="border">
                   <VStack gap={0.5} align="center">
-                    <Text fontSize="lg" fontWeight={700} color="brand.600">{results.correctAnswers}</Text>
+                    <Text fontSize="lg" fontWeight={700} color="brand.700">{results.correctAnswers}</Text>
                     <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">CORRECT</Text>
                   </VStack>
                   <VStack gap={0.5} align="center">
-                    <Text fontSize="lg" fontWeight={700} color="brand.600">{results.incorrectAnswers}</Text>
+                    <Text fontSize="lg" fontWeight={700} color="brand.700">{results.incorrectAnswers}</Text>
                     <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">INCORRECT</Text>
                   </VStack>
                   <VStack gap={0.5} align="center">
-                    <Text fontSize="lg" fontWeight={700} color="brand.600">{results.unanswered}</Text>
+                    <Text fontSize="lg" fontWeight={700} color="brand.700">{results.unanswered}</Text>
                     <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">UNANSWERED</Text>
                   </VStack>
                   <VStack gap={0.5} align="center">
-                    <Text fontSize="lg" fontWeight={700} color="brand.600">{timeDisplay()}</Text>
+                    <Text fontSize="lg" fontWeight={700} color="brand.700">{timeDisplay()}</Text>
                     <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">TIME TAKEN</Text>
                   </VStack>
                 </SimpleGrid>
@@ -223,7 +223,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                 bg="rgba(255, 255, 255, 0.45)"
                 backdropFilter="blur(16px)"
                 _dark={{
-                  bg: "rgba(15, 23, 42, 0.45)",
+                  bg: "rgba(26, 24, 23, 0.45)",
                   borderColor: "rgba(255, 255, 255, 0.08)"
                 }}
                 border="1px solid"
@@ -261,7 +261,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                               {d.name}
                             </Text>
                           </HStack>
-                          <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.600">
+                          <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.700">
                             {breakdown.correct} / {breakdown.total} ({pct}%)
                           </Text>
                         </HStack>
@@ -305,7 +305,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                       href="/sources"
                       fontSize="xs"
                       fontWeight={700}
-                      color="brand.600"
+                      color="brand.700"
                       _hover={{ color: 'brand.700', textDecoration: 'underline' }}
                     >
                       View all resources →
@@ -328,15 +328,16 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                         bg="rgba(255, 255, 255, 0.55)"
                         backdropFilter="blur(10px)"
                         _dark={{
-                          bg: 'rgba(30, 41, 59, 0.45)',
-                          borderColor: 'rgba(255, 255, 255, 0.08)'
+                          bg: 'rgba(35, 33, 32, 0.45)',
+                          borderColor: 'rgba(255, 255, 255, 0.08)',
+                          _hover: { bg: 'rgba(50, 47, 45, 0.75)', borderColor: 'brand.400' },
                         }}
                         transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                         _hover={{
                           borderColor: 'brand.400',
                           bg: 'rgba(255,255,255,0.8)',
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(57,73,171,0.10)',
+                          boxShadow: '0 8px 24px rgba(193,95,60,0.10)',
                           textDecoration: 'none'
                         }}
                         style={{ textDecoration: 'none' }}
@@ -347,6 +348,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                             py={0.5}
                             borderRadius="full"
                             bg="brand.100"
+                            _dark={{ bg: 'rgba(204,120,92,0.15)', color: '#E5BA9E' }}
                             color="brand.700"
                             fontSize="2xs"
                             fontWeight={700}
@@ -391,7 +393,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                           bg="rgba(255, 255, 255, 0.45)"
                           backdropFilter="blur(12px)"
                           _dark={{
-                            bg: "rgba(30, 41, 59, 0.45)",
+                            bg: "rgba(35, 33, 32, 0.45)",
                             borderColor: "rgba(255, 255, 255, 0.08)"
                           }}
                           border="1px solid"
@@ -431,14 +433,14 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
                           {q.scenario && (
                             <Box
                               p={3.5}
-                              bg="rgba(57, 73, 171, 0.08)"
+                              bg="rgba(217, 119, 87, 0.08)"
                               border="1px solid"
-                              borderColor="rgba(57, 73, 171, 0.18)"
+                              borderColor="rgba(217, 119, 87, 0.18)"
                               borderLeft="3px solid"
                               borderLeftColor="brand.500"
                               borderRadius="lg"
                               _dark={{
-                                bg: "rgba(124, 110, 250, 0.12)",
+                                bg: "rgba(217, 119, 87, 0.12)",
                                 borderColor: "rgba(255, 255, 255, 0.12)"
                               }}
                               mb={3}
@@ -551,12 +553,12 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
 
                           <Box
                             p={4}
-                            bg="rgba(57, 73, 171, 0.05)"
+                            bg="rgba(217, 119, 87, 0.05)"
                             border="1px solid"
-                            borderColor="rgba(57, 73, 171, 0.15)"
+                            borderColor="rgba(217, 119, 87, 0.15)"
                             borderRadius="xl"
                             _dark={{
-                              bg: "rgba(124, 110, 250, 0.08)",
+                              bg: "rgba(217, 119, 87, 0.08)",
                               borderColor: "rgba(255, 255, 255, 0.08)"
                             }}
                           >
@@ -579,7 +581,7 @@ export function ResultsSummary({ onRestart }: ResultsSummaryProps) {
             )}
 
             <motion.div variants={itemVariants}>
-              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(30, 41, 59, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
+              <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)" }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
                 <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
                   <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
                 </Text>

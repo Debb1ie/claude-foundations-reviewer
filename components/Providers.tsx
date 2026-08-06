@@ -5,6 +5,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import system from '@/theme/chakraTheme';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [cache] = useState(() => {
@@ -30,7 +31,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <CacheProvider value={cache}>
-      <ChakraProvider value={system}>{children}</ChakraProvider>
+      <ChakraProvider value={system}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </ChakraProvider>
     </CacheProvider>
   );
 }

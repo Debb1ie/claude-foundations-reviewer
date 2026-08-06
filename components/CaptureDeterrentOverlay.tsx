@@ -112,7 +112,7 @@ export function CaptureDeterrentOverlay({
             >
               <Box
                 bg="rgba(255,255,255,0.97)"
-                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
                 borderRadius="2xl"
                 border="1px solid rgba(255,255,255,0.35)"
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"

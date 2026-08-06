@@ -16,6 +16,7 @@ import { useExamStore } from '@/hooks/useExamState';
 import { useTimer } from '@/hooks/useTimer';
 import { DOMAINS, DOMAIN_TEXT_COLORS, DOMAIN_BADGE_BGS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT, isMultiSelect, isAnswerCorrect, isAnswerSelected } from '@/types/exam';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PlayIcon, CheckIcon } from '@/components/icons';
 
 const MODE_LABELS = {
   exam: { title: 'Timed Exam Mode', timer: true, showExplanations: false },
@@ -203,10 +204,10 @@ export function ExamView() {
           let bgColor = 'transparent';
           let borderColor = isNavigable ? 'border' : 'bg.muted';
           if (isCurrent) {
-            bgColor = 'rgba(57,73,171,0.08)';
+            bgColor = 'rgba(193,95,60,0.08)';
             borderColor = 'brand.500';
           } else if (isAns) {
-            bgColor = showAnswerFeedback ? (isCorrect ? '#e6f9f1' : '#fde8e8') : 'rgba(57,73,171,0.06)';
+            bgColor = showAnswerFeedback ? (isCorrect ? '#e6f9f1' : '#fde8e8') : 'rgba(193,95,60,0.06)';
             borderColor = showAnswerFeedback ? (isCorrect ? '#22c88a' : '#f05a5a') : 'brand.400';
           }
           const textColor = isAns
@@ -229,7 +230,7 @@ export function ExamView() {
                 color={textColor}
                 cursor={isNavigable ? 'pointer' : 'not-allowed'}
                 transition="all 0.15s"
-                _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' } : {}}
+                _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(193,95,60,0.04)' } : {}}
                 onClick={() => {
                   if (isNavigable) {
                     goToQuestion(i);
@@ -268,7 +269,7 @@ export function ExamView() {
         bg="rgba(255, 255, 255, 0.45)"
         backdropFilter="blur(16px)"
         _dark={{
-          bg: "rgba(15, 23, 42, 0.45)",
+          bg: "rgba(26, 24, 23, 0.45)",
           borderColor: "rgba(255, 255, 255, 0.08)"
         }}
         position="sticky"
@@ -287,12 +288,12 @@ export function ExamView() {
                   gap={1.5}
                   px={3}
                   py={1}
-                  bg="rgba(57, 73, 171, 0.08)"
+                  bg="rgba(217, 119, 87, 0.08)"
                   borderRadius="md"
                   border="1px solid"
-                  borderColor="rgba(57, 73, 171, 0.18)"
+                  borderColor="rgba(217, 119, 87, 0.18)"
                   _dark={{
-                    bg: "rgba(124, 110, 250, 0.12)",
+                    bg: "rgba(217, 119, 87, 0.12)",
                     borderColor: "rgba(255, 255, 255, 0.12)"
                   }}
                 >
@@ -425,7 +426,7 @@ export function ExamView() {
               bg="rgba(255, 255, 255, 0.45)"
               backdropFilter="blur(16px)"
               _dark={{
-                bg: "rgba(15, 23, 42, 0.45)",
+                bg: "rgba(26, 24, 23, 0.45)",
                 borderColor: "rgba(255, 255, 255, 0.08)"
               }}
               border="1px solid"
@@ -510,14 +511,14 @@ export function ExamView() {
                 {q.scenario && (
                   <Box
                     p={4}
-                    bg="rgba(57, 73, 171, 0.08)"
+                    bg="rgba(217, 119, 87, 0.08)"
                     border="1px solid"
-                    borderColor="rgba(57, 73, 171, 0.18)"
+                    borderColor="rgba(217, 119, 87, 0.18)"
                     borderLeft="4px solid"
                     borderLeftColor="brand.500"
                     borderRadius="lg"
                     _dark={{
-                      bg: "rgba(124, 110, 250, 0.12)",
+                      bg: "rgba(217, 119, 87, 0.12)",
                       borderColor: "rgba(255, 255, 255, 0.12)"
                     }}
                   >
@@ -586,7 +587,7 @@ export function ExamView() {
                       }
                     } else if (isSelected) {
                       borderColor = 'brand.500';
-                      bgColor = 'rgba(57,73,171,0.06)';
+                      bgColor = 'rgba(193,95,60,0.06)';
                       keyBg = 'brand.600';
                       keyBorderColor = 'brand.500';
                       keyTextColor = 'white';
@@ -606,16 +607,16 @@ export function ExamView() {
                         bg={bgColor}
                         backdropFilter="blur(8px)"
                         _dark={{
-                          bg: isSelected ? 'rgba(124, 110, 250, 0.1)' : (showAnswerFeedback && isReviewChecked ? (isCorrectOption ? 'rgba(34, 200, 138, 0.15)' : 'rgba(240, 90, 90, 0.15)') : 'rgba(30, 41, 59, 0.3)'),
+                          bg: isSelected ? 'rgba(217, 119, 87, 0.1)' : (showAnswerFeedback && isReviewChecked ? (isCorrectOption ? 'rgba(34, 200, 138, 0.15)' : 'rgba(240, 90, 90, 0.15)') : 'rgba(35, 33, 32, 0.3)'),
                           borderColor: isSelected ? 'brand.500' : (showAnswerFeedback && isReviewChecked ? (isCorrectOption ? '#22c88a' : '#f05a5a') : 'rgba(255, 255, 255, 0.06)')
                         }}
                         cursor="pointer"
                         transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                         _hover={{
                           borderColor: isSelected ? 'brand.500' : 'brand.400',
-                          bg: isSelected ? 'rgba(57, 73, 171, 0.08)' : 'rgba(255, 255, 255, 0.45)',
+                          bg: isSelected ? 'rgba(217, 119, 87, 0.08)' : 'rgba(255, 255, 255, 0.45)',
                           _dark: {
-                            bg: isSelected ? 'rgba(124, 110, 250, 0.15)' : 'rgba(30, 41, 59, 0.5)'
+                            bg: isSelected ? 'rgba(217, 119, 87, 0.15)' : 'rgba(35, 33, 32, 0.5)'
                           }
                         }}
                         onClick={() => handleAnswerClick(i)}
@@ -685,14 +686,14 @@ export function ExamView() {
                       >
                         <Box
                           p={5}
-                          bg="rgba(57, 73, 171, 0.05)"
+                          bg="rgba(217, 119, 87, 0.05)"
                           border="1px solid"
-                          borderColor="rgba(57, 73, 171, 0.15)"
+                          borderColor="rgba(217, 119, 87, 0.15)"
                           borderRadius="xl"
                           boxShadow="inset 0 2px 4px rgba(0,0,0,0.01)"
                           mt={2}
                           _dark={{
-                            bg: "rgba(124, 110, 250, 0.08)",
+                            bg: "rgba(217, 119, 87, 0.08)",
                             borderColor: "rgba(255, 255, 255, 0.08)"
                           }}
                         >
@@ -738,7 +739,7 @@ export function ExamView() {
               borderTop={{ base: '1px solid', md: 'none' }}
               borderColor="rgba(0, 0, 0, 0.1)"
               zIndex={100}
-              _dark={{ bg: { base: 'rgba(15, 23, 42, 0.9)', md: 'transparent' }, borderColor: 'rgba(255, 255, 255, 0.1)' }}
+              _dark={{ bg: { base: 'rgba(26, 24, 23, 0.9)', md: 'transparent' }, borderColor: 'rgba(255, 255, 255, 0.1)' }}
             >
               <Button
                 variant="outline"
@@ -755,13 +756,13 @@ export function ExamView() {
               </Text>
               {currentQuestion < questions.length - 1 ? (
                 <Button
-                  bg="blue.600"
+                  bg="brand.500"
                   color="white"
                   fontWeight={700}
                   size="md"
                   px={6}
                   borderRadius="lg"
-                  _hover={{ bg: 'blue.700', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(37,99,235,0.45)' }}
+                  _hover={{ bg: 'brand.600', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(204,120,92,0.45)' }}
                   _active={{ transform: 'translateY(0)', boxShadow: 'none' }}
                   transition="all 0.2s"
                   onClick={nextQuestion}
@@ -795,7 +796,7 @@ export function ExamView() {
               bg="rgba(255, 255, 255, 0.45)"
               backdropFilter="blur(16px)"
               _dark={{
-                bg: "rgba(15, 23, 42, 0.45)",
+                bg: "rgba(26, 24, 23, 0.45)",
                 borderColor: "rgba(255, 255, 255, 0.08)"
               }}
               border="1px solid"
@@ -817,11 +818,11 @@ export function ExamView() {
                     COLOR LEGEND
                   </Text>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(57,73,171,0.08)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(193,95,60,0.08)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Active Question</Text>
                   </HStack>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(57,73,171,0.06)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(193,95,60,0.06)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Answered Question</Text>
                   </HStack>
                   <HStack gap={2}>
@@ -860,7 +861,7 @@ export function ExamView() {
             >
               <Box
                 bg="rgba(255,255,255,0.97)"
-                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
                 borderRadius="2xl"
                 border="1px solid rgba(255,255,255,0.35)"
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"
@@ -870,11 +871,11 @@ export function ExamView() {
                   <Box
                     display="inline-flex" alignItems="center" justifyContent="center"
                     w={14} h={14} borderRadius="full"
-                    bg={isTimed ? "rgba(57,73,171,0.08)" : "rgba(239,68,68,0.08)"} mb={4}
-                    border="2px solid" borderColor={isTimed ? "rgba(57,73,171,0.15)" : "rgba(239,68,68,0.15)"}
+                    bg={isTimed ? "rgba(193,95,60,0.08)" : "rgba(239,68,68,0.08)"} mb={4}
+                    border="2px solid" borderColor={isTimed ? "rgba(193,95,60,0.15)" : "rgba(239,68,68,0.15)"}
                   >
                     {isTimed ? (
-                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="#283593" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="#9A4A2F" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="6" y="4" width="4" height="16"></rect>
                         <rect x="14" y="4" width="4" height="16"></rect>
                       </svg>
@@ -896,8 +897,8 @@ export function ExamView() {
                 </Box>
 
                 <Box mx={6} mb={5} p={4} borderRadius="xl"
-                  bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
+                  bg="rgba(193,95,60,0.05)" border="1px solid rgba(193,95,60,0.1)"
+                  _dark={{ bg: 'rgba(193,95,60,0.1)', borderColor: 'rgba(193,95,60,0.2)' }}>
                   <SimpleGrid columns={3} gap={3}>
                     {[
                       { label: 'Answered', value: `${answeredCount}/${questions.length}` },
@@ -918,12 +919,14 @@ export function ExamView() {
                     w="full" size="lg"
                     bg="brand.600" color="white"
                     fontWeight={700} borderRadius="xl"
-                    boxShadow="0 4px 14px rgba(57,73,171,0.35)"
+                    boxShadow="0 4px 14px rgba(193,95,60,0.35)"
                     _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
                     transition="all 0.2s"
                     onClick={isTimed ? handleResume : () => setDialogOpen(false)}
                   >
-                    {isTimed ? '▶ Resume Exam' : 'Cancel'}
+                    {isTimed ? (
+                      <HStack gap={2} justify="center"><PlayIcon size={14} /><Text>Resume Exam</Text></HStack>
+                    ) : 'Cancel'}
                   </Button>
                   {isTimed && (
                     <Button
@@ -940,7 +943,9 @@ export function ExamView() {
                       transition="all 0.2s"
                       onClick={() => { setDialogOpen(false); handleFinishClick(); }}
                     >
-                      {(questions.length - answeredCount) === 0 ? '✓ Submit Exam' : `Submit Early (${questions.length - answeredCount} unanswered)`}
+                      {(questions.length - answeredCount) === 0 ? (
+                        <HStack gap={2} justify="center"><CheckIcon size={14} /><Text>Submit Exam</Text></HStack>
+                      ) : `Submit Early (${questions.length - answeredCount} unanswered)`}
                     </Button>
                   )}
                   <Button
@@ -949,7 +954,7 @@ export function ExamView() {
                     color={isTimed ? "gray.500" : "red.500"}
                     fontWeight={600}
                     borderRadius="xl"
-                    _hover={{ color: isTimed ? 'brand.600' : 'red.600', bg: isTimed ? 'rgba(57,73,171,0.06)' : 'rgba(239,68,68,0.06)' }}
+                    _hover={{ color: isTimed ? 'brand.600' : 'red.600', bg: isTimed ? 'rgba(193,95,60,0.06)' : 'rgba(239,68,68,0.06)' }}
                     onClick={handleExit}
                   >
                     ← {isTimed ? 'Exit to Configuration' : 'Exit and Lose Progress'}
@@ -993,7 +998,7 @@ export function ExamView() {
                 bg="rgba(255, 255, 255, 0.88)"
                 backdropFilter="blur(20px)"
                 _dark={{
-                  bg: "rgba(15, 23, 42, 0.88)",
+                  bg: "rgba(26, 24, 23, 0.88)",
                   borderColor: "rgba(255, 255, 255, 0.12)"
                 }}
                 w="100%"
@@ -1011,7 +1016,7 @@ export function ExamView() {
                 <Text fontSize="sm" color="gray.800" _dark={{ color: "gray.100" }} fontWeight={500} lineHeight="tall" mb={6}>
                   You will be redirected to the bulk review dashboard where you can check all your chosen options before final score evaluation.
                 </Text>
-                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" wrap="wrap" _dark={{ borderColor: "rgba(255,255,255,0.08)" }}>
                   <Button variant="outline" size="sm" onClick={() => setFinishDialogOpen(false)} fontWeight={600} color="gray.700" _dark={{ color: "gray.300", _hover: { bg: "white/10" } }}>
                     Cancel
                   </Button>

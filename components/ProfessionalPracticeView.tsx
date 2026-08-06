@@ -34,6 +34,7 @@ import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
 import { CaptureDeterrentOverlay } from '@/components/CaptureDeterrentOverlay';
 import { requestAppFullscreen } from '@/lib/fullscreen';
 import { PasserTips } from '@/components/PasserTips';
+import { PauseIcon, PlayIcon, CheckIcon, XIcon, FlagIcon, CircleIcon } from '@/components/icons';
 
 const DOMAIN_NAMES: Record<string, string> = {
   'agentic-architecture': 'Agentic Architecture',
@@ -78,11 +79,11 @@ function StartScreen({ onStart }: { onStart: () => void }) {
           <VStack gap={8} align="stretch">
             <Box textAlign="center">
               <Badge
-                bg="rgba(160, 110, 250, 0.12)"
-                color="#6f2bc8"
-                border="1px solid rgba(160, 110, 250, 0.35)"
+                bg="rgba(200, 154, 63, 0.12)"
+                color="#856224"
+                border="1px solid rgba(200, 154, 63, 0.35)"
                 px={3} py={1} borderRadius="full" fontSize="xs" fontWeight={700} mb={4}
-                _dark={{ color: '#b996fb', bg: 'rgba(160,110,250,0.18)' }}
+                _dark={{ color: '#DFBE72', bg: 'rgba(200,154,63,0.18)' }}
               >
                 Professional Mode (CCARP)
               </Badge>
@@ -103,7 +104,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               borderRadius="xl"
               border="1px solid rgba(255, 255, 255, 0.35)"
               boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.04)"
-              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+              _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <Text fontSize="sm" fontWeight={700} color="brand.700" mb={1} textAlign="center">Question Bank Coverage</Text>
               <Text fontSize="2xs" color="gray.500" mb={4} textAlign="center">
@@ -113,7 +114,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 {DOMAINS.map((d) => (
                   <Box key={d.id} p={3} borderRadius="lg" border="1px solid" borderColor="rgba(255,255,255,0.3)"
                     bg="rgba(255,255,255,0.35)" textAlign="center"
-                    _dark={{ bg: 'rgba(30,41,59,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}>
+                    _dark={{ bg: 'rgba(41,40,38,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}>
                     <Badge bg={DOMAIN_SOLID_BGS[d.id]} color={DOMAIN_SOLID_TEXT[d.id]} px={2} py={0.5} borderRadius="md"
                       fontSize="2xs" fontFamily="mono" fontWeight={700} mb={1.5} display="block" w="fit-content" mx="auto">
                       {d.id}
@@ -131,7 +132,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               backdropFilter="blur(12px)"
               borderRadius="xl"
               border="1px solid rgba(255, 255, 255, 0.35)"
-              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+              _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <SimpleGrid columns={[1, 3]} gap={4}>
                 {[
@@ -147,13 +148,13 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               </SimpleGrid>
             </Box>
 
-            <HStack gap={3} justify="center">
+            <HStack gap={3} justify="center" wrap="wrap">
               <Link as={NextLink} href="/home" style={{ textDecoration: 'none' }}>
                 <Button
                   variant="outline"
                   size="lg"
                   borderColor="brand.300"
-                  color="brand.600"
+                  color="brand.700"
                   fontWeight={700}
                   borderRadius="xl"
                   px={8}
@@ -164,15 +165,15 @@ function StartScreen({ onStart }: { onStart: () => void }) {
               </Link>
               <Button
                 size="lg"
-                bg="#3949ab"
+                bg="#C15F3C"
                 color="white"
                 fontWeight={800}
                 borderRadius="xl"
                 px={10}
                 opacity={1}
-                boxShadow="0 6px 24px rgba(57,73,171,0.55)"
-                _hover={{ bg: '#303F9F', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(57,73,171,0.6)' }}
-                _active={{ transform: 'translateY(0)', boxShadow: '0 4px 14px rgba(57,73,171,0.4)' }}
+                boxShadow="0 6px 24px rgba(193,95,60,0.55)"
+                _hover={{ bg: '#9A4A2F', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(193,95,60,0.6)' }}
+                _active={{ transform: 'translateY(0)', boxShadow: '0 4px 14px rgba(193,95,60,0.4)' }}
                 transition="all 0.2s"
                 onClick={onStart}
               >
@@ -246,7 +247,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
             <Box
               bg="rgba(255, 255, 255, 0.45)"
               backdropFilter="blur(16px)"
-              _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
               border="1.5px solid"
               borderColor="rgba(255, 255, 255, 0.35)"
               boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
@@ -298,19 +299,19 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
               <SimpleGrid columns={[2, 4]} gap={4} mt={6} pt={6} borderTop="1px solid" borderColor="border">
                 <VStack gap={0.5} align="center">
-                  <Text fontSize="lg" fontWeight={700} color="brand.600">{correct}</Text>
+                  <Text fontSize="lg" fontWeight={700} color="brand.700">{correct}</Text>
                   <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">CORRECT</Text>
                 </VStack>
                 <VStack gap={0.5} align="center">
-                  <Text fontSize="lg" fontWeight={700} color="brand.600">{incorrectCount}</Text>
+                  <Text fontSize="lg" fontWeight={700} color="brand.700">{incorrectCount}</Text>
                   <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">INCORRECT</Text>
                 </VStack>
                 <VStack gap={0.5} align="center">
-                  <Text fontSize="lg" fontWeight={700} color="brand.600">{unansweredCount}</Text>
+                  <Text fontSize="lg" fontWeight={700} color="brand.700">{unansweredCount}</Text>
                   <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">UNANSWERED</Text>
                 </VStack>
                 <VStack gap={0.5} align="center">
-                  <Text fontSize="lg" fontWeight={700} color="brand.600">{timeDisplay}</Text>
+                  <Text fontSize="lg" fontWeight={700} color="brand.700">{timeDisplay}</Text>
                   <Text fontSize="10px" color="gray.400" fontWeight={700} fontFamily="mono">TIME TAKEN</Text>
                 </VStack>
               </SimpleGrid>
@@ -365,7 +366,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
               backdropFilter="blur(12px)"
               borderRadius="xl"
               border="1px solid rgba(255, 255, 255, 0.35)"
-              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+              _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={5} letterSpacing="0.05em">
                 DOMAIN-WISE PERFORMANCE ANALYSIS
@@ -383,7 +384,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                           </Badge>
                           <Text fontSize="xs" fontWeight={700} color="brand.700">{domain.name}</Text>
                         </HStack>
-                        <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.600">
+                        <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.700">
                           {dc} / {dt} ({pctVal}%)
                         </Text>
                       </HStack>
@@ -422,12 +423,12 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
               </Box>
             )}
 
-            <HStack gap={3} justify="center">
+            <HStack gap={3} justify="center" wrap="wrap">
               <Link as={NextLink} href="/home" style={{ textDecoration: 'none' }}>
                 <Button
                   variant="outline"
                   borderColor="brand.300"
-                  color="brand.600"
+                  color="brand.700"
                   fontWeight={700}
                   borderRadius="xl"
                   px={8}
@@ -440,7 +441,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                 variant="outline"
                 borderColor={showReview ? 'brand.500' : 'brand.200'}
                 bg={showReview ? 'brand.50' : 'transparent'}
-                color="brand.600"
+                color="brand.700"
                 fontWeight={700}
                 borderRadius="xl"
                 px={8}
@@ -517,8 +518,8 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                         >
                           <HStack gap={2} mb={3} flexWrap="wrap">
                             <Badge
-                              bg="rgba(57,73,171,0.08)"
-                              color="brand.600"
+                              bg="rgba(193,95,60,0.08)"
+                              color="brand.700"
                               px={2} borderRadius="md" fontSize="2xs" fontFamily="mono" fontWeight={700}
                             >
                               Q{q.number}
@@ -539,9 +540,12 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                 MATCHING
                               </Badge>
                             )}
-                            <Text fontSize="xs" fontWeight={700} color={isSkipped ? 'gray.500' : isCorrectQ ? 'green.600' : 'red.500'}>
-                              {isSkipped ? '○ Skipped' : isCorrectQ ? '✓ Correct' : '✗ Incorrect'}
-                            </Text>
+                            <HStack gap={1} color={isSkipped ? 'gray.500' : isCorrectQ ? 'green.600' : 'red.500'}>
+                              {isSkipped ? <CircleIcon size={12} /> : isCorrectQ ? <CheckIcon size={12} /> : <XIcon size={12} />}
+                              <Text fontSize="xs" fontWeight={700}>
+                                {isSkipped ? 'Skipped' : isCorrectQ ? 'Correct' : 'Incorrect'}
+                              </Text>
+                            </HStack>
                             {!matchingQ && !isCorrectQ && !isSkipped && (
                               <Text fontSize="xs" color="gray.500">
                                 Your answer: {userSet.map((i) => OPTION_LABELS[i]).join(', ')} · Correct: {correctSet.map((i) => OPTION_LABELS[i]).join(', ')}
@@ -611,7 +615,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                         Your match: {picked !== null && picked !== undefined ? q.options[picked] : '(none)'}
                                       </Text>
                                       {rowCorrect ? (
-                                        <Text color="green.500">✓</Text>
+                                        <Box color="green.500"><CheckIcon size={14} /></Box>
                                       ) : (
                                         <Text color="gray.500">· Correct: {q.options[p.correctOptionIndex]}</Text>
                                       )}
@@ -656,8 +660,8 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                     _dark={{ color: 'gray.300' }}>
                                     {opt}
                                   </Text>
-                                  {isCorrectOpt && <Text color="green.500" fontSize="sm" flexShrink={0}>✓</Text>}
-                                  {isSelectedOpt && !isCorrectOpt && <Text color="red.400" fontSize="sm" flexShrink={0}>✗</Text>}
+                                  {isCorrectOpt && <Box color="green.500" flexShrink={0}><CheckIcon size={16} /></Box>}
+                                  {isSelectedOpt && !isCorrectOpt && <Box color="red.400" flexShrink={0}><XIcon size={16} /></Box>}
                                 </HStack>
                               );
                             })}
@@ -666,12 +670,12 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
 
                           <Box
                             p={3}
-                            bg="rgba(57,73,171,0.05)"
+                            bg="rgba(193,95,60,0.05)"
                             borderRadius="lg"
-                            borderLeft="3px solid rgba(57,73,171,0.3)"
-                            _dark={{ bg: 'rgba(57,73,171,0.08)', borderColor: 'rgba(57,73,171,0.4)' }}
+                            borderLeft="3px solid rgba(193,95,60,0.3)"
+                            _dark={{ bg: 'rgba(193,95,60,0.08)', borderColor: 'rgba(193,95,60,0.4)' }}
                           >
-                            <Text fontSize="xs" fontWeight={700} color="brand.600" mb={1}>Explanation</Text>
+                            <Text fontSize="xs" fontWeight={700} color="brand.700" mb={1}>Explanation</Text>
                             <Text fontSize="xs" color="gray.600" lineHeight="tall" _dark={{ color: 'gray.400' }}>
                               {q.explanation}
                             </Text>
@@ -687,7 +691,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
             </AnimatePresence>
 
             <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)"
-              _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
               border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
               <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
                 <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
@@ -831,8 +835,8 @@ function QuestionView() {
             alignItems="center"
             justifyContent="center"
             bg={
-              isCurrent ? 'rgba(57,73,171,0.08)' :
-              isAnsweredQ ? 'rgba(57,73,171,0.06)' :
+              isCurrent ? 'rgba(193,95,60,0.08)' :
+              isAnsweredQ ? 'rgba(193,95,60,0.06)' :
               'transparent'
             }
             color={
@@ -849,7 +853,7 @@ function QuestionView() {
             }
             cursor={isNavigable ? 'pointer' : 'not-allowed'}
             transition="all 0.15s"
-            _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(57,73,171,0.04)' } : {}}
+            _hover={isNavigable ? { borderColor: 'brand.400', bg: 'rgba(193,95,60,0.04)' } : {}}
             onClick={() => {
               if (!isNavigable) return;
               goToQuestion(idx);
@@ -929,7 +933,7 @@ function QuestionView() {
             >
               <Box
                 bg="rgba(255,255,255,0.97)"
-                _dark={{ bg: 'rgba(20,30,58,0.98)' }}
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
                 borderRadius="2xl"
                 border="1px solid rgba(255,255,255,0.35)"
                 boxShadow="0 24px 64px rgba(10,14,40,0.35)"
@@ -939,10 +943,11 @@ function QuestionView() {
                   <Box
                     display="inline-flex" alignItems="center" justifyContent="center"
                     w={14} h={14} borderRadius="full"
-                    bg="rgba(57,73,171,0.08)" mb={4}
-                    border="2px solid rgba(57,73,171,0.15)"
+                    bg="rgba(193,95,60,0.08)" mb={4}
+                    border="2px solid rgba(193,95,60,0.15)"
+                    color="brand.700"
                   >
-                    <Text fontSize="2xl">⏸</Text>
+                    <PauseIcon size={26} />
                   </Box>
                   <Heading size="lg" fontWeight={800} color="brand.700" mb={1}
                     _dark={{ color: 'gray.100' }}>
@@ -952,8 +957,8 @@ function QuestionView() {
                 </Box>
 
                 <Box mx={6} mb={5} p={4} borderRadius="xl"
-                  bg="rgba(57,73,171,0.05)" border="1px solid rgba(57,73,171,0.1)"
-                  _dark={{ bg: 'rgba(57,73,171,0.1)', borderColor: 'rgba(57,73,171,0.2)' }}>
+                  bg="rgba(193,95,60,0.05)" border="1px solid rgba(193,95,60,0.1)"
+                  _dark={{ bg: 'rgba(193,95,60,0.1)', borderColor: 'rgba(193,95,60,0.2)' }}>
                   <SimpleGrid columns={3} gap={3}>
                     {[
                       { label: 'Answered', value: `${totalAnswered}/${questions.length}` },
@@ -974,12 +979,12 @@ function QuestionView() {
                     w="full" size="lg"
                     bg="brand.600" color="white"
                     fontWeight={700} borderRadius="xl"
-                    boxShadow="0 4px 14px rgba(57,73,171,0.35)"
+                    boxShadow="0 4px 14px rgba(193,95,60,0.35)"
                     _hover={{ bg: 'brand.700', transform: 'translateY(-1px)' }}
                     transition="all 0.2s"
                     onClick={() => setIsPaused(false)}
                   >
-                    ▶ Resume Exam
+                    <HStack gap={2} justify="center"><PlayIcon size={14} /><Text>Resume Exam</Text></HStack>
                   </Button>
                   <Button
                     w="full" size="md"
@@ -995,7 +1000,9 @@ function QuestionView() {
                     transition="all 0.2s"
                     onClick={handleFinish}
                   >
-                    {unanswered === 0 ? '✓ Submit Exam' : `Submit Early (${unanswered} unanswered)`}
+                    {unanswered === 0 ? (
+                      <HStack gap={2} justify="center"><CheckIcon size={14} /><Text>Submit Exam</Text></HStack>
+                    ) : `Submit Early (${unanswered} unanswered)`}
                   </Button>
                   <Link as={NextLink} href="/home" style={{ textDecoration: 'none', width: '100%' }}>
                     <Button
@@ -1004,7 +1011,7 @@ function QuestionView() {
                       color="gray.500"
                       fontWeight={600}
                       borderRadius="xl"
-                      _hover={{ color: 'brand.600', bg: 'rgba(57,73,171,0.06)' }}
+                      _hover={{ color: 'brand.600', bg: 'rgba(193,95,60,0.06)' }}
                     >
                       ← Exit to Home
                     </Button>
@@ -1038,7 +1045,7 @@ function QuestionView() {
               <Box
                 bg="rgba(255, 255, 255, 0.88)"
                 backdropFilter="blur(20px)"
-                _dark={{ bg: 'rgba(15, 23, 42, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                _dark={{ bg: 'rgba(26, 24, 23, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
                 w="100%"
                 maxW="500px"
                 borderRadius="2xl"
@@ -1079,7 +1086,7 @@ function QuestionView() {
         bg="rgba(255, 255, 255, 0.45)"
         backdropFilter="blur(16px)"
         _dark={{
-          bg: "rgba(15, 23, 42, 0.45)",
+          bg: "rgba(26, 24, 23, 0.45)",
           borderColor: "rgba(255, 255, 255, 0.08)"
         }}
         position="sticky"
@@ -1096,12 +1103,12 @@ function QuestionView() {
                 gap={1.5}
                 px={3}
                 py={1}
-                bg="rgba(57, 73, 171, 0.08)"
+                bg="rgba(217, 119, 87, 0.08)"
                 borderRadius="md"
                 border="1px solid"
-                borderColor="rgba(57, 73, 171, 0.18)"
+                borderColor="rgba(217, 119, 87, 0.18)"
                 _dark={{
-                  bg: "rgba(124, 110, 250, 0.12)",
+                  bg: "rgba(217, 119, 87, 0.12)",
                   borderColor: "rgba(255, 255, 255, 0.12)"
                 }}
               >
@@ -1227,7 +1234,7 @@ function QuestionView() {
                 backdropFilter="blur(16px)"
                 borderRadius="xl"
                 border="1px solid rgba(255,255,255,0.35)"
-                _dark={{ bg: 'rgba(30,41,59,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+                _dark={{ bg: 'rgba(41,40,38,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
               >
                 <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono" mb={3}>
                   QUESTION MAP ({totalAnswered}/{questions.length})
@@ -1249,7 +1256,7 @@ function QuestionView() {
               p={[4, 6]}
               boxShadow="0 8px 32px 0 rgba(31,38,135,0.03)"
               overflow="hidden"
-              _dark={{ bg: 'rgba(15,23,42,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+              _dark={{ bg: 'rgba(31,30,29,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -1308,9 +1315,10 @@ function QuestionView() {
                           _hover={{ bg: isFlagged ? 'orange.600' : 'orange.50' }}
                           onClick={() => toggleFlag(currentQuestion)}
                         >
-                          <Text fontSize="2xs" fontWeight={700}>
-                            {isFlagged ? '⚑ Flagged' : '⚐ Flag'}
-                          </Text>
+                          <HStack gap={1.5}>
+                            <FlagIcon size={12} filled={isFlagged} />
+                            <Text fontSize="2xs" fontWeight={700}>{isFlagged ? 'Flagged' : 'Flag'}</Text>
+                          </HStack>
                         </Button>
                         <Text fontSize="xs" fontFamily="mono" color="gray.400" fontWeight={600}>
                           Question {currentQuestion + 1} of {questions.length}
@@ -1332,8 +1340,8 @@ function QuestionView() {
                           const picked = Array.isArray(userAnswer) ? userAnswer[pairIdx] : null;
                           return (
                             <Box key={pairIdx} p={3} borderRadius="lg" border="1px solid"
-                              borderColor="rgba(57,73,171,0.15)" bg="rgba(57,73,171,0.03)"
-                              _dark={{ bg: 'rgba(124,110,250,0.06)', borderColor: 'rgba(255,255,255,0.08)' }}>
+                              borderColor="rgba(193,95,60,0.15)" bg="rgba(193,95,60,0.03)"
+                              _dark={{ bg: 'rgba(217,119,87,0.06)', borderColor: 'rgba(255,255,255,0.08)' }}>
                               <Text fontSize="sm" fontWeight={600} color="brand.700" mb={2.5} lineHeight={1.5}
                                 _dark={{ color: 'gray.100' }}>
                                 {pair.requirement}
@@ -1378,7 +1386,7 @@ function QuestionView() {
                           const optClosed = atMaxSelect && !optSelected;
 
                           const borderColor = optSelected ? 'brand.500' : 'border';
-                          const bg = optSelected ? 'rgba(57,73,171,0.06)' : 'transparent';
+                          const bg = optSelected ? 'rgba(193,95,60,0.06)' : 'transparent';
                           const keyBg = optSelected ? 'brand.600' : 'transparent';
                           const keyBorderColor: string | { _light: string; _dark: string } = optSelected ? 'brand.500' : { _light: 'gray.300', _dark: 'rgba(255,255,255,0.16)' };
                           const keyTextColor: string | { _light: string; _dark: string } = optSelected ? 'white' : { _light: 'gray.500', _dark: 'gray.400' };
@@ -1403,13 +1411,13 @@ function QuestionView() {
                               transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                               textAlign="left"
                               _dark={{
-                                bg: optSelected ? 'rgba(57,73,171,0.12)' : 'rgba(30,41,59,0.3)',
+                                bg: optSelected ? 'rgba(193,95,60,0.12)' : 'rgba(41,40,38,0.3)',
                                 borderColor: optSelected ? 'brand.500' : 'rgba(255,255,255,0.06)',
                               }}
                               _hover={canClick ? {
                                 borderColor: 'brand.400',
                                 bg: 'rgba(255,255,255,0.45)',
-                                _dark: { bg: 'rgba(30,41,59,0.5)' },
+                                _dark: { bg: 'rgba(41,40,38,0.5)' },
                               } : {}}
                               onClick={() => { if (canClick) handleOptionClick(idx); }}
                             >
@@ -1430,7 +1438,7 @@ function QuestionView() {
                                 fontWeight={700}
                                 mt="1px"
                               >
-                                {optSelected && multiSelect ? '✓' : OPTION_LABELS[idx]}
+                                {optSelected && multiSelect ? <CheckIcon size={12} /> : OPTION_LABELS[idx]}
                               </Box>
                               <Text fontSize="sm" color="gray.700" fontWeight={optSelected ? 600 : 500}
                                 lineHeight={1.5} mt="1px" _dark={{ color: 'gray.200' }}>
@@ -1498,7 +1506,7 @@ function QuestionView() {
               borderTop={{ base: '1px solid', md: 'none' }}
               borderColor="rgba(0,0,0,0.1)"
               zIndex={100}
-              _dark={{ bg: { base: 'rgba(15,23,42,0.9)', md: 'transparent' }, borderColor: 'rgba(255,255,255,0.1)' }}
+              _dark={{ bg: { base: 'rgba(31,30,29,0.9)', md: 'transparent' }, borderColor: 'rgba(255,255,255,0.1)' }}
             >
               <Button
                 variant="outline"
@@ -1515,13 +1523,13 @@ function QuestionView() {
               </Text>
               {!isLast ? (
                 <Button
-                  bg="blue.600"
+                  bg="brand.500"
                   color="white"
                   fontWeight={700}
                   size="md"
                   px={6}
                   borderRadius="lg"
-                  _hover={{ bg: 'blue.700', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(37,99,235,0.45)' }}
+                  _hover={{ bg: 'brand.600', transform: 'translateY(-1px)', boxShadow: '0 4px 14px rgba(204,120,92,0.45)' }}
                   _active={{ transform: 'translateY(0)', boxShadow: 'none' }}
                   transition="all 0.2s"
                   onClick={nextQuestion}
@@ -1558,7 +1566,7 @@ function QuestionView() {
               borderRadius="xl"
               p={5}
               boxShadow="0 8px 32px 0 rgba(31,38,135,0.03)"
-              _dark={{ bg: 'rgba(15,23,42,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
+              _dark={{ bg: 'rgba(31,30,29,0.45)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
               <VStack gap={4} align="stretch">
                 <Text fontSize="xs" fontWeight={700} color="brand.700" fontFamily="mono" letterSpacing="0.05em">
@@ -1572,11 +1580,11 @@ function QuestionView() {
                     COLOR LEGEND
                   </Text>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(57,73,171,0.08)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.500" bg="rgba(193,95,60,0.08)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Active Question</Text>
                   </HStack>
                   <HStack gap={2}>
-                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(57,73,171,0.06)" />
+                    <Box w={3} h={3} borderRadius="sm" border="1px solid" borderColor="brand.400" bg="rgba(193,95,60,0.06)" />
                     <Text fontSize="11px" color="gray.600" fontWeight={500}>Answered Question</Text>
                   </HStack>
                   <HStack gap={2}>
@@ -1634,7 +1642,7 @@ function BulkReviewScreen() {
       <Box
         borderBottom="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
         bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
-        _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+        _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
         position="sticky" top={0} zIndex={10}
       >
         <Container maxW="container.md" py={4}>
@@ -1665,19 +1673,22 @@ function BulkReviewScreen() {
                 transition={{ duration: 0.25, ease: 'easeInOut' }}
                 style={{ overflow: 'hidden' }}
               >
-                <Box p={4} bg="orange.50" border="1.5px solid" borderColor="orange.200" borderRadius="xl"
+                <Box p={4} bg="orange.50" _dark={{ bg: 'rgba(204,120,92,0.1)', borderColor: 'rgba(204,120,92,0.35)' }}
+                  border="1.5px solid" borderColor="orange.200" borderRadius="xl"
                   boxShadow="0 2px 8px rgba(246,173,85,0.05)" mb={4}>
                   <HStack align="flex-start" gap={3}>
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#dd6b20" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}>
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                      <line x1="12" y1="9" x2="12" y2="13"></line>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
+                    <Box color="orange.600" _dark={{ color: 'brand.300' }} flexShrink={0} mt="2px">
+                      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                    </Box>
                     <VStack align="stretch" gap={0.5}>
-                      <Text fontSize="sm" fontWeight={700} color="orange.800">
+                      <Text fontSize="sm" fontWeight={700} color="orange.800" _dark={{ color: 'brand.200' }}>
                         Unanswered Questions Alert
                       </Text>
-                      <Text fontSize="xs" color="orange.700" lineHeight={1.5}>
+                      <Text fontSize="xs" color="orange.700" _dark={{ color: 'brand.300' }} lineHeight={1.5}>
                         You still have <strong>{unansweredCount}</strong> {unansweredCount === 1 ? 'question' : 'questions'} remaining without an answer. Please review them before final evaluation to ensure maximum score potential.
                       </Text>
                     </VStack>
@@ -1699,8 +1710,9 @@ function BulkReviewScreen() {
                   bg={isUnanswered ? 'rgba(251, 191, 36, 0.05)' : 'rgba(255, 255, 255, 0.45)'}
                   backdropFilter="blur(12px)"
                   _dark={{
-                    bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(30, 41, 59, 0.45)',
+                    bg: isUnanswered ? 'rgba(251, 191, 36, 0.08)' : 'rgba(35, 33, 32, 0.45)',
                     borderColor: isFlaggedQ ? 'orange.400' : (isUnanswered ? 'orange.300' : 'rgba(255, 255, 255, 0.08)'),
+                    _hover: { bg: isUnanswered ? 'rgba(251, 191, 36, 0.12)' : 'rgba(50, 47, 45, 0.75)', borderColor: 'brand.400' },
                   }}
                   border="1.5px solid"
                   borderColor={isFlaggedQ ? 'orange.400' : (isUnanswered ? 'orange.300' : 'rgba(255, 255, 255, 0.35)')}
@@ -1730,11 +1742,11 @@ function BulkReviewScreen() {
                         </Badge>
                       )}
                       {isUnanswered ? (
-                        <Badge bg="red.50" color="red.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="red.100">
+                        <Badge bg="red.50" _dark={{ bg: "rgba(199,69,42,0.15)", color: "#E8998A", borderColor: "rgba(199,69,42,0.35)" }} color="red.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="red.100">
                           UNANSWERED
                         </Badge>
                       ) : (
-                        <Badge bg="brand.50" color="brand.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="brand.100">
+                        <Badge bg="brand.50" _dark={{ bg: "rgba(204,120,92,0.15)", color: "#E5BA9E", borderColor: "rgba(204,120,92,0.35)" }} color="brand.700" fontSize="2xs" fontWeight={700} fontFamily="mono" borderRadius="md" border="1px solid" borderColor="brand.100">
                           COMPLETED
                         </Badge>
                       )}
@@ -1754,7 +1766,7 @@ function BulkReviewScreen() {
       <Box
         borderTop="1px solid" borderColor="rgba(255, 255, 255, 0.3)"
         bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(16px)"
-        _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+        _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
         position="sticky" bottom={0} zIndex={10}
       >
         <Container maxW="container.md" py={3.5}>
@@ -1796,7 +1808,7 @@ function BulkReviewScreen() {
             >
               <Box
                 bg="rgba(255, 255, 255, 0.88)" backdropFilter="blur(20px)"
-                _dark={{ bg: 'rgba(15, 23, 42, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                _dark={{ bg: 'rgba(26, 24, 23, 0.88)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
                 w="100%" maxW="500px" borderRadius="2xl" border="1px solid"
                 borderColor="rgba(255, 255, 255, 0.45)" boxShadow="0 24px 64px rgba(0, 0, 0, 0.2)"
                 p={[6, 8]} position="relative"

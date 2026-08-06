@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -14,18 +14,51 @@ html, body {
   font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 
-/* Premium vibrant DevCon 16 sky-blue/cyan/indigo canvas background with authentic brand isometric grid overlay */
+/* Prevent any single element from forcing horizontal scroll on narrow
+   viewports -- wide content (tables, grids) should scroll in its own
+   container instead of the whole page. */
 body {
-  background-image: 
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='69.282' viewBox='0 0 120 69.282'%3E%3Cpath d='M 0 34.641 L 60 0 L 120 34.641 L 60 69.282 Z' stroke='rgba(0, 188, 212, 0.09)' stroke-width='0.75' fill='none'/%3E%3Ccircle cx='60' cy='0' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='0' cy='34.641' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='120' cy='34.641' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3Ccircle cx='60' cy='69.282' r='1.5' fill='rgba(0, 188, 212, 0.2)'/%3E%3C/svg%3E"),
-    linear-gradient(135deg, #f0f4ff 0%, #e0f2fe 30%, #e0f7fc 65%, #f5f3ff 100%) !important;
-  background-size: 120px 69.282px, cover !important;
-  background-attachment: fixed !important;
-  background-repeat: repeat, no-repeat !important;
-  color: #0f172a; /* Slate 900 for premium typography */
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Claude-warm canvas background: light cream in light mode, plain black in
+   dark mode (flat -- no pattern/gradient) with the terracotta brand carried
+   through buttons/headings/icons instead of the page background. Follows
+   the `dark`/`light` class next-themes sets on <html> (see
+   components/ThemeProvider.tsx), with a prefers-color-scheme fallback for
+   the brief window before that JS runs. */
+body {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='69.282' viewBox='0 0 120 69.282'%3E%3Cpath d='M 0 34.641 L 60 0 L 120 34.641 L 60 69.282 Z' stroke='rgba(217, 119, 87, 0.10)' stroke-width='0.75' fill='none'/%3E%3Ccircle cx='60' cy='0' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='0' cy='34.641' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='120' cy='34.641' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='60' cy='69.282' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #FBF8F1 0%, #F7F2E7 30%, #F5EFE2 65%, #FAF6EE 100%);
+  background-size: 120px 69.282px, cover;
+  background-attachment: fixed;
+  background-repeat: repeat, no-repeat;
+  color: #211F1C;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image: none;
+    background-color: #1A1817;
+    color: #F2EFE9;
+  }
+}
+
+html.light body {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='69.282' viewBox='0 0 120 69.282'%3E%3Cpath d='M 0 34.641 L 60 0 L 120 34.641 L 60 69.282 Z' stroke='rgba(217, 119, 87, 0.10)' stroke-width='0.75' fill='none'/%3E%3Ccircle cx='60' cy='0' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='0' cy='34.641' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='120' cy='34.641' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3Ccircle cx='60' cy='69.282' r='1.5' fill='rgba(217, 119, 87, 0.22)'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #FBF8F1 0%, #F7F2E7 30%, #F5EFE2 65%, #FAF6EE 100%) !important;
+  color: #211F1C !important;
+}
+
+html.dark body {
+  background-image: none !important;
+  background-color: #1A1817 !important;
+  color: #F2EFE9 !important;
 }
 
 /* Consistent scrollbar styling */
@@ -34,16 +67,24 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #F1EEE3;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #D9CFB8;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #C4B896;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #141414;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #3A3A3A;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4D4D4D;
 }
 
 /* Ensure content sits above any potential background structures */
 #__next { position: relative; z-index: 1; }
-

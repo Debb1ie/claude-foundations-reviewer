@@ -102,7 +102,7 @@ export default function OverviewPage() {
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
                   _dark={{
-                    bg: "rgba(15, 23, 42, 0.45)",
+                    bg: "rgba(26, 24, 23, 0.45)",
                     borderColor: "rgba(255, 255, 255, 0.08)"
                   }}
                   borderRadius="xl"
@@ -115,12 +115,12 @@ export default function OverviewPage() {
                     <Box
                       p={2.5}
                       borderRadius="lg"
-                      bg="rgba(57, 73, 171, 0.08)"
+                      bg="rgba(217, 119, 87, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(57, 73, 171, 0.18)"
-                      color="brand.600"
+                      borderColor="rgba(217, 119, 87, 0.18)"
+                      color="brand.700"
                       _dark={{
-                        bg: "rgba(124, 110, 250, 0.15)",
+                        bg: "rgba(217, 119, 87, 0.15)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
                         color: "brand.300"
                       }}
@@ -131,19 +131,19 @@ export default function OverviewPage() {
                   </HStack>
                   <VStack align="stretch" gap={4} pl={1}>
                     <HStack gap={4}>
-                      <Badge bg="rgba(57, 73, 171, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(57, 73, 171, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(124, 110, 250, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Format</Badge>
+                      <Badge bg="rgba(217, 119, 87, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(217, 119, 87, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(217, 119, 87, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Format</Badge>
                       <Text fontSize="sm" color="gray.600" fontWeight={500}>Multiple Choice (Scenario-based)</Text>
                     </HStack>
                     <HStack gap={4}>
-                      <Badge bg="rgba(57, 73, 171, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(57, 73, 171, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(124, 110, 250, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Score</Badge>
+                      <Badge bg="rgba(217, 119, 87, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(217, 119, 87, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(217, 119, 87, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Score</Badge>
                       <Text fontSize="sm" color="gray.600" fontWeight={500}>720 passing (Scale: 100-1000)</Text>
                     </HStack>
                     <HStack gap={4}>
-                      <Badge bg="rgba(57, 73, 171, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(57, 73, 171, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(124, 110, 250, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Penalty</Badge>
+                      <Badge bg="rgba(217, 119, 87, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(217, 119, 87, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(217, 119, 87, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Penalty</Badge>
                       <Text fontSize="sm" color="gray.600" fontWeight={500}>None for guessing</Text>
                     </HStack>
                     <HStack gap={4}>
-                      <Badge bg="rgba(57, 73, 171, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(57, 73, 171, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(124, 110, 250, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Scenarios</Badge>
+                      <Badge bg="rgba(217, 119, 87, 0.07)" color="brand.700" border="1px solid" borderColor="rgba(217, 119, 87, 0.16)" minW="85px" display="flex" justifyContent="center" px={2} py={1} borderRadius="md" fontSize="xs" _dark={{ bg: "rgba(217, 119, 87, 0.12)", color: "brand.200", borderColor: "rgba(255, 255, 255, 0.1)" }}>Scenarios</Badge>
                       <Text fontSize="sm" color="gray.600" fontWeight={500}>4 presented randomly out of 6</Text>
                     </HStack>
                   </VStack>
@@ -153,7 +153,7 @@ export default function OverviewPage() {
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
                   _dark={{
-                    bg: "rgba(15, 23, 42, 0.45)",
+                    bg: "rgba(26, 24, 23, 0.45)",
                     borderColor: "rgba(255, 255, 255, 0.08)"
                   }}
                   borderRadius="xl"
@@ -167,12 +167,12 @@ export default function OverviewPage() {
                     <Box
                       p={2.5}
                       borderRadius="lg"
-                      bg="rgba(57, 73, 171, 0.08)"
+                      bg="rgba(217, 119, 87, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(57, 73, 171, 0.18)"
-                      color="brand.600"
+                      borderColor="rgba(217, 119, 87, 0.18)"
+                      color="brand.700"
                       _dark={{
-                        bg: "rgba(124, 110, 250, 0.15)",
+                        bg: "rgba(217, 119, 87, 0.15)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
                         color: "brand.300"
                       }}
@@ -200,7 +200,7 @@ export default function OverviewPage() {
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
                   _dark={{
-                    bg: "rgba(15, 23, 42, 0.45)",
+                    bg: "rgba(26, 24, 23, 0.45)",
                     borderColor: "rgba(255, 255, 255, 0.08)"
                   }}
                   p={[6, 10]}
@@ -237,17 +237,17 @@ export default function OverviewPage() {
                     </Flex>
                   </Box>
 
-                  <VStack align="stretch" gap={2} flex={1} minW="280px">
+                  <VStack align="stretch" gap={2} flex={1} minW={["auto", "auto", "280px"]} w={["100%", "100%", "auto"]}>
                     {DOMAINS.map((domain, i) => (
                       <Box
                         key={i}
                         borderRadius="lg"
                         overflow="hidden"
                         border="1px solid"
-                        borderColor={expandedDomain === domain.id ? 'rgba(57, 73, 171, 0.22)' : 'transparent'}
+                        borderColor={expandedDomain === domain.id ? 'rgba(217, 119, 87, 0.22)' : 'transparent'}
                         bg={expandedDomain === domain.id ? 'rgba(255, 255, 255, 0.65)' : 'transparent'}
                         _dark={{
-                          bg: expandedDomain === domain.id ? 'rgba(30, 41, 59, 0.5)' : 'transparent',
+                          bg: expandedDomain === domain.id ? 'rgba(35, 33, 32, 0.5)' : 'transparent',
                           borderColor: expandedDomain === domain.id ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
                         }}
                         backdropFilter={expandedDomain === domain.id ? 'blur(8px)' : 'none'}
@@ -259,9 +259,9 @@ export default function OverviewPage() {
                           cursor="pointer" 
                           onClick={() => setExpandedDomain(expandedDomain === domain.id ? null : domain.id)}
                           _hover={{
-                            bg: expandedDomain === domain.id ? 'rgba(57, 73, 171, 0.12)' : 'rgba(57, 73, 171, 0.06)',
+                            bg: expandedDomain === domain.id ? 'rgba(217, 119, 87, 0.12)' : 'rgba(217, 119, 87, 0.06)',
                             _dark: {
-                              bg: expandedDomain === domain.id ? 'rgba(124, 110, 250, 0.2)' : 'rgba(124, 110, 250, 0.1)'
+                              bg: expandedDomain === domain.id ? 'rgba(217, 119, 87, 0.2)' : 'rgba(217, 119, 87, 0.1)'
                             }
                           }}
                           transition="all 0.2s"
@@ -352,7 +352,7 @@ export default function OverviewPage() {
                       key={idx}
                       bg="rgba(255, 255, 255, 0.45)"
                       backdropFilter="blur(12px)"
-                      _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                      _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                       borderRadius="xl"
                       border="2px solid"
                       borderColor="rgba(255, 255, 255, 0.35)"
@@ -362,10 +362,10 @@ export default function OverviewPage() {
                       <HStack gap={3.5} align="flex-start">
                         <Box
                           p={2.5} borderRadius="lg"
-                          bg="rgba(57, 73, 171, 0.08)"
-                          border="1px solid" borderColor="rgba(57, 73, 171, 0.18)"
-                          color="brand.600" flexShrink={0}
-                          _dark={{ bg: 'rgba(124, 110, 250, 0.15)', borderColor: 'rgba(255, 255, 255, 0.12)', color: 'brand.300' }}
+                          bg="rgba(217, 119, 87, 0.08)"
+                          border="1px solid" borderColor="rgba(217, 119, 87, 0.18)"
+                          color="brand.700" flexShrink={0}
+                          _dark={{ bg: 'rgba(217, 119, 87, 0.15)', borderColor: 'rgba(255, 255, 255, 0.12)', color: 'brand.300' }}
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d={mod.icon} />
@@ -413,7 +413,7 @@ export default function OverviewPage() {
                   <Box
                     bg="rgba(255, 255, 255, 0.45)"
                     backdropFilter="blur(12px)"
-                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                     borderRadius="xl"
                     border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
                     p={5}
@@ -425,14 +425,14 @@ export default function OverviewPage() {
                       The application portal mentions <strong>10 team members</strong> completing Academy courses, but the manual review process is flexible. Boutique agencies (as small as 3 people) have been accepted.
                     </Text>
                     <HStack gap={4} wrap="wrap">
-                      <Badge px={2.5} py={1} borderRadius="md" bg="rgba(57,73,171,0.08)" color="brand.700" border="1px solid" borderColor="rgba(57,73,171,0.18)" fontSize="2xs" fontWeight={700}>Portal: 10+ members</Badge>
+                      <Badge px={2.5} py={1} borderRadius="md" bg="rgba(193,95,60,0.08)" color="brand.700" border="1px solid" borderColor="rgba(193,95,60,0.18)" fontSize="2xs" fontWeight={700}>Portal: 10+ members</Badge>
                       <Badge px={2.5} py={1} borderRadius="md" bg="rgba(34,200,138,0.1)" color="green.700" border="1px solid" borderColor="green.200" fontSize="2xs" fontWeight={700}>Confirmed: 3-person agency accepted</Badge>
                     </HStack>
                   </Box>
                   <Box
                     bg="rgba(255, 255, 255, 0.45)"
                     backdropFilter="blur(12px)"
-                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                     borderRadius="xl"
                     border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
                     p={5}
@@ -469,7 +469,7 @@ export default function OverviewPage() {
                 <Box
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
-                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                   borderRadius="xl"
                   border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
                   p={5}
@@ -487,7 +487,7 @@ export default function OverviewPage() {
                         key={scenario.id}
                         bg="rgba(255, 255, 255, 0.55)"
                         backdropFilter="blur(8px)"
-                        _dark={{ bg: 'rgba(30, 41, 59, 0.5)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                        _dark={{ bg: 'rgba(35, 33, 32, 0.5)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                         p={4}
                         borderRadius="lg"
                         border="1px solid"
@@ -496,21 +496,21 @@ export default function OverviewPage() {
                         _hover={{
                           borderColor: 'brand.400',
                           bg: '#ffffff',
-                          _dark: { bg: 'rgba(30, 41, 59, 0.7)' },
+                          _dark: { bg: 'rgba(35, 33, 32, 0.7)' },
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px 0 rgba(57, 73, 171, 0.12)'
+                          boxShadow: '0 8px 24px 0 rgba(217, 119, 87, 0.12)'
                         }}
                       >
                         <HStack align="center" gap={3}>
                           <Box
                             p={2}
                             borderRadius="lg"
-                            bg="rgba(57, 73, 171, 0.08)"
+                            bg="rgba(217, 119, 87, 0.08)"
                             border="1px solid"
-                            borderColor="rgba(57, 73, 171, 0.16)"
-                            color="brand.600"
+                            borderColor="rgba(217, 119, 87, 0.16)"
+                            color="brand.700"
                             _dark={{
-                              bg: "rgba(124, 110, 250, 0.15)",
+                              bg: "rgba(217, 119, 87, 0.15)",
                               borderColor: "rgba(255, 255, 255, 0.12)",
                               color: "brand.300"
                             }}
@@ -518,7 +518,7 @@ export default function OverviewPage() {
                             <Box w="20px" h="20px" display="flex" alignItems="center" justifyContent="center">{scenario.icon}</Box>
                           </Box>
                           <Box>
-                            <Badge bg="brand.100" color="brand.700" mb={1} size="sm" borderRadius="full" px={2}>
+                            <Badge bg="brand.100" _dark={{ bg: 'rgba(204,120,92,0.15)', color: '#E5BA9E' }} color="brand.700" mb={1} size="sm" borderRadius="full" px={2}>
                               Scenario {scenario.id}
                             </Badge>
                             <Heading as="h4" size="xs" fontWeight={700} color="brand.700" lineHeight="1.3">
@@ -535,7 +535,7 @@ export default function OverviewPage() {
                 <Box
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
-                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                   borderRadius="xl"
                   border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
                   p={6}
@@ -561,7 +561,7 @@ export default function OverviewPage() {
                             <Box w="10px" h="10px" borderRadius="sm" bg={d.color} flexShrink={0} />
                             <Text fontSize="xs" fontWeight={600} color="brand.700">{d.label}</Text>
                           </HStack>
-                          <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.600">{d.weight}%</Text>
+                          <Text fontSize="xs" fontFamily="mono" fontWeight={700} color="brand.700">{d.weight}%</Text>
                         </HStack>
                         <Box w="100%" h="6px" bg="border" borderRadius="full" overflow="hidden">
                           <Box h="100%" borderRadius="full" bg={d.color} w={`${d.weight}%`} transition="width 0.5s ease" />
@@ -576,13 +576,13 @@ export default function OverviewPage() {
                   <Box
                     bg="rgba(255, 255, 255, 0.45)"
                     backdropFilter="blur(12px)"
-                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                     borderRadius="xl"
                     border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
                     p={5}
                   >
                     <HStack gap={2.5} mb={3}>
-                      <Box p={2} borderRadius="lg" bg="rgba(57,73,171,0.08)" border="1px solid" borderColor="rgba(57,73,171,0.18)" color="brand.600">
+                      <Box p={2} borderRadius="lg" bg="rgba(193,95,60,0.08)" border="1px solid" borderColor="rgba(193,95,60,0.18)" color="brand.700">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                         </svg>
@@ -596,13 +596,13 @@ export default function OverviewPage() {
                   <Box
                     bg="rgba(255, 255, 255, 0.45)"
                     backdropFilter="blur(12px)"
-                    _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                     borderRadius="xl"
                     border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
                     p={5}
                   >
                     <HStack gap={2.5} mb={3}>
-                      <Box p={2} borderRadius="lg" bg="rgba(57,73,171,0.08)" border="1px solid" borderColor="rgba(57,73,171,0.18)" color="brand.600">
+                      <Box p={2} borderRadius="lg" bg="rgba(193,95,60,0.08)" border="1px solid" borderColor="rgba(193,95,60,0.18)" color="brand.700">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
                         </svg>
@@ -619,7 +619,7 @@ export default function OverviewPage() {
                 <Box
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(16px)"
-                  _dark={{ bg: 'rgba(15, 23, 42, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  _dark={{ bg: 'rgba(26, 24, 23, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                   borderRadius="xl"
                   border="2px solid" borderColor="rgba(255, 255, 255, 0.3)"
                   p={6}
@@ -635,7 +635,7 @@ export default function OverviewPage() {
                       { phase: 'Weeks 5-6', title: 'Practice & Refine', items: 'Work through the 105-question practice set, identify weak domains and revisit docs, join community study groups, take timed mock exams' },
                       { phase: 'Week 7', title: 'Final Review', items: 'Review all domain summaries, focus on API Architecture and Prompt Engineering, rest before exam day' },
                     ].map((phase, i) => (
-                      <HStack key={i} gap={4} p={3.5} borderRadius="lg" bg="rgba(57,73,171,0.04)" border="1px solid" borderColor="rgba(57,73,171,0.1)">
+                      <HStack key={i} gap={4} p={3.5} borderRadius="lg" bg="rgba(193,95,60,0.04)" border="1px solid" borderColor="rgba(193,95,60,0.1)">
                         <Badge
                           px={3} py={1.5} borderRadius="md"
                           bg={['rgba(124,110,250,0.12)', 'rgba(250,140,110,0.12)', 'rgba(110,207,250,0.12)', 'rgba(240,208,110,0.12)'][i]}
@@ -658,7 +658,7 @@ export default function OverviewPage() {
                 <Box
                   bg="rgba(255, 255, 255, 0.45)"
                   backdropFilter="blur(12px)"
-                  _dark={{ bg: 'rgba(30, 41, 59, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                  _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
                   borderRadius="xl"
                   border="2px solid" borderColor="rgba(255, 255, 255, 0.35)"
                   p={5}

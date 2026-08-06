@@ -4,9 +4,53 @@ import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Box, Container, HStack, Heading, Link, Flex, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import { getActiveCertification } from '@/lib/certifications';
 
 const cert = getActiveCertification();
+
+const SunIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+);
+
+/** Sun/moon toggle -- flips the resolved theme, not a tri-state cycle, so
+ *  one click always does the obviously-opposite thing regardless of
+ *  whether "system" currently resolves light or dark. */
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  return (
+    <Box
+      as="button"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      p={2}
+      minW="40px"
+      minH="40px"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      borderRadius="lg"
+      color="gray.600"
+      _dark={{ color: 'gray.300' }}
+      _hover={{ bg: 'rgba(217, 119, 87, 0.1)', color: 'brand.600' }}
+      outline="none"
+      _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}
+      transition="all 0.15s"
+    >
+      {isDark ? <SunIcon /> : <MoonIcon />}
+    </Box>
+  );
+}
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
@@ -32,7 +76,7 @@ export function Header() {
       bg="rgba(255, 255, 255, 0.45)"
       backdropFilter="blur(16px)"
       _dark={{
-        bg: "rgba(15, 23, 42, 0.45)",
+        bg: "rgba(35, 33, 32, 0.6)",
         borderColor: "rgba(255, 255, 255, 0.08)"
       }}
       position="sticky"
@@ -50,25 +94,29 @@ export function Header() {
           </HStack>
 
           {/* Desktop Navigation */}
-          <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
-            {isHome ? (
-              <>
-                <Link as={NextLink} href="/overview" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                  Exam Overview
+          <HStack gap={4} display={{ base: 'none', md: 'flex' }}>
+            <HStack gap={6}>
+              {isHome ? (
+                <>
+                  <Link as={NextLink} href="/overview" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                    Exam Overview
+                  </Link>
+                  <Link as={NextLink} href="/sources" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                    Study Resources
+                  </Link>
+                </>
+              ) : (
+                <Link as={NextLink} href="/" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
+                  Back to Simulator
                 </Link>
-                <Link as={NextLink} href="/sources" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                  Study Resources
-                </Link>
-              </>
-            ) : (
-              <Link as={NextLink} href="/" p={2} fontSize="sm" fontWeight={600} color="gray.600" _hover={{ color: 'brand.600' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
-                Back to Simulator
-              </Link>
-            )}
+              )}
+            </HStack>
+            <ThemeToggle />
           </HStack>
 
           {/* Mobile Navigation Toggle */}
-          <Flex display={{ base: 'flex', md: 'none' }}>
+          <Flex display={{ base: 'flex', md: 'none' }} align="center" gap={1}>
+            <ThemeToggle />
             <Box
               as="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -123,16 +171,16 @@ export function Header() {
                       fontSize="md" 
                       fontWeight={600} 
                       color="brand.700" 
-                      bg="rgba(57, 73, 171, 0.08)"
+                      bg="rgba(217, 119, 87, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(57, 73, 171, 0.18)"
+                      borderColor="rgba(217, 119, 87, 0.18)"
                       borderRadius="md"
-                      _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                      _hover={{ bg: 'rgba(217, 119, 87, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                       _dark={{
-                        bg: "rgba(124, 110, 250, 0.12)",
+                        bg: "rgba(217, 119, 87, 0.12)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
                         color: "brand.200",
-                        _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
+                        _hover: { bg: "rgba(217, 119, 87, 0.22)", color: "white" }
                       }}
                       onClick={() => setIsMobileMenuOpen(false)}
                       outline="none" 
@@ -148,16 +196,16 @@ export function Header() {
                       fontSize="md" 
                       fontWeight={600} 
                       color="brand.700" 
-                      bg="rgba(57, 73, 171, 0.08)"
+                      bg="rgba(217, 119, 87, 0.08)"
                       border="1px solid"
-                      borderColor="rgba(57, 73, 171, 0.18)"
+                      borderColor="rgba(217, 119, 87, 0.18)"
                       borderRadius="md"
-                      _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                      _hover={{ bg: 'rgba(217, 119, 87, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                       _dark={{
-                        bg: "rgba(124, 110, 250, 0.12)",
+                        bg: "rgba(217, 119, 87, 0.12)",
                         borderColor: "rgba(255, 255, 255, 0.12)",
                         color: "brand.200",
-                        _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
+                        _hover: { bg: "rgba(217, 119, 87, 0.22)", color: "white" }
                       }}
                       onClick={() => setIsMobileMenuOpen(false)}
                       outline="none" 
@@ -175,16 +223,16 @@ export function Header() {
                     fontSize="md" 
                     fontWeight={600} 
                     color="brand.700" 
-                    bg="rgba(57, 73, 171, 0.08)"
+                    bg="rgba(217, 119, 87, 0.08)"
                     border="1px solid"
-                    borderColor="rgba(57, 73, 171, 0.18)"
+                    borderColor="rgba(217, 119, 87, 0.18)"
                     borderRadius="md"
-                    _hover={{ bg: 'rgba(57, 73, 171, 0.15)', color: 'brand.800', textDecoration: 'none' }}
+                    _hover={{ bg: 'rgba(217, 119, 87, 0.15)', color: 'brand.800', textDecoration: 'none' }}
                     _dark={{
-                      bg: "rgba(124, 110, 250, 0.12)",
+                      bg: "rgba(217, 119, 87, 0.12)",
                       borderColor: "rgba(255, 255, 255, 0.12)",
                       color: "brand.200",
-                      _hover: { bg: "rgba(124, 110, 250, 0.22)", color: "white" }
+                      _hover: { bg: "rgba(217, 119, 87, 0.22)", color: "white" }
                     }}
                     onClick={() => setIsMobileMenuOpen(false)}
                     outline="none" 

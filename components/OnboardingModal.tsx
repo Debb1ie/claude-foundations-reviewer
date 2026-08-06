@@ -144,7 +144,7 @@ export function OnboardingModal() {
         bg="rgba(255, 255, 255, 0.88)"
         backdropFilter="blur(20px)"
         _dark={{
-          bg: "rgba(15, 23, 42, 0.88)",
+          bg: "rgba(26, 24, 23, 0.88)",
           borderColor: "rgba(255, 255, 255, 0.12)"
         }}
         w="100%"
@@ -187,7 +187,7 @@ export function OnboardingModal() {
             transition={{ duration: 0.3 }}
           >
             <VStack gap={6} align="center" textAlign="center" minH="240px" justify="center">
-              <Box color="brand.600" p={4} bg="brand.50" _dark={{ bg: "rgba(57, 73, 171, 0.2)", color: "brand.300" }} borderRadius="full">
+              <Box color="brand.700" p={4} bg="brand.50" _dark={{ bg: "rgba(217, 119, 87, 0.2)", color: "brand.300" }} borderRadius="full">
                 {slides[currentSlide].icon}
               </Box>
               <Heading size="lg" color="brand.800" _dark={{ color: "brand.200" }} fontWeight="bold">
@@ -226,7 +226,7 @@ export function OnboardingModal() {
                 Next
               </Button>
             ) : (
-              <Button bg="accent.600" _dark={{ bg: "accent.500" }} color="white" _hover={{ bg: 'accent.700' }} onClick={handleClose}>
+              <Button bg="brand.500" _dark={{ bg: "accent.500" }} color="white" _hover={{ bg: 'brand.600' }} onClick={handleClose}>
                 Get Started
               </Button>
             )}
