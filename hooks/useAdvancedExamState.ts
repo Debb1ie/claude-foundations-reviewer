@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-// Swapped to the community mock-exam bank (60 questions) -- passers reported
-// the original CCA-F-domain-quota bank in advanced-questions.json only
-// tracked ~1/3 of what the real exam actually asks. That original file is
-// kept on disk (unused) rather than deleted, in case it's needed again.
-import advancedQuestionsData from '@/data/advanced-mock-questions.json';
+// Blended bank: 55% legacy CCA-F-domain-quota questions (advanced-questions.json)
+// + 45% community mock-exam questions (advanced-mock-questions.json). Both
+// files share the same 5-domain taxonomy, so the split is applied per domain
+// using the exam's existing domainTargets quota, keeping the original
+// per-domain distribution intact while blending sources within each domain.
+import legacyQuestionsData from '@/data/advanced-questions.json';
+import mockQuestionsData from '@/data/advanced-mock-questions.json';
 import type { DomainId } from '@/types/certification';
 import { getActiveCertification } from '@/lib/certifications';
 
@@ -102,17 +104,30 @@ function recordElapsed(
   questionEnteredAt = now;
 }
 
-const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
-// The mock bank is exactly one exam's worth of questions (60), so every
-// attempt serves all of them -- no per-domain quota sampling needed, unlike
-// the old bank which drew a fixed-size sample from a larger domain-tagged pool.
-export const TOTAL_QUESTIONS = allAdvanced.length;
+const allLegacy = legacyQuestionsData as AdvancedQuestion[];
+const allMock = mockQuestionsData as AdvancedQuestion[];
 
-// Re-run per attempt: both question order and each question's option order
-// are randomized, so no two sessions show the same exam in the same
-// sequence — a fixed order is trivially memorizable otherwise.
+const LEGACY_SHARE = 0.55;
+const domainTargets = cert.advancedMode.domainTargets;
+export const TOTAL_QUESTIONS = (Object.values(domainTargets) as number[]).reduce((a, b) => a + b, 0);
+
+// Re-run per attempt: for each domain, draw ~55% of that domain's quota from
+// the legacy bank and the rest from the mock bank, then shuffle both the
+// question order and each question's option order -- so no two sessions
+// show the same exam in the same sequence, and no fixed source/order is
+// memorizable across attempts.
 function buildSession(): AdvancedQuestion[] {
-  return shuffleArray(allAdvanced).map(shuffleOptions);
+  const picked: AdvancedQuestion[] = [];
+  for (const domain of Object.keys(domainTargets) as DomainId[]) {
+    const target = domainTargets[domain];
+    const legacyCount = Math.round(target * LEGACY_SHARE);
+    const mockCount = target - legacyCount;
+    const legacyPool = allLegacy.filter((q) => q.domain === domain);
+    const mockPool = allMock.filter((q) => q.domain === domain);
+    picked.push(...shuffleArray(legacyPool).slice(0, legacyCount));
+    picked.push(...shuffleArray(mockPool).slice(0, mockCount));
+  }
+  return shuffleArray(picked).map(shuffleOptions);
 }
 
 export const useAdvancedExamStore = create<AdvancedExamStore>()(

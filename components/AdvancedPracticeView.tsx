@@ -15,7 +15,6 @@ import {
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS, TOTAL_QUESTIONS } from '@/hooks/useAdvancedExamState';
-import advancedQuestionsData from '@/data/advanced-mock-questions.json';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
@@ -206,13 +205,11 @@ function SourceModal({ question, onClose }: { question: AdvancedQuestion | null;
   );
 }
 
-// Computed from the actual bank rather than hardcoded, so this can't drift
-// out of sync with the question data again.
-const domainCounts: Record<string, number> = (advancedQuestionsData as AdvancedQuestion[])
-  .reduce((acc, q) => {
-    acc[q.domain] = (acc[q.domain] ?? 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+// Sourced from the exam's own per-domain quota (the blended legacy/mock
+// session draws exactly this many questions per domain -- see buildSession
+// in useAdvancedExamState), so this can't drift out of sync with what a
+// session actually serves.
+const domainCounts: Record<string, number> = activeCertification.advancedMode.domainTargets;
 
 function StartScreen({ onStart }: { onStart: () => void }) {
   return (

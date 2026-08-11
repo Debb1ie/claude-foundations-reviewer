@@ -153,10 +153,10 @@
     "difficulty": "2x",
     "text": "A team repeatedly asks Claude to perform a standardized dependency audit. The audit consists of several instructions that should only be used when developers explicitly request an audit. Where is the most appropriate place for this reusable workflow?",
     "options": [
-      "The root CLAUDE.md.",
-      "A project skill that developers can explicitly invoke.",
-      "The MCP server configuration.",
-      "A global permission rule."
+      "The root CLAUDE.md file, which loads its full contents into every single conversation by default.",
+      "A project skill that developers can explicitly invoke, rather than something loaded into every conversation by default.",
+      "The MCP server configuration, which is where external tool and resource connections get registered.",
+      "A global permission rule, which controls what actions are allowed rather than what workflow content gets loaded."
     ],
     "correctAnswer": 1,
     "explanation": "A Skill is exactly the mechanism for a reusable, multi-step workflow that should only load when explicitly invoked, rather than being present in every task by default. Putting it in the root CLAUDE.md would load it into every conversation whether an audit was requested or not, MCP configuration is for connecting external tools/resources, and permission rules control access, not workflow content."
@@ -277,10 +277,10 @@
     "difficulty": "2x",
     "text": "An MCP tool called inspect_dependencies is available, but Claude repeatedly uses Grep instead. The MCP tool's description only says \"Inspect dependencies\". What change is most likely to improve tool selection?",
     "options": [
-      "Remove Grep from the environment.",
-      "Rename the MCP tool to something longer and more specific.",
+      "Remove the Grep tool from the environment entirely, so the model has no general-purpose alternative left to fall back on.",
+      "Rename the MCP tool to something longer and more specific-sounding, while leaving its underlying one-line description untouched.",
       "Expand the MCP tool description to clearly explain what it does, what it returns, and when it should be used.",
-      "Add a second MCP server providing the same functionality."
+      "Add a second MCP server that provides the exact same dependency-inspection functionality under a different name."
     ],
     "correctAnswer": 2,
     "explanation": "A thin, vague description like \"Inspect dependencies\" gives the model little basis to prefer it over a familiar general-purpose tool like Grep -- clearly explaining what it does, what it returns, and when to use it is what actually improves selection. Removing Grep just forces a workaround rather than fixing the real cause, renaming alone without adding substance doesn't give the model new information, and a duplicate server adds more ambiguity rather than resolving it."
@@ -356,10 +356,10 @@
     "difficulty": "2x",
     "text": "A function is imported directly in some files but accessed through aliases and wrapper functions elsewhere. The original function name therefore does not appear everywhere it is used. How should an agent find its callers before removing it?",
     "options": [
-      "Search only for the original function name.",
-      "Search documentation for references to the function.",
+      "Search the codebase only for the exact original function name, and treat every match found that way as complete.",
+      "Search the project's documentation for any references to the function, rather than searching the code itself.",
       "Trace how the function is exposed through wrappers and aliases, then search for those names as well.",
-      "Search only for files importing the module and assume every import is a caller."
+      "Search only for files that import the module containing the function, and assume every one of those imports is an actual caller."
     ],
     "correctAnswer": 2,
     "explanation": "Since the function is reached through aliases and wrapper functions in some places, tracing those indirections and searching for the wrapper/alias names too is the only way to find every real caller before removing it. Searching only the original name misses every indirect reference, documentation search doesn't reflect actual code usage, and assuming every importer is a caller ignores that an import doesn't guarantee the specific function is actually used."
@@ -386,10 +386,10 @@
     "difficulty": "2x",
     "text": "A team asks an agent to improve testing across a large legacy repository with little existing coverage. No specific module has been identified as the priority. What should the agent do first?",
     "options": [
-      "Start testing files alphabetically.",
+      "Start writing tests for files strictly in alphabetical order, working through the repository from A to Z.",
       "Map the repository, identify important or highly coupled areas, and prioritize testing based on impact.",
-      "Read every file completely before creating any tests.",
-      "Create equal testing quotas for every directory."
+      "Read every single file in the repository completely from start to finish before writing even one test.",
+      "Create an equal testing quota for every directory in the repository, regardless of how important or coupled each one actually is."
     ],
     "correctAnswer": 1,
     "explanation": "With no priority given, mapping the repository to find the highest-impact or most tightly-coupled areas is what actually targets testing effort where it matters most. Alphabetical order and equal per-directory quotas both ignore impact entirely, and reading every file in full before writing a single test delays useful work without a clear payoff."
@@ -499,10 +499,10 @@
     "difficulty": "2x",
     "text": "Your application extracts candidate information into a predefined structure. Downstream code expects exact field types and rejects malformed outputs. Which approach provides the strongest structural guarantee?",
     "options": [
-      "Ask Claude to output JSON using a detailed prompt.",
+      "Ask Claude to output JSON directly by writing a very detailed prompt describing the exact structure needed.",
       "Use a tool whose input schema represents the required structure and extract the tool-use arguments.",
-      "Parse Claude's response using regular expressions.",
-      "Ask Claude to generate text first and convert it to JSON afterward."
+      "Parse Claude's free-text response after the fact using regular expressions to pull out the fields you need.",
+      "Ask Claude to generate a natural-language description first, then convert that text into JSON in a separate step."
     ],
     "correctAnswer": 1,
     "explanation": "Defining a tool whose input_schema matches the required structure and reading the tool-use arguments gives the strongest schema-conformance guarantee, since the model is constrained to populate that exact structure. Asking for JSON in prose still leaves formatting to the model's discretion, regex parsing is fragile against any deviation in output shape, and generating free text before converting it adds an unreliable extra translation step.",
@@ -533,10 +533,10 @@
     "difficulty": "2x",
     "text": "An extraction schema allows null, but the model frequently invents values for information that is not explicitly present. What's the most direct improvement?",
     "options": [
-      "Require every field to contain a value.",
+      "Require every field in the schema to contain some value no matter what, removing null as an allowed option entirely.",
       "Instruct the model to return null when the source does not explicitly provide the information.",
-      "Use a larger model automatically.",
-      "Add confidence values and ignore values below 80%."
+      "Automatically switch to a larger, more capable model on the assumption that a bigger model will stop inventing values on its own.",
+      "Add a confidence score to every extracted field and simply ignore any value that comes back below an 80% threshold."
     ],
     "correctAnswer": 1,
     "explanation": "Explicitly instructing the model to return null when information isn't present directly targets the fabrication behavior, reinforcing that null is an acceptable and expected answer rather than a failure to fill in something. Requiring every field to have a value pushes in exactly the wrong direction, a larger model doesn't inherently stop this specific behavior, and post-hoc confidence filtering doesn't prevent the invented value from being generated in the first place."
@@ -548,10 +548,10 @@
     "difficulty": "2x",
     "text": "A contract contains an original payment deadline of 30 days and a later amendment changing it to 60 days. The extraction system sometimes returns 30 and sometimes 60, without indicating which clause it used. What schema design would best preserve the relevant information?",
     "options": [
-      "Store only the most recent value.",
+      "Store only the most recently seen value for the payment deadline, discarding whichever figure came first.",
       "Store multiple values with information such as source location and effective date.",
-      "Remove the payment deadline field from the schema.",
-      "Ask the model to ignore the original contract completely."
+      "Remove the payment deadline field from the schema entirely, since it clearly changed at some point in the contract.",
+      "Ask the model to ignore the original 30-day clause completely and only ever consider the amendment."
     ],
     "correctAnswer": 1,
     "explanation": "Storing both values along with metadata like source location and effective date preserves the actual provenance of each figure, letting downstream logic (or a reviewer) determine which one applies rather than silently guessing. Keeping only the most recent value discards the original clause's context, removing the field entirely loses information the business clearly needs, and telling the model to ignore the original contract throws away real data that may still matter for other purposes."
@@ -578,10 +578,10 @@
     "difficulty": "2x",
     "text": "A schema expects a numeric quantity, but source documents sometimes contain \"5-7 units\". Validation fails because the model attempts to place the entire range into a numeric field. What is the most appropriate solution?",
     "options": [
-      "Retry the identical request repeatedly.",
+      "Retry the exact same extraction request repeatedly, expecting the model to eventually settle on a single number on its own.",
       "Redesign the schema to represent the range explicitly if ranges are valid domain data.",
-      "Force temperature to zero.",
-      "Tell Claude to guess the midpoint."
+      "Force the model's sampling temperature down to zero, expecting that removing randomness will resolve the range-versus-single-number mismatch.",
+      "Tell Claude to just guess the midpoint of the range and silently write that single number into the numeric field."
     ],
     "correctAnswer": 1,
     "explanation": "If ranges like \"5-7 units\" are genuinely valid data the source documents contain, the schema itself should be able to represent a range explicitly (e.g. min/max fields) rather than forcing a range into a single numeric slot it was never designed to hold. Retrying an identical request won't change a fundamentally mismatched schema, temperature has no bearing on a structural type mismatch, and guessing a midpoint quietly discards real information the document actually provided."
@@ -594,9 +594,9 @@
     "text": "An extraction system must identify technologies from job descriptions. The current output varies widely: sometimes \"Python and SQL\" is one item, while other times they are separate. The model also occasionally includes skills that are implied but never mentioned. What's the strongest prompt-level improvement?",
     "options": [
       "Add few-shot examples demonstrating the desired granularity and explicit-mention rule.",
-      "Increase the maximum number of skills allowed.",
-      "Add a confidence score to every skill.",
-      "Ask Claude to infer skills based on job responsibilities."
+      "Increase the maximum number of skills the model is allowed to extract from any single job description.",
+      "Add a confidence score to every extracted skill, without changing how skills get split or invented.",
+      "Ask Claude to actively infer additional skills based on the job's listed responsibilities, even ones never explicitly named."
     ],
     "correctAnswer": 0,
     "explanation": "Concrete few-shot examples that show exactly how to split compound mentions and enforce an explicit-mention-only rule give the model a consistent pattern to match on both problems at once. Raising the maximum count doesn't address inconsistent granularity, a confidence score doesn't fix how items get split or invented, and explicitly asking Claude to infer skills from responsibilities would make the implied-skill problem worse, not better."
@@ -702,10 +702,10 @@
     "difficulty": "2x",
     "text": "A company can manually review only 5% of extracted records. The system produces both high-confidence and low-confidence outputs, with certain ambiguous documents known to be riskier. Which routing strategy is most appropriate?",
     "options": [
-      "Randomly select exactly 5% of all records.",
+      "Randomly select exactly 5% of all extracted records to review, without regard to how confident the model was in any of them.",
       "Prioritize uncertain or ambiguous records using model signals and document characteristics.",
-      "Review only records containing dates.",
-      "Review only records that downstream systems reject."
+      "Review only the records that happen to contain a date field somewhere in their extracted output.",
+      "Review only the records that downstream systems have already rejected outright, and skip everything else entirely."
     ],
     "correctAnswer": 1,
     "explanation": "With limited review capacity, spending it on the records the system itself flags as uncertain or that come from known-riskier document types gets far more value out of that 5% than reviewing at random. Random sampling wastes review budget on records that were likely already correct, filtering by an arbitrary field like 'contains dates' has nothing to do with actual risk, and reviewing only what downstream systems already rejected misses the harder case of a wrong-but-accepted value slipping through undetected."
@@ -732,10 +732,10 @@
     "difficulty": "2x",
     "text": "A customer support agent has a maximum turn limit. Sometimes the agent reaches the limit after gathering information but before either resolving the issue or escalating it. The business requires every interaction to end with one of those two outcomes. What's the strongest solution?",
     "options": [
-      "Tell Claude to be more concise so it uses fewer turns.",
-      "Increase the maximum turns indefinitely.",
+      "Instruct Claude to be more concise in its responses so that it naturally uses fewer turns before reaching the maximum limit.",
+      "Increase the maximum number of turns indefinitely so the conversation effectively never runs out of room to resolve itself.",
       "Have the orchestration layer inspect terminal outcomes and programmatically perform the required fallback escalation when necessary.",
-      "Add more examples showing successful escalation."
+      "Add more few-shot examples to the prompt that demonstrate what a successful escalation looks like in practice."
     ],
     "correctAnswer": 2,
     "explanation": "A deterministic check in the orchestration layer -- outside the model's discretion -- that inspects whether the conversation ended in resolution or escalation and forces the required fallback escalation otherwise, guarantees the business requirement is met every time. Asking Claude to be more concise or adding more examples are still just requests the model could fail to satisfy under pressure, and removing the turn limit entirely doesn't guarantee an outcome either -- it just delays the same problem."
@@ -762,10 +762,10 @@
     "difficulty": "2x",
     "text": "A support system has separate tools for refund_customer and issue_store_credit, but both accept nearly identical parameters and are frequently confused by the model. Which design change most directly addresses the ambiguity?",
     "options": [
-      "Add extensive examples to the prompt.",
-      "Rename both tools without changing their descriptions.",
+      "Add extensive few-shot examples to the prompt showing when to call each of the two similarly-parameterized tools.",
+      "Rename both tools to sound more distinct from each other, without changing anything in their underlying descriptions.",
       "Redesign the interface so the shared compensation decision is represented explicitly.",
-      "Hide both tools until the model requests them."
+      "Hide both tools from the model by default until it specifically requests access to either one of them."
     ],
     "correctAnswer": 2,
     "explanation": "Redesigning the interface so the actual underlying decision -- which form of compensation applies -- is represented explicitly (for example, a single tool with a compensation-type parameter) removes the ambiguity structurally rather than papering over it. Extensive prompt examples try to compensate for a design problem instead of fixing it, renaming without changing what actually distinguishes the tools doesn't resolve the near-identical parameters causing the confusion, and hiding both tools until requested doesn't change how confusable they are once they are available."
@@ -777,10 +777,10 @@
     "difficulty": "2x",
     "text": "A multi-step verification workflow works correctly during the first few exchanges, but the agent suddenly asks for information that the customer already provided earlier in the same conversation. What is the first thing you should investigate?",
     "options": [
-      "Whether the model's temperature is too high.",
+      "Whether the model's sampling temperature has been set too high, causing inconsistent responses across turns.",
       "Whether conversation history is actually being preserved and passed into subsequent requests.",
-      "Whether the verification tool has too many parameters.",
-      "Whether the system prompt needs stronger memory instructions."
+      "Whether the verification tool itself has too many required parameters for the model to track correctly.",
+      "Whether the system prompt needs stronger, more explicit instructions telling the model to remember earlier answers."
     ],
     "correctAnswer": 1,
     "explanation": "An agent forgetting information from earlier in the SAME conversation is a strong signal that conversation history isn't actually being carried into subsequent API requests -- checking that plumbing first is the right root-cause step before touching anything else. Temperature affects word choice, not whether prior turns are visible at all; tool parameter count doesn't explain forgetting information the customer already gave; and no amount of system-prompt wording fixes a request that genuinely never included the earlier turns."
@@ -811,10 +811,10 @@
     "difficulty": "2x",
     "text": "A billing agent determines that a customer's requested refund exceeds its authorization level. It has already gathered the customer's identity and order details. What should it provide when escalating?",
     "options": [
-      "Only the original customer message.",
+      "Only the original customer message, with none of the identity or order details the agent already gathered included.",
       "A structured handoff containing relevant customer information, order details, and the reason for escalation.",
-      "The complete raw database contents associated with the customer.",
-      "A generic message saying that the agent could not complete the request."
+      "The complete raw database contents associated with that customer, including every field regardless of relevance to this refund.",
+      "A generic message simply stating that the agent could not complete the request, with no supporting detail attached."
     ],
     "correctAnswer": 1,
     "explanation": "A structured handoff with the customer's identity, the order details already gathered, and the specific reason for escalation gives the next handler (human or agent) everything needed to continue without re-doing work that's already done. Passing only the original message discards everything the agent already learned, dumping raw database contents is unfocused and likely exposes more than necessary, and a generic failure message forces whoever picks it up to start the investigation from zero."
@@ -886,10 +886,10 @@
     "difficulty": "2x",
     "text": "A refund tool requires an order_id. Users sometimes say only \"I want a refund for my recent order.\" The agent occasionally invents an order ID and sends it to the refund tool. What's the best way to address the root problem?",
     "options": [
-      "Add a server-side check that rejects nonexistent IDs.",
-      "Tell the model to think more carefully before selecting the ID.",
+      "Add a server-side validation check on the refund tool that rejects any order ID that doesn't actually exist in the system.",
+      "Tell the model in the prompt to think more carefully and double-check itself before selecting which order ID to use.",
       "Make the tool description explicitly state that the ID must come from a verified order lookup and must never be invented.",
-      "Force the agent to call a tool on every turn."
+      "Force the agent to make some kind of tool call on every single turn, regardless of what the customer actually asked for."
     ],
     "correctAnswer": 2,
     "explanation": "Explicitly stating in the tool's own description that the order_id must come from a verified lookup and must never be invented gives the model a clear, tool-level constraint on where a valid ID can come from -- addressing the actual root cause rather than reacting after the fact. A server-side rejection check only catches the problem after an invented ID has already been sent, telling the model to 'think more carefully' is a vague nudge rather than a concrete constraint, and forcing a tool call every turn doesn't stop the wrong ID from being invented in the first place."
@@ -916,10 +916,10 @@
     "difficulty": "2x",
     "text": "Your team wants an agent to escalate when a human is genuinely needed. Cases may include policy exceptions, explicit requests for human assistance, or situations where the agent cannot make meaningful progress. Which approach best preserves appropriate model judgment while defining useful escalation boundaries?",
     "options": [
-      "Escalate after exactly three failed tool calls.",
-      "Escalate based only on customer sentiment.",
+      "Escalate automatically after exactly three failed tool calls in a row, regardless of what those failures actually were or whether the agent could still recover.",
+      "Escalate based only on the customer's detected sentiment in their most recent message, without considering any other signal in the conversation.",
       "Define clear escalation conditions covering authorization limits, human requests, and inability to make meaningful progress.",
-      "Route every unusual request directly to a human."
+      "Route every request that seems even slightly unusual directly to a human agent, rather than letting the model attempt to resolve it first."
     ],
     "correctAnswer": 2,
     "explanation": "Explicitly defining the escalation conditions -- authorization limits, explicit human requests, and genuine inability to progress -- gives the model clear boundaries for when to hand off, while still leaving it to exercise judgment about when those conditions are actually met. A rigid count of failed tool calls doesn't distinguish a real block from ordinary retries, sentiment alone ignores clear-cut cases like explicit requests or policy exceptions, and escalating every unusual request removes the agent's judgment altogether, defeating the purpose of having it handle routine cases at all."
@@ -931,10 +931,10 @@
     "difficulty": "2x",
     "text": "A support conversation contains three separate issues: a refund, a subscription problem, and a payment-method update. The conversation is becoming long, and the customer returns to the refund issue after many turns. What approach best preserves the information needed across the different issues?",
     "options": [
-      "Keep only the most recent conversation turns.",
+      "Keep only the most recent conversation turns in context, letting older ones fall out of the window over time.",
       "Store structured state for each issue separately, including identifiers, status, and relevant actions.",
-      "Depend entirely on the model's ability to remember all previous turns.",
-      "Start a new conversation whenever the customer changes topics."
+      "Depend entirely on the model's own ability to remember all previous turns, no matter how long the conversation runs.",
+      "Start an entirely new conversation every time the customer switches from one issue to a different one."
     ],
     "correctAnswer": 1,
     "explanation": "Tracking structured state per issue -- identifiers, current status, and actions already taken -- lets the agent pick the refund issue back up accurately regardless of how many turns have passed or how many other topics came in between. Keeping only recent turns risks losing the refund details entirely once the conversation moves on, relying purely on the model to remember everything degrades as the conversation grows longer, and starting a new conversation per topic loses the shared customer context and forces redundant re-verification."
