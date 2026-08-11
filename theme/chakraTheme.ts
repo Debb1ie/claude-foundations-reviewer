@@ -94,8 +94,17 @@ const system = createSystem(defaultConfig, {
         // safe to make it repaint lighter in dark mode. Without this, dark
         // terracotta heading text sits on a dark terracotta-tinted panel:
         // low contrast, hard to read ("brown text on brown background").
+        // NOTE: the _light value here must be a literal hex, not a
+        // '{colors.brand.700}' self-reference -- semantic tokens and raw
+        // tokens share the same generated CSS variable name when they use
+        // the same path, so referencing "brand.700" from within the
+        // "brand.700" semantic token creates a circular custom property.
+        // Browsers treat a cyclic var() as invalid at computed-value time,
+        // which made `bg: 'brand.700'` silently resolve to transparent
+        // (background's initial value) anywhere it was used -- e.g. every
+        // button's hover state went blank instead of darker terracotta.
         brand: {
-          700: { value: { _light: '{colors.brand.700}', _dark: '#E5BA9E' } },
+          700: { value: { _light: '#8F4C31', _dark: '#E5BA9E' } },
         },
 
         // Chakra's raw gray.* swatches are static (not light/dark aware) by
@@ -104,12 +113,15 @@ const system = createSystem(defaultConfig, {
         // override. Redeclaring the shades actually used as semantic
         // tokens makes them repaint automatically in dark mode instead of
         // staying a fixed medium-gray that's unreadable on a dark surface.
+        // (Same self-reference pitfall as brand.700 above -- _light values
+        // are literal hexes matching Chakra's default gray scale, not
+        // '{colors.gray.*}' references back to themselves.)
         gray: {
-          300: { value: { _light: '{colors.gray.300}', _dark: '#7D7A74' } },
-          400: { value: { _light: '{colors.gray.400}', _dark: '#98948C' } },
-          500: { value: { _light: '{colors.gray.500}', _dark: '#AFABA1' } },
-          600: { value: { _light: '{colors.gray.600}', _dark: '#C2BEB3' } },
-          700: { value: { _light: '{colors.gray.700}', _dark: '#D6D2C6' } },
+          300: { value: { _light: '#d4d4d8', _dark: '#7D7A74' } },
+          400: { value: { _light: '#a1a1aa', _dark: '#98948C' } },
+          500: { value: { _light: '#71717a', _dark: '#AFABA1' } },
+          600: { value: { _light: '#52525b', _dark: '#C2BEB3' } },
+          700: { value: { _light: '#3f3f46', _dark: '#D6D2C6' } },
         },
       },
     },
