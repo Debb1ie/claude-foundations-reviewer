@@ -203,7 +203,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       color="white"
                       fontWeight={700}
                       borderRadius="lg"
-                      _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
+                      _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                       transition="all 0.2s"
                     >
                       Browse Resources
@@ -351,7 +351,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 color="white"
                                 fontWeight={700}
                                 borderRadius="lg"
-                                _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
+                                _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                                 transition="all 0.2s"
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -441,7 +441,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         color="white"
                         fontWeight={700}
                         borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
+                        _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => setShowAdvancedWarning(true)}
                       >
@@ -525,7 +525,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                         color="white"
                         fontWeight={700}
                         borderRadius="lg"
-                        _hover={{ bg: 'brand.700', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
+                        _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
                         transition="all 0.2s"
                         onClick={() => setShowProfessionalWarning(true)}
                       >
