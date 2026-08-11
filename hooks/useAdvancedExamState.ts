@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import advancedQuestionsData from '@/data/advanced-questions.json';
+// Swapped to the community mock-exam bank (60 questions) -- passers reported
+// the original CCA-F-domain-quota bank in advanced-questions.json only
+// tracked ~1/3 of what the real exam actually asks. That original file is
+// kept on disk (unused) rather than deleted, in case it's needed again.
+import advancedQuestionsData from '@/data/advanced-mock-questions.json';
 import type { DomainId } from '@/types/certification';
 import { getActiveCertification } from '@/lib/certifications';
 
@@ -54,10 +58,6 @@ const cert = getActiveCertification();
 
 export const TOTAL_SECONDS = cert.advancedMode.durationSeconds;
 
-// Per-domain question counts, summing to the mode's total (matches the
-// real exam's ~2hr scope). Sourced from the active certification config.
-const targetPerDomain: Record<string, number> = cert.advancedMode.domainTargets;
-
 // Fisher-Yates, generic.
 function shuffleArray<T>(items: T[]): T[] {
   const arr = [...items];
@@ -103,20 +103,16 @@ function recordElapsed(
 }
 
 const allAdvanced = advancedQuestionsData as AdvancedQuestion[];
-export const TOTAL_QUESTIONS = Object.values(targetPerDomain).reduce((a, b) => a + b, 0);
+// The mock bank is exactly one exam's worth of questions (60), so every
+// attempt serves all of them -- no per-domain quota sampling needed, unlike
+// the old bank which drew a fixed-size sample from a larger domain-tagged pool.
+export const TOTAL_QUESTIONS = allAdvanced.length;
 
-// Re-run per attempt: both WHICH questions get drawn per domain and the final
-// question order are randomized, so no two sessions show the same exam in the
-// same sequence — a fixed pool + fixed order is trivially memorizable otherwise.
+// Re-run per attempt: both question order and each question's option order
+// are randomized, so no two sessions show the same exam in the same
+// sequence — a fixed order is trivially memorizable otherwise.
 function buildSession(): AdvancedQuestion[] {
-  const perDomain = Object.keys(targetPerDomain).flatMap((domain) => {
-    const target = targetPerDomain[domain];
-    const threes = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '3x');
-    const twos = allAdvanced.filter((q) => q.domain === domain && q.difficulty === '2x');
-    if (threes.length >= target) return shuffleArray(threes).slice(0, target);
-    return shuffleArray(threes).concat(shuffleArray(twos).slice(0, target - threes.length));
-  });
-  return shuffleArray(perDomain).map(shuffleOptions);
+  return shuffleArray(allAdvanced).map(shuffleOptions);
 }
 
 export const useAdvancedExamStore = create<AdvancedExamStore>()(
@@ -238,7 +234,7 @@ export const useAdvancedExamStore = create<AdvancedExamStore>()(
       },
     }),
     {
-      name: 'advanced-exam-storage-v9',
+      name: 'advanced-exam-storage-v10',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         questions: state.questions,

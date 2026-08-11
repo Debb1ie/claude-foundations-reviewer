@@ -14,7 +14,8 @@ import {
   Progress,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS } from '@/hooks/useAdvancedExamState';
+import { useAdvancedExamStore, type AdvancedQuestion, TOTAL_SECONDS, TOTAL_QUESTIONS } from '@/hooks/useAdvancedExamState';
+import advancedQuestionsData from '@/data/advanced-mock-questions.json';
 import { DOMAINS, DOMAIN_SOLID_BGS, DOMAIN_SOLID_TEXT } from '@/types/exam';
 import NextLink from 'next/link';
 import { useCaptureDeterrent } from '@/hooks/useCaptureDeterrent';
@@ -205,8 +206,15 @@ function SourceModal({ question, onClose }: { question: AdvancedQuestion | null;
   );
 }
 
+// Computed from the actual bank rather than hardcoded, so this can't drift
+// out of sync with the question data again.
+const domainCounts: Record<string, number> = (advancedQuestionsData as AdvancedQuestion[])
+  .reduce((acc, q) => {
+    acc[q.domain] = (acc[q.domain] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
 function StartScreen({ onStart }: { onStart: () => void }) {
-  const domainCounts: Record<string, number> = { D1: 15, D2: 9, D3: 12, D4: 12, D5: 12 };
   return (
     <Box minH="100vh" bg="transparent">
       <Container maxW="container.md" py={[8, 14]}>
@@ -226,7 +234,7 @@ function StartScreen({ onStart }: { onStart: () => void }) {
                 Advanced Practice (CCAF)
               </Heading>
               <Text color="gray.600" fontSize="lg" lineHeight="tall" maxW="lg" mx="auto">
-                60 scenario-based questions covering all 5 exam domains.
+                {TOTAL_QUESTIONS} scenario-based questions covering all 5 exam domains.
                 2-hour timed — answers and explanations revealed after you finish.
               </Text>
             </Box>
@@ -511,7 +519,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                     <Text fontSize="xs" color="yellow.700" lineHeight={1.5} _dark={{ color: 'yellow.300' }}>
                       {Math.round(fastPct * 100)}% of the questions you answered were completed faster than the
                       expected reading time for their difficulty (45s for standard questions, 90s for the harder
-                      tier). This isn't a penalty -- just a self-check: these are dense, multi-paragraph scenarios,
+                      tier). This isn&apos;t a penalty -- just a self-check: these are dense, multi-paragraph scenarios,
                       so a score like this at this pace is worth a second look at whether every question was
                       actually read in full.
                     </Text>
@@ -774,7 +782,7 @@ function ResultsScreen({ onReset }: { onReset: () => void }) {
                                 _dark={{ bg: 'rgba(148,163,184,0.1)', borderColor: 'rgba(148,163,184,0.4)' }}
                               >
                                 <Text fontSize="xs" color="gray.500" lineHeight="tall">
-                                  You didn't answer this one, so the correct answer and explanation stay hidden — attempt it in a future session to see them.
+                                  You didn&apos;t answer this one, so the correct answer and explanation stay hidden — attempt it in a future session to see them.
                                 </Text>
                               </Box>
                             </>

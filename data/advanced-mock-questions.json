@@ -1,0 +1,942 @@
+[
+  {
+    "id": "mock-001",
+    "number": 1,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your team maintains a shared Claude Code project. The repository contains project-wide instructions, while individual developers also have personal preferences they don't want committed to version control. The team wants database conventions to apply to everyone working on the project, while a developer's experimental workflow should remain local to their machine. Which configuration provides the appropriate separation?",
+    "options": [
+      "Put both sets of instructions in the project's CLAUDE.md so Claude has a single source of truth.",
+      "Put both sets of instructions in the user's global configuration so they remain available across projects.",
+      "Put shared project guidance in the project's configuration and personal preferences in the user's local Claude configuration.",
+      "Put shared guidance in .claude/rules/ and personal preferences in the project's .mcp.json."
+    ],
+    "correctAnswer": 2,
+    "explanation": "The project's committed CLAUDE.md is exactly where team-wide, everyone-follows-this conventions belong, while a personal, not-committed configuration (Claude Code's local settings scope) is where one developer's own preferences live without affecting -- or being seen by -- the rest of the team. Putting everything in one shared file forces personal preferences onto the whole team, a global user config wrongly scopes database conventions to every project the developer touches, and .mcp.json is for MCP server connections, not personal workflow preferences.",
+    "sourceUrl": "https://code.claude.com/docs/en/settings",
+    "sourceLabel": "Claude Code Docs: Settings",
+    "sourceExcerpt": "Local -- .claude/settings.local.json -- You, this repo only -- No (gitignored)",
+    "sourceHighlight": ".claude/settings.local.json"
+  },
+  {
+    "id": "mock-002",
+    "number": 2,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A project requires every modified Python file to pass Black formatting before it can be committed. Claude frequently produces valid Python but occasionally leaves formatting inconsistencies. The team wants formatting to happen automatically rather than relying on Claude to remember the instruction. What is the most appropriate approach?",
+    "options": [
+      "Add a stronger formatting instruction to CLAUDE.md.",
+      "Add a PostToolUse hook that runs Black after Claude modifies Python files.",
+      "Create a separate slash command reminding Claude to format files.",
+      "Add examples of correctly formatted Python files to the system prompt."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A PostToolUse hook runs deterministically after every matching file-edit tool call, regardless of whether the model remembers to ask for formatting -- this is what 'automatic, not dependent on Claude remembering' actually requires. A stronger CLAUDE.md instruction, a slash command, or examples are all still just requests the model could forget or deprioritize.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks",
+    "sourceLabel": "Claude Code Docs: Hooks",
+    "sourceExcerpt": "PostToolUse -- React after successful tool execution",
+    "sourceHighlight": "PostToolUse"
+  },
+  {
+    "id": "mock-003",
+    "number": 3,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "You need Claude to implement a new API client using conventions from two existing clients in the repository. The examples are authoritative, but the conventions are only relevant to this particular implementation. What's the most effective approach?",
+    "options": [
+      "Permanently document both clients' patterns in CLAUDE.md.",
+      "Ask Claude to independently infer the patterns without showing it the existing implementations.",
+      "Reference the relevant existing files directly so Claude can use them as concrete examples.",
+      "Create a new project rule specifically for the API client before beginning implementation."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Pointing Claude at the actual existing files gives it concrete, authoritative examples to follow for this specific task, without permanently altering shared project instructions for something that's only relevant once. Baking one-off conventions into CLAUDE.md or a new standing rule pollutes guidance every future task will load, and asking Claude to infer patterns blind throws away the exact information you already have."
+  },
+  {
+    "id": "mock-004",
+    "number": 4,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "You're asked to add rate limiting to an unfamiliar API. You know the endpoint, but you're uncertain about the appropriate strategy for distributed deployments, failure handling, and retry behavior. What is the best way to begin?",
+    "options": [
+      "Ask Claude to immediately implement a basic in-memory rate limiter and refine it later.",
+      "Write a complete specification yourself before allowing Claude to inspect the codebase.",
+      "Ask Claude to explore the existing architecture and identify the decisions that need to be made before implementation.",
+      "Enable extended thinking and instruct Claude to implement the most robust rate limiter it can design."
+    ],
+    "correctAnswer": 2,
+    "explanation": "When the open questions are architectural (distributed coordination, failure handling, retry strategy) rather than mechanical, the right first step is exploration and decision-surfacing before code gets written -- jumping straight to an in-memory implementation ignores the distributed-deployment requirement entirely, and writing a full spec yourself before Claude has even looked at the codebase risks designing against the wrong constraints. Extended thinking doesn't substitute for actually looking at how the system is deployed."
+  },
+  {
+    "id": "mock-005",
+    "number": 5,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A developer needs to change one constant from 30 to 45 in a configuration file. No other files are affected. Which workflow is most appropriate?",
+    "options": [
+      "Enter plan mode and create a detailed implementation plan.",
+      "Use direct execution to make the small, localized change.",
+      "Spawn a subagent to verify the configuration architecture first.",
+      "Create a dedicated skill for configuration changes."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A single-value, single-file change has no ambiguity to plan around and no architecture to verify -- direct execution matches the size of the task. Planning, subagent delegation, and a dedicated skill are all overhead built for larger or more uncertain work, and applying them here just adds ceremony without benefit."
+  },
+  {
+    "id": "mock-006",
+    "number": 6,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Claude generates a database query that works for normal records but fails when the user's search term contains an apostrophe. What is the most effective way to iterate toward a fix?",
+    "options": [
+      "Tell Claude to rewrite the entire database layer with stronger security practices.",
+      "Provide a failing example and the expected behavior, then ask Claude to diagnose and correct the issue.",
+      "Add \"always handle special characters\" to CLAUDE.md.",
+      "Manually modify the query and ask Claude to continue with the remaining implementation."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A concrete failing input plus the expected behavior gives Claude exactly what it needs to diagnose and target the actual bug -- an apostrophe breaking a query is almost always a parameterization issue, and a specific repro finds that fast. Rewriting the whole database layer way overshoots a one-bug fix, a vague CLAUDE.md rule doesn't tell Claude what's actually broken, and silently patching it yourself skips the diagnosis that would prevent the same class of bug elsewhere."
+  },
+  {
+    "id": "mock-007",
+    "number": 7,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your project has three requirements: Claude must not modify production deployment manifests. Claude should use the project's logger utility instead of print. Every JavaScript file modified by Claude should be formatted automatically. The team currently stores all three requirements in CLAUDE.md. Which restructuring best matches the nature of each requirement?",
+    "options": [
+      "Keep all three in CLAUDE.md because project instructions should always be centralized.",
+      "Use permissions for the protected files, project guidance for the logging convention, and a hook for automatic formatting.",
+      "Move all three requirements into .claude/rules/ so Claude can apply them consistently.",
+      "Use hooks for all three because hooks provide stronger enforcement than instructions."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Each requirement has a different enforcement need: a hard 'never touch this file' rule belongs in permissions (actually blocked, not just requested), a stylistic convention like using a logger is a good fit for CLAUDE.md guidance, and 'always happens automatically' formatting is exactly what a hook guarantees. Treating all three the same -- all in CLAUDE.md, all as rules, or all as hooks -- ignores that a permission, a convention, and an automation are enforced by fundamentally different mechanisms."
+  },
+  {
+    "id": "mock-008",
+    "number": 8,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "A library upgrade changes several APIs across a codebase. The migration guide contains breaking changes, and the library is referenced by more than 60 files across unrelated modules. What's the most effective approach?",
+    "options": [
+      "Update the dependency and fix failures one at a time without first mapping usage.",
+      "Create a migration slash command and run it against every matching file.",
+      "Explore how the old APIs are used, identify affected areas, and develop a migration strategy before implementation.",
+      "Paste the migration guide into a single prompt and ask Claude to update the entire repository."
+    ],
+    "correctAnswer": 2,
+    "explanation": "With 60+ files across unrelated modules and real breaking changes, understanding how the old APIs are actually used and planning the migration first catches inconsistent usage patterns and edge cases before they turn into a pile of one-off failures. Fixing reactively file-by-file wastes the chance to spot a pattern early, and a single blind prompt over the whole repo has no way to account for the different ways each module might be using the old API."
+  },
+  {
+    "id": "mock-009",
+    "number": 9,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A custom MCP server exposes a prompt called incident_summary. The team wants developers to invoke that reusable prompt directly from Claude Code. How should the MCP prompt be exposed?",
+    "options": [
+      "It becomes available as an MCP-provided slash command.",
+      "It automatically becomes a normal tool that Claude invokes whenever appropriate.",
+      "It is injected into every conversation as system context.",
+      "It becomes an @-mentionable file resource."
+    ],
+    "correctAnswer": 0,
+    "explanation": "MCP prompts are surfaced in Claude Code as slash commands (in the form /mcp__servername__promptname), letting a developer invoke that specific reusable prompt directly and on demand. A tool is a different MCP primitive the model chooses to call on its own, permanent system-context injection would apply it to every conversation whether wanted or not, and @-mentionable resources are for referencing data/files, not invoking a prompt.",
+    "sourceUrl": "https://code.claude.com/docs/en/mcp",
+    "sourceLabel": "Claude Code Docs: MCP",
+    "sourceExcerpt": "MCP prompts appear with the format /mcp__servername__promptname",
+    "sourceHighlight": "/mcp__servername__promptname"
+  },
+  {
+    "id": "mock-010",
+    "number": 10,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A team repeatedly asks Claude to perform a standardized dependency audit. The audit consists of several instructions that should only be used when developers explicitly request an audit. Where is the most appropriate place for this reusable workflow?",
+    "options": [
+      "The root CLAUDE.md.",
+      "A project skill that developers can explicitly invoke.",
+      "The MCP server configuration.",
+      "A global permission rule."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A Skill is exactly the mechanism for a reusable, multi-step workflow that should only load when explicitly invoked, rather than being present in every task by default. Putting it in the root CLAUDE.md would load it into every conversation whether an audit was requested or not, MCP configuration is for connecting external tools/resources, and permission rules control access, not workflow content."
+  },
+  {
+    "id": "mock-011",
+    "number": 11,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your company has an eight-step security review checklist that should only apply when reviewing pull requests. Developers also use Claude for debugging, implementation, and documentation. Which approach best avoids unnecessarily loading the checklist into unrelated tasks?",
+    "options": [
+      "Put the checklist in CLAUDE.md.",
+      "Create a dedicated review skill or slash command containing the checklist.",
+      "Add the checklist to every project's system prompt.",
+      "Create a permission rule that loads the checklist during file edits."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A dedicated skill or slash command is only loaded when a developer actually invokes it for a review, keeping the eight-step checklist out of debugging, implementation, and documentation work entirely. CLAUDE.md and a standing system prompt addition would load the checklist into every single task regardless of relevance, and permissions govern access, not conditional content loading."
+  },
+  {
+    "id": "mock-012",
+    "number": 12,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "Your organization maintains a /generate-report workflow used by every developer. The workflow changes frequently, and updates need to be committed with the repository so all developers receive the same version. Where should it live?",
+    "options": [
+      "~/.claude/skills/generate-report/SKILL.md",
+      ".claude/skills/generate-report/SKILL.md",
+      ".claude/settings.json",
+      "CLAUDE.md only"
+    ],
+    "correctAnswer": 1,
+    "explanation": "A project-level skill at .claude/skills/generate-report/SKILL.md is committed to the repository, so every developer who pulls the latest code gets the same version automatically. The ~/.claude path is the personal, per-machine scope and wouldn't be shared via version control at all, settings.json holds configuration rather than a workflow's instructions, and CLAUDE.md isn't the mechanism for a discrete, explicitly-invoked, frequently-updated command.",
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills",
+    "sourceExcerpt": "Project -- .claude/skills/<skill-name>/SKILL.md -- This project only",
+    "sourceHighlight": ".claude/skills/<skill-name>/SKILL.md"
+  },
+  {
+    "id": "mock-013",
+    "number": 13,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "Claude is generating HTML reports. The generated output has three related problems: inconsistent spacing, incorrect table widths, and page overflow when long descriptions are present. What is the strongest iterative strategy?",
+    "options": [
+      "Give Claude all three issues and ask it to redesign the entire report renderer.",
+      "Fix each issue sequentially, testing the output after each meaningful change.",
+      "Provide one correct screenshot and ask Claude to reproduce it exactly.",
+      "Rewrite the reporting specification from scratch before allowing further changes."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Fixing one issue at a time and checking the actual rendered output after each change lets you confirm each fix works and didn't introduce a new problem, before moving to the next. Bundling all three into a full redesign risks a much larger, harder-to-verify change, a single reference screenshot doesn't capture every edge case (like long-description overflow) on its own, and rewriting the whole spec is a disproportionate response to three specific, fixable bugs."
+  },
+  {
+    "id": "mock-014",
+    "number": 14,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A repository contains /frontend, /backend, and /infrastructure, each with substantially different conventions. The root CLAUDE.md has grown to hundreds of lines and much of it is irrelevant depending on what developers are editing. What's the best organizational strategy?",
+    "options": [
+      "Move all instructions into separate global user configurations.",
+      "Create path-scoped rules so relevant guidance loads for matching files.",
+      "Keep everything in CLAUDE.md but add more headings.",
+      "Copy the entire root instructions file into each directory."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Path-scoped rules let frontend-specific, backend-specific, and infrastructure-specific guidance load only when a developer is actually working in that part of the repo, cutting the irrelevant-context problem directly at the source. Moving everything to global user config wrongly makes repo-specific conventions apply across every project, better headings don't stop irrelevant content from still being loaded, and copying the same giant file into every directory triples the maintenance burden without solving the relevance problem at all."
+  },
+  {
+    "id": "mock-015",
+    "number": 15,
+    "domain": "claude-code",
+    "difficulty": "3x",
+    "text": "A team needs to introduce asynchronous notifications. The solution could use a queue, WebSockets, or polling, and the correct choice depends on latency, infrastructure, and existing architecture. How should Claude Code approach the task?",
+    "options": [
+      "Immediately implement polling because it is the simplest solution.",
+      "Implement WebSockets because real-time requirements imply WebSockets.",
+      "Analyze the architecture and trade-offs before selecting an implementation.",
+      "Ask Claude to implement all three approaches so the team can compare them afterward."
+    ],
+    "correctAnswer": 2,
+    "explanation": "When the right answer genuinely depends on the existing infrastructure, latency needs, and architecture -- none of which are given -- the correct move is to analyze those constraints before committing to an implementation. Defaulting to polling for simplicity or to WebSockets because it 'sounds real-time' both skip the actual trade-off analysis, and building all three wastes effort on two approaches that will likely be thrown away."
+  },
+  {
+    "id": "mock-016",
+    "number": 16,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "You're implementing a graph algorithm with several edge cases and strict performance requirements. You want the implementation to be driven by objective behavioral checks rather than subjective review. Which workflow is most effective?",
+    "options": [
+      "Write tests covering normal behavior, edge cases, and performance expectations, then iterate against failures.",
+      "Give Claude a long natural-language description and manually inspect every generated function.",
+      "Ask Claude to research graph algorithms before writing any tests.",
+      "Provide a reference implementation and ask Claude to copy its structure."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Tests covering normal cases, edge cases, and performance expectations give Claude an objective, executable target to iterate against -- exactly the 'behavioral checks rather than subjective review' the question asks for. Manual inspection is precisely the subjective review being avoided, background research alone produces no verifiable target, and copying a reference implementation's structure doesn't guarantee it actually satisfies this codebase's specific edge cases and performance bar."
+  },
+  {
+    "id": "mock-017",
+    "number": 17,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "An agent has spent significant time understanding a complex rendering subsystem. You now want it to investigate a separate physics subsystem while preserving the important conclusions from the rendering investigation. Which approach best balances context preservation and focused exploration?",
+    "options": [
+      "Clear the entire conversation and start over.",
+      "Continue indefinitely in the same context regardless of relevance.",
+      "Delegate the physics investigation while giving the subagent the relevant findings it needs.",
+      "Ask a second agent to investigate physics independently and discard the original context."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Delegating the new, unrelated investigation to a subagent -- while explicitly passing along the rendering conclusions that are actually relevant -- keeps the physics exploration focused without losing the earlier work. Clearing everything throws away the rendering conclusions entirely, continuing indefinitely in one context lets irrelevant rendering detail crowd out the physics work, and a fully independent second agent that discards prior context loses any findings that might actually matter to the new investigation."
+  },
+  {
+    "id": "mock-018",
+    "number": 18,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "An MCP tool called inspect_dependencies is available, but Claude repeatedly uses Grep instead. The MCP tool's description only says \"Inspect dependencies\". What change is most likely to improve tool selection?",
+    "options": [
+      "Remove Grep from the environment.",
+      "Rename the MCP tool to something longer and more specific.",
+      "Expand the MCP tool description to clearly explain what it does, what it returns, and when it should be used.",
+      "Add a second MCP server providing the same functionality."
+    ],
+    "correctAnswer": 2,
+    "explanation": "A thin, vague description like \"Inspect dependencies\" gives the model little basis to prefer it over a familiar general-purpose tool like Grep -- clearly explaining what it does, what it returns, and when to use it is what actually improves selection. Removing Grep just forces a workaround rather than fixing the real cause, renaming alone without adding substance doesn't give the model new information, and a duplicate server adds more ambiguity rather than resolving it."
+  },
+  {
+    "id": "mock-019",
+    "number": 19,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An agent needs to understand a caching subsystem spanning 20 files. You want to avoid loading every file while still developing an accurate mental model. What's the best exploration strategy?",
+    "options": [
+      "Read all 20 files completely before making any conclusions.",
+      "Identify important interfaces and relationships first, then inspect the implementations relevant to the requested behavior.",
+      "Read only the largest files because they probably contain the main logic.",
+      "Search for the word \"cache\" and read every matching line without examining surrounding code."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Mapping the key interfaces and relationships first, then drilling into only the implementations relevant to the actual behavior in question, builds an accurate model without paying the token cost of reading all 20 files. Reading everything defeats the goal of avoiding full-file loading, file size doesn't reliably indicate where the relevant logic lives, and matching a single keyword without reading surrounding context misses how the pieces actually connect."
+  },
+  {
+    "id": "mock-020",
+    "number": 20,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "An engineer worked yesterday on a named investigation session called \"payment-analysis\". Several other sessions have been used since then. How should the engineer resume the specific investigation?",
+    "options": [
+      "Use --continue, because it always finds the oldest relevant session.",
+      "Use --resume payment-analysis.",
+      "Start a new session and manually reconstruct all findings.",
+      "Use the most recent session because Claude automatically merges related conversations."
+    ],
+    "correctAnswer": 1,
+    "explanation": "--resume lets you resume a specific named or identified prior session directly, which is exactly what's needed when several other sessions have happened since. --continue resumes only the most recent session (not the oldest, and not necessarily the right one), manually reconstructing findings throws away work that's already saved, and Claude does not automatically merge unrelated conversations together.",
+    "sourceUrl": "https://code.claude.com/docs/en/cli-reference",
+    "sourceLabel": "Claude Code Docs: CLI Reference",
+    "sourceExcerpt": "--resume / -r -- Resume a specific session by ID or name, or show an interactive picker",
+    "sourceHighlight": "--resume"
+  },
+  {
+    "id": "mock-021",
+    "number": 21,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "An agent investigates a production bug whose cause could involve routing, authentication, caching, database access, or external services. The correct investigation path is unknown at the beginning. What decomposition strategy is most appropriate?",
+    "options": [
+      "Define a rigid investigation sequence and follow it regardless of findings.",
+      "Dynamically generate investigation tasks based on evidence discovered during exploration.",
+      "Read the entire repository before investigating the issue.",
+      "Investigate every subsystem independently with equal effort."
+    ],
+    "correctAnswer": 1,
+    "explanation": "When the actual cause is genuinely unknown up front, letting each finding shape what gets investigated next is what actually narrows in on the real cause efficiently. A rigid predefined sequence ignores evidence as it comes in, reading the whole repository first burns time without targeting the actual symptom, and spreading equal effort across every subsystem wastes investigation time on areas the evidence may already be ruling out."
+  },
+  {
+    "id": "mock-022",
+    "number": 22,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "Consider two tasks: Task A: Rename getAccount() to fetchAccount() throughout a small module. Task B: Improve reliability across a payment-processing subsystem involving retries, error handling, partial failures, and transaction boundaries. Which task benefits more from an explicit analyze -> propose -> implement workflow?",
+    "options": [
+      "Task A, because renaming requires careful planning.",
+      "Task B, because it contains multiple interacting design decisions.",
+      "Both equally.",
+      "Neither, because Claude should always directly implement tasks."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Task B involves several interacting design decisions -- retry strategy, error handling, partial-failure recovery, transaction boundaries -- that genuinely benefit from being analyzed and proposed before code gets written. Task A is a small, mechanical, unambiguous rename with no design decisions to weigh, so the heavier workflow would just be overhead there; the two tasks are not equivalent in this respect, and design-heavy work does benefit from more than jumping straight to implementation."
+  },
+  {
+    "id": "mock-023",
+    "number": 23,
+    "domain": "claude-code",
+    "difficulty": "2x",
+    "text": "A function is imported directly in some files but accessed through aliases and wrapper functions elsewhere. The original function name therefore does not appear everywhere it is used. How should an agent find its callers before removing it?",
+    "options": [
+      "Search only for the original function name.",
+      "Search documentation for references to the function.",
+      "Trace how the function is exposed through wrappers and aliases, then search for those names as well.",
+      "Search only for files importing the module and assume every import is a caller."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Since the function is reached through aliases and wrapper functions in some places, tracing those indirections and searching for the wrapper/alias names too is the only way to find every real caller before removing it. Searching only the original name misses every indirect reference, documentation search doesn't reflect actual code usage, and assuming every importer is a caller ignores that an import doesn't guarantee the specific function is actually used."
+  },
+  {
+    "id": "mock-024",
+    "number": 24,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An agent resumes an investigation from yesterday. Most of its previous context is still valid, but several source files have changed since the original analysis. What's the most reliable approach?",
+    "options": [
+      "Start over and discard all previous context.",
+      "Resume the session and explicitly identify the changed files so the agent can revalidate affected conclusions.",
+      "Resume without mentioning the changes because previous analysis is already available.",
+      "Re-read every file from the previous session regardless of whether it changed."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Resuming the prior session preserves the still-valid context, while explicitly flagging which files changed tells the agent exactly what to revalidate rather than trusting stale conclusions. Discarding everything wastes the valid parts of yesterday's work, resuming silently risks acting on conclusions that the changed files have since invalidated, and re-reading every file regardless of change status spends effort on files that didn't need revalidation at all."
+  },
+  {
+    "id": "mock-025",
+    "number": 25,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A team asks an agent to improve testing across a large legacy repository with little existing coverage. No specific module has been identified as the priority. What should the agent do first?",
+    "options": [
+      "Start testing files alphabetically.",
+      "Map the repository, identify important or highly coupled areas, and prioritize testing based on impact.",
+      "Read every file completely before creating any tests.",
+      "Create equal testing quotas for every directory."
+    ],
+    "correctAnswer": 1,
+    "explanation": "With no priority given, mapping the repository to find the highest-impact or most tightly-coupled areas is what actually targets testing effort where it matters most. Alphabetical order and equal per-directory quotas both ignore impact entirely, and reading every file in full before writing a single test delays useful work without a clear payoff."
+  },
+  {
+    "id": "mock-026",
+    "number": 26,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An engineer wants to investigate two incompatible architectural approaches based on the same existing codebase. They want each investigation to preserve the original context while allowing independent exploration. Which approach is best?",
+    "options": [
+      "Investigate both approaches sequentially in one conversation.",
+      "Create independent session forks from the existing investigation.",
+      "Start both investigations from scratch.",
+      "Clear the original session after investigating the first approach."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Forking the existing session gives each architectural approach its own independent branch that still carries the original investigation's context, letting the two explorations diverge without interfering with each other. Investigating both in one conversation risks the two approaches' reasoning bleeding together, starting from scratch throws away the shared context both approaches need, and clearing the session after the first approach loses the baseline the second approach was supposed to share.",
+    "sourceUrl": "https://code.claude.com/docs/en/sessions",
+    "sourceLabel": "Claude Code Docs: Sessions",
+    "sourceExcerpt": "Branching creates a copy of the conversation so far and switches you into it, leaving the original intact",
+    "sourceHighlight": "Branching creates a copy of the conversation"
+  },
+  {
+    "id": "mock-027",
+    "number": 27,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An agent understands a complex service after reading many files. The team wants to independently evaluate two different testing architectures without one experiment influencing the other. How should the experiments be structured?",
+    "options": [
+      "Develop both strategies sequentially in the original conversation.",
+      "Fork the existing session into separate branches for each strategy.",
+      "Start fresh sessions and make each agent rediscover the entire architecture.",
+      "Summarize the architecture manually and provide the same summary to two new agents."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Forking the already-informed session into two branches gives each testing strategy the full benefit of the architecture the agent already understands, while keeping the two experiments from influencing each other. Developing both in the same conversation risks cross-contamination between the two strategies, and both 'start fresh' options throw away the expensive architecture-discovery work that's already been done -- either by making the agent redo it or by hoping a manual summary captures everything that mattered."
+  },
+  {
+    "id": "mock-028",
+    "number": 28,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An exploration agent is losing accuracy because the conversation contains a large amount of source material. More exploration is still required. What is the most effective strategy?",
+    "options": [
+      "Continue adding files to the same context until the investigation is complete.",
+      "Delegate focused investigations to subagents while preserving the main agent's high-level context.",
+      "Stop the investigation and use only the files already read.",
+      "Replace all file reading with broad keyword searches."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Delegating the next round of focused exploration to subagents keeps the bulk of new source material out of the main agent's context, while the main agent retains the high-level understanding needed to direct the investigation -- directly addressing the accuracy loss from context overload. Continuing to pile files into the same context makes the exact problem worse, stopping short abandons work that still needs to happen, and replacing reading with keyword search alone sacrifices the depth needed to actually understand the code."
+  },
+  {
+    "id": "mock-029",
+    "number": 29,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "An exploration session was interrupted. The codebase changed afterward, including renamed functions that were relevant to the investigation. How should the agent continue?",
+    "options": [
+      "Resume the previous session and inform the agent about the relevant changes.",
+      "Resume the previous session without mentioning changes.",
+      "Start a completely new session with no previous findings.",
+      "Reconstruct the entire investigation manually from memory."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Resuming the prior session keeps everything already discovered, while explicitly flagging the renamed functions tells the agent exactly what to double-check rather than silently relying on now-outdated references. Resuming without mentioning the changes risks the agent chasing function names that no longer exist, and starting over or manually reconstructing the investigation both discard the interrupted session's still-valid findings for no reason."
+  },
+  {
+    "id": "mock-030",
+    "number": 30,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A PR review always consists of three independent checks: security, test coverage, and documentation. Each check follows the same sequence and the results are combined into a final report. Which decomposition pattern best matches this workflow?",
+    "options": [
+      "Routing.",
+      "Prompt chaining.",
+      "Single-agent execution with no decomposition.",
+      "Classification followed by unrelated workflows."
+    ],
+    "correctAnswer": 1,
+    "explanation": "The review is decomposed into a fixed, always-executed sequence of steps whose outputs are combined into one final result -- the defining shape of prompt chaining, a task broken into a defined sequence of steps rather than dispatched to only one of several paths. It isn't routing, since routing classifies input and sends it down exactly one specialized path rather than always running every check; it clearly is decomposed (ruling out 'no decomposition'); and there's no classification step directing work to unrelated workflows.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Prompt chaining decomposes a task into a sequence of steps, where each LLM call processes the output of the previous one",
+    "sourceHighlight": "decomposes a task into a sequence of steps"
+  },
+  {
+    "id": "mock-031",
+    "number": 31,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A document extraction system produces valid-looking values for fields that are absent from the source. For example, when no product weight is provided, the model sometimes outputs a plausible number anyway. Which change most directly prevents unsupported values from being accepted?",
+    "options": [
+      "Add a self-reported confidence score to every field.",
+      "Make missing fields optional so the model can omit unsupported information.",
+      "Add more detailed descriptions of each field without changing the schema.",
+      "Increase the model temperature to encourage more varied outputs."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Making the field optional/nullable in the schema -- combined with instructing the model to return null when the source doesn't support a value -- removes the structural pressure to invent a plausible-looking number for a required field. A self-reported confidence score doesn't stop the invented value from being produced in the first place, better descriptions alone don't change what the schema will accept, and higher temperature makes fabrication more likely, not less."
+  },
+  {
+    "id": "mock-032",
+    "number": 32,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "Your application extracts candidate information into a predefined structure. Downstream code expects exact field types and rejects malformed outputs. Which approach provides the strongest structural guarantee?",
+    "options": [
+      "Ask Claude to output JSON using a detailed prompt.",
+      "Use a tool whose input schema represents the required structure and extract the tool-use arguments.",
+      "Parse Claude's response using regular expressions.",
+      "Ask Claude to generate text first and convert it to JSON afterward."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Defining a tool whose input_schema matches the required structure and reading the tool-use arguments gives the strongest schema-conformance guarantee, since the model is constrained to populate that exact structure. Asking for JSON in prose still leaves formatting to the model's discretion, regex parsing is fragile against any deviation in output shape, and generating free text before converting it adds an unreliable extra translation step.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Combine tool_choice with strict tool use to guarantee both that one of your tools will be called AND that the tool inputs strictly follow your schema",
+    "sourceHighlight": "strictly follow your schema"
+  },
+  {
+    "id": "mock-033",
+    "number": 33,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "Your extraction model reports 95% accuracy overall. However, early analysis suggests that performance may vary significantly between invoices, resumes, and legal documents. Before automating high-confidence results, what should you validate?",
+    "options": [
+      "Only whether the aggregate accuracy exceeds the business requirement.",
+      "Whether the model uses the same number of tokens for each document type.",
+      "Accuracy across important document types and fields rather than relying solely on aggregate results.",
+      "Whether the model produces identical results when run twice."
+    ],
+    "correctAnswer": 2,
+    "explanation": "A single aggregate accuracy number can hide a document type that performs far worse than the average -- breaking accuracy down by document type and by field is what actually reveals whether it's safe to automate high-confidence results across the board. Checking only the aggregate score ignores exactly the variance the question raises, token count says nothing about correctness, and output-to-output consistency doesn't tell you whether the extracted values are actually right."
+  },
+  {
+    "id": "mock-034",
+    "number": 34,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "An extraction schema allows null, but the model frequently invents values for information that is not explicitly present. What's the most direct improvement?",
+    "options": [
+      "Require every field to contain a value.",
+      "Instruct the model to return null when the source does not explicitly provide the information.",
+      "Use a larger model automatically.",
+      "Add confidence values and ignore values below 80%."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Explicitly instructing the model to return null when information isn't present directly targets the fabrication behavior, reinforcing that null is an acceptable and expected answer rather than a failure to fill in something. Requiring every field to have a value pushes in exactly the wrong direction, a larger model doesn't inherently stop this specific behavior, and post-hoc confidence filtering doesn't prevent the invented value from being generated in the first place."
+  },
+  {
+    "id": "mock-035",
+    "number": 35,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A contract contains an original payment deadline of 30 days and a later amendment changing it to 60 days. The extraction system sometimes returns 30 and sometimes 60, without indicating which clause it used. What schema design would best preserve the relevant information?",
+    "options": [
+      "Store only the most recent value.",
+      "Store multiple values with information such as source location and effective date.",
+      "Remove the payment deadline field from the schema.",
+      "Ask the model to ignore the original contract completely."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Storing both values along with metadata like source location and effective date preserves the actual provenance of each figure, letting downstream logic (or a reviewer) determine which one applies rather than silently guessing. Keeping only the most recent value discards the original clause's context, removing the field entirely loses information the business clearly needs, and telling the model to ignore the original contract throws away real data that may still matter for other purposes."
+  },
+  {
+    "id": "mock-036",
+    "number": 36,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "Production reviewers repeatedly correct an extraction error involving informal phrases such as \"a handful\" and \"roughly two cups\". These examples are now available as labeled corrections. What's an appropriate first improvement?",
+    "options": [
+      "Add representative examples showing how those phrases should be extracted.",
+      "Delete all informal measurements from the schema.",
+      "Immediately fine-tune the model using every correction.",
+      "Convert every informal measurement into an exact numeric value."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Turning the labeled corrections into a handful of representative few-shot examples is a fast, low-cost first step that directly shows the model the extraction pattern reviewers actually want for these informal phrases. Deleting informal measurements from the schema throws away real data the business needs, jumping straight to fine-tuning is a heavier response than the problem calls for as a first step, and forcing an exact numeric value out of an inherently vague phrase like \"a handful\" invents precision that isn't really there."
+  },
+  {
+    "id": "mock-037",
+    "number": 37,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A schema expects a numeric quantity, but source documents sometimes contain \"5-7 units\". Validation fails because the model attempts to place the entire range into a numeric field. What is the most appropriate solution?",
+    "options": [
+      "Retry the identical request repeatedly.",
+      "Redesign the schema to represent the range explicitly if ranges are valid domain data.",
+      "Force temperature to zero.",
+      "Tell Claude to guess the midpoint."
+    ],
+    "correctAnswer": 1,
+    "explanation": "If ranges like \"5-7 units\" are genuinely valid data the source documents contain, the schema itself should be able to represent a range explicitly (e.g. min/max fields) rather than forcing a range into a single numeric slot it was never designed to hold. Retrying an identical request won't change a fundamentally mismatched schema, temperature has no bearing on a structural type mismatch, and guessing a midpoint quietly discards real information the document actually provided."
+  },
+  {
+    "id": "mock-038",
+    "number": 38,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "An extraction system must identify technologies from job descriptions. The current output varies widely: sometimes \"Python and SQL\" is one item, while other times they are separate. The model also occasionally includes skills that are implied but never mentioned. What's the strongest prompt-level improvement?",
+    "options": [
+      "Add few-shot examples demonstrating the desired granularity and explicit-mention rule.",
+      "Increase the maximum number of skills allowed.",
+      "Add a confidence score to every skill.",
+      "Ask Claude to infer skills based on job responsibilities."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Concrete few-shot examples that show exactly how to split compound mentions and enforce an explicit-mention-only rule give the model a consistent pattern to match on both problems at once. Raising the maximum count doesn't address inconsistent granularity, a confidence score doesn't fix how items get split or invented, and explicitly asking Claude to infer skills from responsibilities would make the implied-skill problem worse, not better."
+  },
+  {
+    "id": "mock-039",
+    "number": 39,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "Your extraction pipeline automatically retries validation failures. Most formatting errors are corrected after one or two retries. However, one recurring failure occurs because the source document simply does not contain the requested information. For which case are retries least useful?",
+    "options": [
+      "A date is returned in the wrong format.",
+      "An integer is returned as a formatted string.",
+      "A required fact is absent from the source document.",
+      "A nested object is returned where a flat list is expected."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Retrying makes sense when the model produced a wrong-shaped but recoverable answer -- a bad date format, a stringified integer, or the wrong nesting are all still fixable formatting mistakes. If the information simply isn't in the source document at all, no number of retries will make it appear; the fix there is a schema/prompt that allows an honest 'not present' answer, not more attempts at the same impossible extraction."
+  },
+  {
+    "id": "mock-040",
+    "number": 40,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A pipeline has three tools: extract_document, find_related_records, generate_summary. find_related_records requires an identifier that extract_document produces. Claude sometimes selects the lookup tool first. What is the strongest way to guarantee the first operation?",
+    "options": [
+      "Put extract_document first in the tool list.",
+      "Use a prompt instruction saying Claude should probably extract first.",
+      "Force extract_document for the first API turn, then allow subsequent operations.",
+      "Rename the lookup tool so it appears later alphabetically."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Using tool_choice to force extract_document specifically on the first turn, then releasing that constraint for subsequent turns, structurally guarantees the required ordering rather than just hoping the model picks correctly. List position and alphabetical ordering aren't decision factors the model is bound by, and a soft prompt instruction ('should probably') is exactly the kind of guidance that can still be skipped, which is the problem being solved here.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "tool_choice parameter: 'tool' forces Claude to always use a particular tool",
+    "sourceHighlight": "forces Claude to always use a particular tool"
+  },
+  {
+    "id": "mock-041",
+    "number": 41,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "An invoice extraction pipeline identifies line items and a stated grand total. In some cases, the extracted line items do not mathematically agree with the stated total. What is the safest design?",
+    "options": [
+      "Automatically modify the line items until the totals match.",
+      "Store both extracted values and flag discrepancies for validation or review.",
+      "Ignore the stated total and always calculate a new one.",
+      "Ask Claude to choose whichever total seems more plausible."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Storing both the extracted line items and the stated total, and flagging when they don't agree, surfaces a real discrepancy for a human or downstream process to resolve rather than silently guessing which figure is 'right'. Auto-adjusting the line items to force agreement can quietly corrupt real invoice data, always recalculating and discarding the stated total throws away information that might reveal a genuine document error, and asking the model to pick whichever number 'seems more plausible' is exactly the kind of silent guess the discrepancy should be flagged for instead."
+  },
+  {
+    "id": "mock-042",
+    "number": 42,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A model has high confidence on many documents, but audits reveal that certain document layouts produce systematic errors despite high confidence. What's the strongest way to monitor this problem over time?",
+    "options": [
+      "Lower the confidence threshold for every document.",
+      "Perform stratified sampling across relevant document categories and measure error rates.",
+      "Trust the model's confidence because it already correlates with accuracy.",
+      "Route every high-confidence extraction to human review."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Stratified sampling across the different document categories directly measures whether specific layouts are systematically wrong, which is exactly the blind spot a single overall confidence or accuracy number would hide. Lowering the threshold everywhere doesn't target the specific layouts causing trouble, trusting confidence is the assumption the audit just disproved, and routing every high-confidence case to human review defeats the purpose of having a confidence signal at all."
+  },
+  {
+    "id": "mock-043",
+    "number": 43,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A menu extraction system receives prices such as $8, $8.00, and 8 USD. The downstream application requires a consistent numeric representation. Where should normalization primarily occur?",
+    "options": [
+      "Ask the model to normalize the values directly.",
+      "Normalize the extracted values in deterministic post-processing code.",
+      "Run three extraction attempts and choose the most common format.",
+      "Remove price normalization from the pipeline."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Deterministic post-processing code reliably converts any of these equivalent representations into one consistent numeric format every time, which is exactly the guarantee a downstream application needs. Relying on the model to normalize formatting is still probabilistic and can vary run to run, running extraction three times and voting on the format adds cost without a real reliability guarantee, and removing normalization entirely leaves the inconsistency for the downstream application to deal with."
+  },
+  {
+    "id": "mock-044",
+    "number": 44,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A calendar extraction service must return strictly structured event data. Malformed output causes downstream failures. Which approach provides the strongest schema-level constraint?",
+    "options": [
+      "Include an example JSON object in the prompt.",
+      "Tell Claude to output JSON and retry when parsing fails.",
+      "Use a tool input schema representing the required event structure.",
+      "Add an opening { to the assistant's response before generation."
+    ],
+    "correctAnswer": 2,
+    "explanation": "A tool input schema representing the exact required event structure constrains the model's output at the schema level, the strongest guarantee among these options -- matching the same principle as forcing structured tool-use output elsewhere in extraction pipelines. A prompt example is only a suggestion the model can still deviate from, retrying after a parse failure is reactive rather than preventive, and pre-filling an opening brace nudges format but doesn't constrain the actual structure that follows."
+  },
+  {
+    "id": "mock-045",
+    "number": 45,
+    "domain": "prompt-engineering",
+    "difficulty": "2x",
+    "text": "A company can manually review only 5% of extracted records. The system produces both high-confidence and low-confidence outputs, with certain ambiguous documents known to be riskier. Which routing strategy is most appropriate?",
+    "options": [
+      "Randomly select exactly 5% of all records.",
+      "Prioritize uncertain or ambiguous records using model signals and document characteristics.",
+      "Review only records containing dates.",
+      "Review only records that downstream systems reject."
+    ],
+    "correctAnswer": 1,
+    "explanation": "With limited review capacity, spending it on the records the system itself flags as uncertain or that come from known-riskier document types gets far more value out of that 5% than reviewing at random. Random sampling wastes review budget on records that were likely already correct, filtering by an arbitrary field like 'contains dates' has nothing to do with actual risk, and reviewing only what downstream systems already rejected misses the harder case of a wrong-but-accepted value slipping through undetected."
+  },
+  {
+    "id": "mock-046",
+    "number": 46,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A support agent uses MCP tools for customer lookup, order retrieval, refunds, and escalation. A tool currently returns only \"Operation failed\" regardless of whether the cause is a timeout, authorization failure, or invalid input. The agent's retry and escalation behavior is inconsistent. What's the most effective improvement?",
+    "options": [
+      "Add structured error information identifying categories and whether the operation is retryable.",
+      "Add more examples to the system prompt showing common errors.",
+      "Make the agent retry every failure twice.",
+      "Create a separate error-analysis agent that handles every failed tool call."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Structured error information that identifies the failure category and whether it's retryable gives the agent exactly what it needs to decide, consistently, whether to retry or escalate -- addressing the root cause of the inconsistent behavior. More prompt examples can't compensate for a tool that never reports which category of failure occurred, blanket retrying twice ignores that some failures (like invalid input) will never succeed on retry, and a whole separate agent for this is a heavier fix than simply returning better error data from the tool itself."
+  },
+  {
+    "id": "mock-047",
+    "number": 47,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A customer support agent has a maximum turn limit. Sometimes the agent reaches the limit after gathering information but before either resolving the issue or escalating it. The business requires every interaction to end with one of those two outcomes. What's the strongest solution?",
+    "options": [
+      "Tell Claude to be more concise so it uses fewer turns.",
+      "Increase the maximum turns indefinitely.",
+      "Have the orchestration layer inspect terminal outcomes and programmatically perform the required fallback escalation when necessary.",
+      "Add more examples showing successful escalation."
+    ],
+    "correctAnswer": 2,
+    "explanation": "A deterministic check in the orchestration layer -- outside the model's discretion -- that inspects whether the conversation ended in resolution or escalation and forces the required fallback escalation otherwise, guarantees the business requirement is met every time. Asking Claude to be more concise or adding more examples are still just requests the model could fail to satisfy under pressure, and removing the turn limit entirely doesn't guarantee an outcome either -- it just delays the same problem."
+  },
+  {
+    "id": "mock-048",
+    "number": 48,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "An agent has accumulated many tools. Several tools have overlapping responsibilities, and evaluation shows declining tool-selection accuracy. What's the most direct structural solution when the overlap itself is unnecessary?",
+    "options": [
+      "Add more tool-selection examples to the system prompt.",
+      "Consolidate overlapping capabilities into clearer tool interfaces.",
+      "Increase the maximum number of agent turns.",
+      "Randomize the order in which tools are presented."
+    ],
+    "correctAnswer": 1,
+    "explanation": "When the overlap between tools is genuinely unnecessary, consolidating those overlapping capabilities into fewer, clearer tool interfaces removes the ambiguity at its source rather than compensating for it. More examples just paper over confusion that a cleaner tool design would prevent outright, more turns doesn't help the model choose better among ambiguous options, and randomizing presentation order doesn't address why the tools are hard to distinguish in the first place."
+  },
+  {
+    "id": "mock-049",
+    "number": 49,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A support system has separate tools for refund_customer and issue_store_credit, but both accept nearly identical parameters and are frequently confused by the model. Which design change most directly addresses the ambiguity?",
+    "options": [
+      "Add extensive examples to the prompt.",
+      "Rename both tools without changing their descriptions.",
+      "Redesign the interface so the shared compensation decision is represented explicitly.",
+      "Hide both tools until the model requests them."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Redesigning the interface so the actual underlying decision -- which form of compensation applies -- is represented explicitly (for example, a single tool with a compensation-type parameter) removes the ambiguity structurally rather than papering over it. Extensive prompt examples try to compensate for a design problem instead of fixing it, renaming without changing what actually distinguishes the tools doesn't resolve the near-identical parameters causing the confusion, and hiding both tools until requested doesn't change how confusable they are once they are available."
+  },
+  {
+    "id": "mock-050",
+    "number": 50,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "A multi-step verification workflow works correctly during the first few exchanges, but the agent suddenly asks for information that the customer already provided earlier in the same conversation. What is the first thing you should investigate?",
+    "options": [
+      "Whether the model's temperature is too high.",
+      "Whether conversation history is actually being preserved and passed into subsequent requests.",
+      "Whether the verification tool has too many parameters.",
+      "Whether the system prompt needs stronger memory instructions."
+    ],
+    "correctAnswer": 1,
+    "explanation": "An agent forgetting information from earlier in the SAME conversation is a strong signal that conversation history isn't actually being carried into subsequent API requests -- checking that plumbing first is the right root-cause step before touching anything else. Temperature affects word choice, not whether prior turns are visible at all; tool parameter count doesn't explain forgetting information the customer already gave; and no amount of system-prompt wording fixes a request that genuinely never included the earlier turns."
+  },
+  {
+    "id": "mock-051",
+    "number": 51,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "You're implementing a Claude API agentic loop. The model can either return text or request another tool call. How should the application determine whether another iteration is required?",
+    "options": [
+      "Continue until the response contains no text.",
+      "Continue whenever the response contains any content blocks.",
+      "Inspect the response's stop_reason and continue when it indicates tool use.",
+      "Continue until the configured maximum number of turns is reached."
+    ],
+    "correctAnswer": 2,
+    "explanation": "The response's stop_reason field is the documented, reliable signal for this decision -- checking for stop_reason == \"tool_use\" tells you definitively whether the model is requesting another tool call and the loop needs another iteration. Presence or absence of text or content blocks isn't a reliable proxy for that (a tool-use response can still include text), and simply running until a fixed maximum turn count ignores whether the model has actually finished, either stopping early or running longer than needed.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
+    "sourceLabel": "Claude Docs: Handling Stop Reasons",
+    "sourceExcerpt": "The fundamental pattern is to check stop_reason == \"tool_use\" and continue the conversation",
+    "sourceHighlight": "check stop_reason == \"tool_use\""
+  },
+  {
+    "id": "mock-052",
+    "number": 52,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "A billing agent determines that a customer's requested refund exceeds its authorization level. It has already gathered the customer's identity and order details. What should it provide when escalating?",
+    "options": [
+      "Only the original customer message.",
+      "A structured handoff containing relevant customer information, order details, and the reason for escalation.",
+      "The complete raw database contents associated with the customer.",
+      "A generic message saying that the agent could not complete the request."
+    ],
+    "correctAnswer": 1,
+    "explanation": "A structured handoff with the customer's identity, the order details already gathered, and the specific reason for escalation gives the next handler (human or agent) everything needed to continue without re-doing work that's already done. Passing only the original message discards everything the agent already learned, dumping raw database contents is unfocused and likely exposes more than necessary, and a generic failure message forces whoever picks it up to start the investigation from zero."
+  },
+  {
+    "id": "mock-053",
+    "number": 53,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A refund tool encounters two failure categories: Temporary network failures that may succeed when retried. Business-rule violations that will never succeed through retry. Currently both return identical error messages. What is the strongest improvement?",
+    "options": [
+      "Retry all failures with exponential backoff.",
+      "Return structured error information that distinguishes retryable from permanent failures.",
+      "Ask the model to infer the category from the error wording.",
+      "Prevent the tool from returning any errors to the model."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Structured error information that explicitly distinguishes retryable failures from permanent ones lets the calling agent make the correct decision for each case, rather than treating both identically. Blanket retrying with backoff wastes effort retrying business-rule violations that can never succeed, asking the model to guess the category from wording is unreliable when the tool doesn't actually expose that information, and hiding errors from the model entirely removes the very signal it needs to behave correctly."
+  },
+  {
+    "id": "mock-054",
+    "number": 54,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "Company policy states that refunds over $1,000 must always be reviewed by a human. This is a hard compliance requirement, not a recommendation. What provides the strongest enforcement?",
+    "options": [
+      "Put the rule prominently in the system prompt.",
+      "Add several examples of refunds above and below the threshold.",
+      "Enforce the threshold in the tool or orchestration layer so the prohibited action cannot execute.",
+      "Ask Claude to confirm the amount before calling the refund tool."
+    ],
+    "correctAnswer": 2,
+    "explanation": "A hard compliance requirement needs to be enforced somewhere the model's behavior can't override it -- building the $1,000 threshold check into the tool or orchestration layer means the action is structurally blocked rather than merely discouraged. A prominent system-prompt rule, extra examples, and asking Claude to self-confirm are all still requests directed at the model, and none of them can guarantee a hard requirement the way a code-level check can."
+  },
+  {
+    "id": "mock-055",
+    "number": 55,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "A returning customer resumes an earlier support conversation several hours later. Previous tool results are now potentially stale, particularly order status and payment information. What is the safest approach?",
+    "options": [
+      "Trust the previous tool results because they are already part of the conversation.",
+      "Use the previous conversation for context but re-fetch time-sensitive information before making decisions.",
+      "Delete all previous conversation history.",
+      "Tell the model to assume that the newest information is always correct without making new tool calls."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Keeping the earlier conversation for context while re-fetching anything time-sensitive -- like order status or payment information -- before acting on it avoids making decisions based on data that may have changed in the intervening hours. Trusting old results outright risks acting on stale information, deleting the whole history throws away useful context that's still valid, and instructing the model to just assume the newest information is correct without actually checking doesn't verify anything at all."
+  },
+  {
+    "id": "mock-056",
+    "number": 56,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "After retrieving an order, an agent receives information indicating that the order is outside the normal refund period. It must decide whether to refund or escalate. Who should primarily determine the next action in an agentic workflow?",
+    "options": [
+      "A fixed sequence defined before the conversation begins.",
+      "The model, using the newly retrieved information and available tools.",
+      "The tool server automatically based on the order status.",
+      "The application must hard-code every possible order state."
+    ],
+    "correctAnswer": 1,
+    "explanation": "In an agentic workflow, the model is meant to reason over newly retrieved information and decide the next step using the tools available to it -- that's the core of what makes it agentic rather than a fixed script. A predefined rigid sequence or hard-coding every possible order state defeats the purpose of using an agent at all for this kind of judgment call, and having the tool server silently decide the outcome removes the agent's reasoning from the loop entirely (and removes the point at which policy-level judgment, like whether to escalate, should happen)."
+  },
+  {
+    "id": "mock-057",
+    "number": 57,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "A refund tool requires an order_id. Users sometimes say only \"I want a refund for my recent order.\" The agent occasionally invents an order ID and sends it to the refund tool. What's the best way to address the root problem?",
+    "options": [
+      "Add a server-side check that rejects nonexistent IDs.",
+      "Tell the model to think more carefully before selecting the ID.",
+      "Make the tool description explicitly state that the ID must come from a verified order lookup and must never be invented.",
+      "Force the agent to call a tool on every turn."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Explicitly stating in the tool's own description that the order_id must come from a verified lookup and must never be invented gives the model a clear, tool-level constraint on where a valid ID can come from -- addressing the actual root cause rather than reacting after the fact. A server-side rejection check only catches the problem after an invented ID has already been sent, telling the model to 'think more carefully' is a vague nudge rather than a concrete constraint, and forcing a tool call every turn doesn't stop the wrong ID from being invented in the first place."
+  },
+  {
+    "id": "mock-058",
+    "number": 58,
+    "domain": "tool-design-mcp",
+    "difficulty": "2x",
+    "text": "An MCP tool returns generic errors such as \"Request failed\". Claude sometimes retries indefinitely because it cannot determine whether the failure is recoverable. What change best follows the principle of providing useful tool errors?",
+    "options": [
+      "Return detailed, error-specific messages that explain the problem and suggest an appropriate next action.",
+      "Remove the error flag so Claude treats every failure as normal data.",
+      "Hide all errors from the model and let the application handle them silently.",
+      "Increase the agent's maximum number of turns."
+    ],
+    "correctAnswer": 0,
+    "explanation": "Returning a detailed, error-specific message that explains what actually went wrong and suggests the appropriate next step gives Claude the information it needs to stop retrying when retrying won't help -- directly fixing the indefinite-retry problem at its source. Removing the error flag would make a real failure look like valid data, hiding errors entirely takes the decision out of the model's hands without actually resolving it, and simply raising the turn limit lets the same unproductive retrying run longer instead of fixing why it's happening."
+  },
+  {
+    "id": "mock-059",
+    "number": 59,
+    "domain": "agentic-architecture",
+    "difficulty": "2x",
+    "text": "Your team wants an agent to escalate when a human is genuinely needed. Cases may include policy exceptions, explicit requests for human assistance, or situations where the agent cannot make meaningful progress. Which approach best preserves appropriate model judgment while defining useful escalation boundaries?",
+    "options": [
+      "Escalate after exactly three failed tool calls.",
+      "Escalate based only on customer sentiment.",
+      "Define clear escalation conditions covering authorization limits, human requests, and inability to make meaningful progress.",
+      "Route every unusual request directly to a human."
+    ],
+    "correctAnswer": 2,
+    "explanation": "Explicitly defining the escalation conditions -- authorization limits, explicit human requests, and genuine inability to progress -- gives the model clear boundaries for when to hand off, while still leaving it to exercise judgment about when those conditions are actually met. A rigid count of failed tool calls doesn't distinguish a real block from ordinary retries, sentiment alone ignores clear-cut cases like explicit requests or policy exceptions, and escalating every unusual request removes the agent's judgment altogether, defeating the purpose of having it handle routine cases at all."
+  },
+  {
+    "id": "mock-060",
+    "number": 60,
+    "domain": "context-management",
+    "difficulty": "2x",
+    "text": "A support conversation contains three separate issues: a refund, a subscription problem, and a payment-method update. The conversation is becoming long, and the customer returns to the refund issue after many turns. What approach best preserves the information needed across the different issues?",
+    "options": [
+      "Keep only the most recent conversation turns.",
+      "Store structured state for each issue separately, including identifiers, status, and relevant actions.",
+      "Depend entirely on the model's ability to remember all previous turns.",
+      "Start a new conversation whenever the customer changes topics."
+    ],
+    "correctAnswer": 1,
+    "explanation": "Tracking structured state per issue -- identifiers, current status, and actions already taken -- lets the agent pick the refund issue back up accurately regardless of how many turns have passed or how many other topics came in between. Keeping only recent turns risks losing the refund details entirely once the conversation moves on, relying purely on the model to remember everything degrades as the conversation grows longer, and starting a new conversation per topic loses the shared customer context and forces redundant re-verification."
+  }
+]

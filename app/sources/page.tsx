@@ -10,12 +10,25 @@ import {
   HStack,
   Link,
   SimpleGrid,
-  Icon,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { getActiveCertification } from '@/lib/certifications';
 
 const cert = getActiveCertification();
+
+const FEATURED_LINKS = [
+  {
+    title: 'CCA-F Study Guide (Tutorials Dojo)',
+    description: 'A comprehensive written study guide covering the Claude Certified Architect - Foundations exam domains, format, and key concepts.',
+    url: 'https://tutorialsdojo.com/ccar-f-claude-certified-architect-foundations-study-guide/',
+    category: 'Top Recommended'
+  },
+  {
+    title: 'CCA-F Video Course (Tutorials Dojo)',
+    description: 'A full video course walking through the Claude Certified Architect - Foundations certification, from Tutorials Dojo\'s training portal.',
+    url: 'https://portal.tutorialsdojo.com/courses/claude-certified-architect-foundations-ccar-f-video-course/',
+    category: 'Top Recommended'
+  },
+];
 
 const PARTNER_LINKS = [
   {
@@ -113,6 +126,69 @@ export default function SourcesPage() {
             <Text color="gray.600" fontSize="lg" lineHeight="tall">
               A curated collection of official documentation, guides, and courses to help you prepare for the {cert.fullName} exam.
             </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h3" size="lg" fontWeight={700} color="brand.700" mb={5}>
+              ⭐ Featured — Top Recommended Sources
+            </Heading>
+            <SimpleGrid columns={[1, 1, 2]} gap={6}>
+              {FEATURED_LINKS.map((source, idx) => (
+                <Link
+                  key={idx}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  border="2px solid"
+                  borderColor="rgba(200, 154, 63, 0.5)"
+                  bg="rgba(255, 251, 240, 0.65)"
+                  backdropFilter="blur(12px)"
+                  _dark={{ bg: "rgba(60, 48, 20, 0.35)", borderColor: "rgba(223, 190, 114, 0.4)", _hover: { bg: "rgba(60, 48, 20, 0.55)", borderColor: "#DFBE72" } }}
+                  borderRadius="xl"
+                  p={6}
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  boxShadow="0 8px 32px 0 rgba(200, 154, 63, 0.08)"
+                  _hover={{
+                    borderColor: '#C89A3F',
+                    bg: 'rgba(255, 251, 240, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px 0 rgba(200, 154, 63, 0.18)',
+                    textDecoration: 'none'
+                  }}
+                  display="flex"
+                  flexDirection="column"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <HStack justify="space-between" mb={3}>
+                    <Box
+                      px={2.5}
+                      py={1}
+                      borderRadius="full"
+                      bg="rgba(200, 154, 63, 0.18)"
+                      _dark={{ bg: 'rgba(223,190,114,0.2)', color: '#F3DFAE' }}
+                      color="#856224"
+                      fontSize="xs"
+                      fontWeight={700}
+                      fontFamily="mono"
+                    >
+                      {source.category}
+                    </Box>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" color="#C89A3F">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </HStack>
+
+                  <Heading as="h3" size="md" fontWeight={700} color="brand.700" mb={2}>
+                    {source.title}
+                  </Heading>
+                  <Text fontSize="sm" color="gray.600" lineHeight={1.6} flex={1}>
+                    {source.description}
+                  </Text>
+                </Link>
+              ))}
+            </SimpleGrid>
           </Box>
 
           <Box>
