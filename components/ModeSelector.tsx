@@ -199,6 +199,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       mt="auto"
                       w="100%"
                       size="sm"
+                      colorPalette="brand"
                       bg="brand.600"
                       color="white"
                       fontWeight={700}
@@ -347,6 +348,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                                 mt={2}
                                 w="100%"
                                 size="sm"
+                                colorPalette="brand"
                                 bg={isSelected ? 'brand.600' : 'brand.500'}
                                 color="white"
                                 fontWeight={700}
@@ -437,6 +439,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Button
                         w="100%"
                         size="sm"
+                        colorPalette="brand"
                         bg="brand.600"
                         color="white"
                         fontWeight={700}
@@ -521,6 +524,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                       <Button
                         w="100%"
                         size="sm"
+                        colorPalette="brand"
                         bg="brand.600"
                         color="white"
                         fontWeight={700}
