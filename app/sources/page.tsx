@@ -28,6 +28,30 @@ const FEATURED_LINKS = [
     url: 'https://portal.tutorialsdojo.com/courses/claude-certified-architect-foundations-ccar-f-video-course/',
     category: 'Top Recommended'
   },
+  {
+    title: 'Claude Certification Guide - Learn',
+    description: 'Recommended by recent passers: structured learning content covering the CCA-F exam domains.',
+    url: 'https://claudecertificationguide.com/learn',
+    category: 'Recommended by Passers'
+  },
+  {
+    title: 'Claude Certification Guide - Mock Exam',
+    description: 'Recommended by recent passers: a full-length mock exam to test your readiness before sitting the real thing.',
+    url: 'https://claudecertificationguide.com/mock-exam',
+    category: 'Recommended by Passers'
+  },
+  {
+    title: 'CyberSkill Practice',
+    description: 'Recommended by recent passers: practice questions and exercises to reinforce key certification concepts.',
+    url: 'https://practice.cyberskill.world/',
+    category: 'Recommended by Passers'
+  },
+  {
+    title: 'CertSafari',
+    description: 'Recommended by recent passers: additional certification prep resources and practice material.',
+    url: 'https://www.certsafari.com/',
+    category: 'Recommended by Passers'
+  },
 ];
 
 const PARTNER_LINKS = [
