@@ -5,9 +5,6 @@ import { usePathname } from 'next/navigation';
 import { Box, Container, HStack, Heading, Link, Flex, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { getActiveCertification } from '@/lib/certifications';
-
-const cert = getActiveCertification();
 
 const SunIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -60,8 +57,8 @@ export function Header() {
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
-  // Completely hide header on any active exam pages, advanced practice, or professional practice view
-  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced-ccaf') || pathname?.startsWith('/professional-ccarp');
+  // Completely hide header on any active exam pages, advanced practice, professional practice, or developer practice view
+  const isExam = pathname?.startsWith('/exam') || pathname?.startsWith('/advanced-ccaf') || pathname?.startsWith('/professional-ccarp') || pathname?.startsWith('/developer-ccdv');
   if (isExam) {
     return null;
   }
@@ -88,7 +85,7 @@ export function Header() {
           <HStack gap={3}>
             <Link as={NextLink} href="/home" _hover={{ textDecoration: 'none' }} outline="none" _focusVisible={{ boxShadow: 'outline', borderRadius: 'md' }}>
               <Heading as="h1" size={{ base: 'sm', md: 'md' }} fontWeight={600} color="brand.700" lineHeight="1.3">
-                {cert.fullName} Exam Simulator
+                Claude Certified Exams Reviewer
               </Heading>
             </Link>
           </HStack>

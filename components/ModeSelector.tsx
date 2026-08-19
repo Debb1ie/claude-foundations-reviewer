@@ -17,7 +17,6 @@ import { getActiveCertification } from '@/lib/certifications';
 
 const cert = getActiveCertification();
 import { useRouter } from 'next/navigation';
-import NextLink from 'next/link';
 import React from 'react';
 
 const containerVariants: Variants = {
@@ -67,6 +66,12 @@ const SVG_ICONS = {
       <path d="M9 13.5 7 22l5-3 5 3-2-8.5"></path>
     </svg>
   ),
+  CODE: (
+    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <polyline points="16 18 22 12 16 6"></polyline>
+      <polyline points="8 6 2 12 8 18"></polyline>
+    </svg>
+  ),
 };
 const MODES = [
   {
@@ -89,6 +94,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
   const [examTimed, setExamTimed] = React.useState<boolean>(true);
   const [showAdvancedWarning, setShowAdvancedWarning] = React.useState(false);
   const [showProfessionalWarning, setShowProfessionalWarning] = React.useState(false);
+  const [showDeveloperWarning, setShowDeveloperWarning] = React.useState(false);
 
   // Navigates to the mode's own landing page, which is always the real
   // gate -- it shows the intro/rules screen and only starts the timed,
@@ -102,6 +108,11 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
   const beginProfessionalPractice = () => {
     setShowProfessionalWarning(false);
     router.push('/professional-ccarp');
+  };
+
+  const beginDeveloperPractice = () => {
+    setShowDeveloperWarning(false);
+    router.push('/developer-ccdv');
   };
 
   return (
@@ -126,93 +137,6 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
 
             {/* Grid of modes */}
             <SimpleGrid columns={[1, 2, 4]} gap={5}>
-              {/* Review Resources card — links to /sources */}
-              <motion.div
-                key="review-resources"
-                variants={itemVariants}
-                style={{ display: 'flex', width: '100%' }}
-              >
-                <Link
-                  as={NextLink}
-                  href="/sources"
-                  w="100%"
-                  border="2px solid"
-                  borderColor="rgba(255, 255, 255, 0.35)"
-                  bg="rgba(255, 255, 255, 0.45)"
-                  backdropFilter="blur(12px)"
-                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
-                  borderRadius="xl"
-                  p={5}
-                  textAlign="left"
-                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
-                  _hover={{
-                    borderColor: 'brand.400',
-                    bg: 'rgba(255, 255, 255, 0.65)',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)',
-                    textDecoration: 'none'
-                  }}
-                  display="flex"
-                  flexDirection="column"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <VStack gap={4} align="stretch" h="100%">
-                    <HStack justify="space-between" align="center">
-                      <Box
-                        p={2.5}
-                        borderRadius="lg"
-                        bg="rgba(217, 119, 87, 0.08)"
-                        border="1px solid"
-                        borderColor="rgba(217, 119, 87, 0.16)"
-                        color="brand.700"
-                        transition="all 0.2s"
-                        _dark={{
-                          bg: 'rgba(217, 119, 87, 0.15)',
-                          borderColor: 'rgba(255, 255, 255, 0.12)',
-                          color: 'brand.300'
-                        }}
-                      >
-                        {SVG_ICONS.BOOK}
-                      </Box>
-                    </HStack>
-
-                    <Box>
-                      <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
-                        Review Resources
-                      </Heading>
-                      <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
-                        Access curated study materials, official docs, and community guides.
-                      </Text>
-                    </Box>
-
-                    <VStack gap={2} align="stretch" pt={3} borderTop="1px solid" borderColor="border">
-                      {['Official study guides', 'API documentation', 'Community resources', 'Exam tips & strategy'].map((f) => (
-                        <HStack key={f} gap={2} align="center">
-                          <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
-                          <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
-                        </HStack>
-                      ))}
-                    </VStack>
-
-                    <Button
-                      mt="auto"
-                      w="100%"
-                      size="sm"
-                      colorPalette="brand"
-                      bg="brand.600"
-                      color="white"
-                      fontWeight={700}
-                      borderRadius="lg"
-                      _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
-                      transition="all 0.2s"
-                    >
-                      Browse Resources
-                    </Button>
-                  </VStack>
-                </Link>
-              </motion.div>
-
               {MODES.map((mode) => {
                 const isSelected = selectedMode === mode.id;
                 return (
@@ -455,6 +379,91 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                 </Box>
               </motion.div>
 
+              {/* Developer Practice card */}
+              <motion.div
+                key="developer-practice"
+                variants={itemVariants}
+                style={{ display: 'flex', width: '100%' }}
+              >
+                <Box
+                  w="100%"
+                  border="2px solid"
+                  borderColor="rgba(255, 255, 255, 0.35)"
+                  bg="rgba(255, 255, 255, 0.45)"
+                  backdropFilter="blur(12px)"
+                  _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }}
+                  borderRadius="xl"
+                  p={5}
+                  textAlign="left"
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                  _hover={{
+                    borderColor: 'brand.400',
+                    bg: 'rgba(255, 255, 255, 0.65)',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 12px 40px 0 rgba(217, 119, 87, 0.12)',
+                  }}
+                  display="flex"
+                  flexDirection="column"
+                >
+                  <VStack gap={4} align="stretch" h="100%">
+                    <HStack justify="space-between" align="center">
+                      <Box
+                        p={2.5}
+                        borderRadius="lg"
+                        bg="rgba(217, 119, 87, 0.08)"
+                        border="1px solid"
+                        borderColor="rgba(217, 119, 87, 0.16)"
+                        color="brand.700"
+                        transition="all 0.2s"
+                        _dark={{
+                          bg: 'rgba(217, 119, 87, 0.15)',
+                          borderColor: 'rgba(255, 255, 255, 0.12)',
+                          color: 'brand.300'
+                        }}
+                      >
+                        {SVG_ICONS.CODE}
+                      </Box>
+                    </HStack>
+
+                    <Box>
+                      <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={1.5}>
+                        Developer Practice (CCDV-F)
+                      </Heading>
+                      <Text fontSize="xs" color="gray.500" lineHeight={1.6} minH="50px">
+                        53 questions per attempt, randomly drawn from a 100-question bank covering the Claude Certified Developer – Foundations blueprint.
+                      </Text>
+                    </Box>
+
+                    <VStack gap={2} align="stretch" pt={3} borderTop="1px solid" borderColor="border">
+                      {['53 of 100 questions', 'All 8 domains', 'Select-two & select-three', 'Sourced explanations'].map((f) => (
+                        <HStack key={f} gap={2} align="center">
+                          <Box w={1.5} h={1.5} borderRadius="full" bg="accent.500" />
+                          <Text fontSize="11px" fontWeight={500} color="gray.600">{f}</Text>
+                        </HStack>
+                      ))}
+                    </VStack>
+
+                    <VStack mt="auto" gap={2} align="stretch">
+                      <Button
+                        w="100%"
+                        size="sm"
+                        colorPalette="brand"
+                        bg="brand.600"
+                        color="white"
+                        fontWeight={700}
+                        borderRadius="lg"
+                        _hover={{ bg: 'brand.700!', transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(193,95,60,0.35)' }}
+                        transition="all 0.2s"
+                        onClick={() => setShowDeveloperWarning(true)}
+                      >
+                        Start Developer Practice
+                      </Button>
+                    </VStack>
+                  </VStack>
+                </Box>
+              </motion.div>
+
               {/* Professional Exam Practice card */}
               <motion.div
                 key="professional-practice"
@@ -544,7 +553,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
             <motion.div variants={itemVariants}>
               <Box mt={4} p={5} bg="rgba(255, 255, 255, 0.45)" backdropFilter="blur(12px)" _dark={{ bg: "rgba(35, 33, 32, 0.45)", borderColor: "rgba(255, 255, 255, 0.08)", _hover: { bg: "rgba(50, 47, 45, 0.75)", borderColor: "brand.400" } }} border="1px solid" borderColor="rgba(255, 255, 255, 0.35)" borderRadius="xl">
                 <Text fontSize="xs" color="gray.500" textAlign="justify" lineHeight="tall">
-                  <strong>Disclaimer:</strong> This Claude Certified Architect Reviewer is an independent educational initiative created by Kenshin Juanico &amp; Precious Manucom from the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
+                  <strong>Disclaimer:</strong> This Claude Certified Exams Reviewer is an independent educational initiative created by Kenshin Juanico &amp; Precious Manucom from the DEVCON Jumpstart AI Engineering Interns based on public resources, Reddit community reviews, and official study guides. It is not affiliated with, endorsed by, or connected to Anthropic PBC or Skilljar, and it strictly adheres to non-disclosure policies by not reproducing actual live exam questions. Because AI technologies and certification requirements evolve rapidly, this material is intended solely for preparatory study and does not guarantee exam success; users must always verify the latest exam domains, updates, and training modules directly by visiting the official portal at <Link href="https://anthropic.skilljar.com/" target="_blank" rel="noopener noreferrer" color="brand.500" textDecoration="underline">https://anthropic.skilljar.com/</Link>.
                 </Text>
               </Box>
             </motion.div>
@@ -679,6 +688,75 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                     Cancel
                   </Button>
                   <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={beginProfessionalPractice} fontWeight={700}>
+                    I Understand — Start
+                  </Button>
+                </HStack>
+              </Box>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Developer Practice rules warning, shown before the session starts */}
+      <AnimatePresence>
+        {showDeveloperWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(10,14,40,0.72)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '24px',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 16 }}
+              transition={{ duration: 0.22 }}
+              style={{ width: '100%', maxWidth: '480px' }}
+            >
+              <Box
+                bg="rgba(255,255,255,0.97)"
+                _dark={{ bg: 'rgba(23,21,20,0.98)' }}
+                borderRadius="2xl"
+                border="1px solid rgba(255,255,255,0.35)"
+                boxShadow="0 24px 64px rgba(10,14,40,0.35)"
+                overflow="hidden"
+                p={[6, 7]}
+              >
+                <Heading size="md" fontWeight={800} color="brand.700" mb={1} _dark={{ color: 'gray.100' }}>
+                  Before you start
+                </Heading>
+                <Text fontSize="sm" color="gray.500" mb={5}>
+                  Developer Practice (CCDV-F) enforces a few rules to make your score mean something:
+                </Text>
+                <VStack align="stretch" gap={3} mb={6}>
+                  {[
+                    'This runs in fullscreen. Leaving fullscreen wipes your answers and restarts you from Question 1.',
+                    'Switching tabs, alt-tabbing, or leaving fullscreen wipes your answers and restarts you from Question 1 -- same as leaving fullscreen. Taking a screenshot triggers a warning banner instead.',
+                    'Some questions are multi-select ("Select TWO" or "Select THREE") -- pick exactly that many, then hit Confirm Selection to lock it in. Once the quota is checked, the rest close until you uncheck one. Single-answer questions lock the moment you click.',
+                    'Each question has a 75s time limit. When it runs out, the question is skipped automatically, answered or not.',
+                    'Each attempt draws 53 of the 100 questions in the bank at random, so no two attempts are identical.',
+                    'The review screen hides answer options and correct answers for anything you skip -- you only see what you actually attempted.',
+                  ].map((line, i) => (
+                    <HStack key={i} align="flex-start" gap={2.5}>
+                      <Box w="6px" h="6px" borderRadius="full" bg="brand.500" mt="7px" flexShrink={0} />
+                      <Text fontSize="sm" color="gray.700" _dark={{ color: 'gray.300' }} lineHeight={1.5}>
+                        {line}
+                      </Text>
+                    </HStack>
+                  ))}
+                </VStack>
+                <HStack justify="flex-end" gap={3} pt={4} borderTop="1px solid" borderColor="rgba(0,0,0,0.06)" _dark={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                  <Button variant="outline" size="sm" onClick={() => setShowDeveloperWarning(false)} fontWeight={600} color="gray.700" _dark={{ color: 'gray.300' }}>
+                    Cancel
+                  </Button>
+                  <Button bg="brand.600" color="white" _hover={{ bg: 'brand.700' }} size="sm" onClick={beginDeveloperPractice} fontWeight={700}>
                     I Understand — Start
                   </Button>
                 </HStack>

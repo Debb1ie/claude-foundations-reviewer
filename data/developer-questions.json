@@ -1,0 +1,1817 @@
+[
+  {
+    "id": "ccdv-001",
+    "number": 1,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "A team must run the same fixed sequence of three deterministic steps for every input, with no branching or dynamic decision-making. Which approach best fits?",
+    "options": [
+      "An autonomous agent that decides each step at runtime",
+      "A predefined workflow that chains the three steps",
+      "A single prompt asking the model to guess the steps",
+      "A manager agent supervising three subagents"
+    ],
+    "correctAnswer": 1,
+    "explanation": "A workflow chains a fixed, predefined sequence of steps -- exactly what's needed when the steps never branch or change. An agent is the wrong tool here because it introduces runtime decision-making that this task doesn't need or benefit from; the other two options either skip structure entirely or add unnecessary coordination overhead.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Workflows are systems where LLMs and tools are orchestrated through predefined code paths.",
+    "sourceHighlight": "predefined code paths"
+  },
+  {
+    "id": "ccdv-002",
+    "number": 2,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "What most clearly distinguishes an agent from a workflow?",
+    "options": [
+      "Agents are always cheaper to run",
+      "Agents dynamically direct their own process and tool use, while workflows follow predefined paths",
+      "Workflows can call tools but agents cannot",
+      "Agents never use the Claude API"
+    ],
+    "correctAnswer": 1,
+    "explanation": "The defining line is who controls the path: a workflow follows a path a developer wrote in advance, while an agent decides its own steps and tool calls as it goes based on what it observes. Cost, tool access, and API usage are not what separates the two categories.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Agents, on the other hand, are systems where LLMs dynamically direct their own processes and tool usage, maintaining control over how they accomplish tasks.",
+    "sourceHighlight": "dynamically direct their own processes and tool usage"
+  },
+  {
+    "id": "ccdv-003",
+    "number": 3,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "In a manager/supervisor hierarchy, what is the primary role of the manager agent?",
+    "options": [
+      "To execute every low-level tool call itself",
+      "To decompose the task and delegate subtasks to subagents, then synthesize results",
+      "To replace the need for any subagents",
+      "To store the entire conversation in a database"
+    ],
+    "correctAnswer": 1,
+    "explanation": "The manager's job is orchestration, not execution: break the task apart, hand pieces to subagents suited to each piece, and combine what comes back into a final result. It deliberately avoids doing every low-level step itself, and the pattern only works because subagents exist to receive the delegated work.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "The lead agent... analyzes the query, develops a strategy, and spawns subagents to explore different aspects of the question in parallel.",
+    "sourceHighlight": "spawns subagents to explore different aspects"
+  },
+  {
+    "id": "ccdv-004",
+    "number": 4,
+    "domain": "agents-workflows",
+    "type": "multi",
+    "text": "Why might subagents improve task execution on a complex, multi-part problem?",
+    "options": [
+      "They isolate context so each subagent focuses on a narrower task",
+      "They guarantee deterministic output every time",
+      "They allow parallel or specialized handling of subtasks",
+      "They eliminate the need for prompt engineering"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Subagents help in two concrete ways: each one carries only the context relevant to its own slice of the problem, and separate subagents can work on separate subtasks at the same time or with different specializations. Neither benefit implies deterministic output, and good prompt engineering still matters for every subagent.",
+    "correctAnswers": [
+      0,
+      2
+    ],
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Each subagent operates independently... this parallelization... provides each agent with its own context window.",
+    "sourceHighlight": "provides each agent with its own context window"
+  },
+  {
+    "id": "ccdv-005",
+    "number": 5,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "Which is a valid reason to choose a workflow over an agent?",
+    "options": [
+      "The task requires open-ended, unpredictable reasoning",
+      "The steps are well-defined, predictable, and benefit from reliability and lower cost",
+      "You want the model to invent new steps at runtime",
+      "You need maximum non-determinism"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Workflows earn their keep when the steps are already known and stable, trading the flexibility of an agent for predictability and lower per-run cost. Open-ended reasoning, runtime step invention, and maximizing non-determinism are exactly the situations that argue for an agent instead.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Workflows offer more predictability and consistency for well-defined tasks",
+    "sourceHighlight": "more predictability and consistency for well-defined tasks"
+  },
+  {
+    "id": "ccdv-006",
+    "number": 6,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "The Claude Agent SDK is best described as a tool for:",
+    "options": [
+      "Rendering front-end UI components",
+      "Building agents with built-in support for agent loops, tool use, and context management",
+      "Fine-tuning custom base models",
+      "Replacing the need for the Messages API entirely"
+    ],
+    "correctAnswer": 1,
+    "explanation": "The Agent SDK packages up the infrastructure that most agents need anyway -- running the tool-use loop, managing context, handling permissions -- so developers don't rebuild it from scratch. It sits on top of the Messages API rather than replacing it, and has nothing to do with UI rendering or fine-tuning.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/claude-agent-sdk/overview",
+    "sourceLabel": "Claude Docs: Agent SDK Overview",
+    "sourceExcerpt": "The Claude Agent SDK provides the same infrastructure that powers Claude Code, giving you the tools to build your own AI agents.",
+    "sourceHighlight": "the same infrastructure that powers Claude Code"
+  },
+  {
+    "id": "ccdv-007",
+    "number": 7,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "What is a \"custom agent loop / harness\" in the context of Claude agents?",
+    "options": [
+      "A hardware device for running models locally",
+      "Application code that repeatedly calls the model, executes returned tool calls, and feeds results back until the task completes",
+      "A billing mechanism for token usage",
+      "A type of guardrail that blocks all tool calls"
+    ],
+    "correctAnswer": 1,
+    "explanation": "A harness is ordinary application code: it sends a request, checks whether the response asks for a tool, runs that tool, sends the result back, and repeats until the model signals it's done. It's not hardware, a billing construct, or a guardrail -- it's the orchestration loop itself.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+    "sourceLabel": "Claude Docs: Tool Use Overview",
+    "sourceExcerpt": "The basic tool use workflow: Claude decides to use a tool, your application runs the tool, and returns the result to Claude to continue.",
+    "sourceHighlight": "your application runs the tool"
+  },
+  {
+    "id": "ccdv-008",
+    "number": 8,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "A team wants Anthropic to manage the infrastructure that runs their agent rather than hosting it themselves. This is an example of choosing:",
+    "options": [
+      "A self-hosted deployment",
+      "An Anthropic-hosted / managed agent deployment model",
+      "A batch-only deployment",
+      "A stdio transport"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Letting Anthropic run the hosting infrastructure -- instead of the team standing up and maintaining their own servers -- is precisely what a managed, Anthropic-hosted deployment model means. It's a deployment-model choice, unrelated to batch processing or the stdio transport mechanism."
+  },
+  {
+    "id": "ccdv-009",
+    "number": 9,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "Hooks in an agent are primarily used to:",
+    "options": [
+      "Introduce randomness into responses",
+      "Trigger deterministic actions at defined points in the agent lifecycle (e.g., before a tool runs)",
+      "Increase the context window size",
+      "Replace the system prompt"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Hooks fire reliably at fixed points in the lifecycle -- for example, right before a tool executes -- so you can run deterministic checks or side effects at exactly that moment. They don't touch context window size, add randomness, or take the place of a system prompt.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks-guide",
+    "sourceLabel": "Claude Code Docs: Hooks Guide",
+    "sourceExcerpt": "Hooks provide deterministic control over Claude Code’s behavior, ensuring certain actions always happen rather than relying on the LLM to choose to run them.",
+    "sourceHighlight": "deterministic control"
+  },
+  {
+    "id": "ccdv-010",
+    "number": 10,
+    "domain": "agents-workflows",
+    "type": "multi",
+    "text": "Which are commonly cited agentic frameworks/abstractions for building agents and workflows?",
+    "options": [
+      "LangGraph",
+      "PydanticAI",
+      "Strands",
+      "Photoshop"
+    ],
+    "correctAnswer": 0,
+    "explanation": "LangGraph, PydanticAI, and Strands are all real frameworks/abstractions built specifically for constructing agents and multi-step workflows around LLMs. Photoshop is an image-editing application with no relationship to agent orchestration.",
+    "correctAnswers": [
+      0,
+      1,
+      2
+    ],
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Frameworks like LangGraph... or... Amazon Bedrock’s AI Agent framework... make these patterns easier to implement",
+    "sourceHighlight": "frameworks... make these patterns easier to implement"
+  },
+  {
+    "id": "ccdv-011",
+    "number": 11,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "A \"tool-use loop\" pattern refers to:",
+    "options": [
+      "A loop where the model requests a tool, the harness executes it, and the result is returned for the next step",
+      "A UI animation loop",
+      "A loop that only runs during batch processing",
+      "A method of pinning model versions"
+    ],
+    "correctAnswer": 0,
+    "explanation": "This is the core mechanic behind every agent: the model asks for a tool, application code actually runs it, and the result goes back to the model so it can decide what to do next. It has nothing to do with UI animation, batch-only processing, or version pinning.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use",
+    "sourceLabel": "Claude Docs: Implement Tool Use",
+    "sourceExcerpt": "Claude may use multiple tools to complete a task... continue the conversation by sending another request with the tool result included.",
+    "sourceHighlight": "continue the conversation by sending another request with the tool result"
+  },
+  {
+    "id": "ccdv-012",
+    "number": 12,
+    "domain": "agents-workflows",
+    "type": "multi",
+    "text": "Context-window management is important in long-running agents because:",
+    "options": [
+      "Accumulated tool output and history can exceed or bloat the context window",
+      "Larger context always improves accuracy with no downside",
+      "Unmanaged context can raise cost and degrade performance (context drift)",
+      "Context windows never fill up in practice"
+    ],
+    "correctAnswer": 0,
+    "explanation": "As an agent runs longer, tool results and history pile up and can genuinely overflow the window -- and even before that happens, too much accumulated context raises cost and can degrade the model's focus (context drift). More context is not a free lunch, and windows absolutely do fill up in real long-running agents.",
+    "correctAnswers": [
+      0,
+      2
+    ],
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "As context grows... models can experience “context rot”... the model’s attention budget is a scarce resource.",
+    "sourceHighlight": "context rot"
+  },
+  {
+    "id": "ccdv-013",
+    "number": 13,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "Which scenario most justifies an autonomous agent rather than a fixed workflow?",
+    "options": [
+      "Converting a CSV to JSON with a known schema every time",
+      "Investigating a bug where the required steps vary and must be decided based on intermediate findings",
+      "Sending a templated email to a list",
+      "Rounding numbers in a spreadsheet"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Bug investigation is inherently unpredictable: what to check next depends entirely on what you find at each step, which is exactly the open-ended decision-making an agent is built for. The other three tasks all follow the same fixed steps every time, which is what a workflow is for.",
+    "sourceUrl": "https://www.anthropic.com/engineering/building-effective-agents",
+    "sourceLabel": "Anthropic Engineering: Building Effective Agents",
+    "sourceExcerpt": "Agents are used for open-ended problems where it’s difficult or impossible to predict the required number of steps",
+    "sourceHighlight": "difficult or impossible to predict the required number of steps"
+  },
+  {
+    "id": "ccdv-014",
+    "number": 14,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "A \"memory\" pattern in agents typically refers to:",
+    "options": [
+      "GPU RAM allocation",
+      "Mechanisms that persist relevant information across steps or sessions so the agent can reference it later",
+      "A way to disable tool use",
+      "The model’s training data"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Memory here means something the agent (or its harness) writes down and can pull back up later -- across turns or even across sessions -- so it doesn't have to rediscover the same facts repeatedly. It's unrelated to GPU hardware, disabling tools, or the static data a model was trained on.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Agentic memory... a file that persists information, learnings, and progress outside of the context window across contexts and sessions.",
+    "sourceHighlight": "persists information... across contexts and sessions"
+  },
+  {
+    "id": "ccdv-015",
+    "number": 15,
+    "domain": "agents-workflows",
+    "type": "single",
+    "text": "When designing a multi-agent system, a key tradeoff of adding more subagents is:",
+    "options": [
+      "It always reduces total token usage",
+      "Increased coordination overhead and complexity versus better task specialization",
+      "It removes the need for evaluation",
+      "It guarantees faster responses"
+    ],
+    "correctAnswer": 1,
+    "explanation": "More subagents can mean better specialization per subtask, but that benefit is bought with real coordination overhead -- more moving parts to synchronize and more complexity to manage. It doesn't automatically cut token usage, speed things up, or remove the need to evaluate the system.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Multi-agent systems... use about 15x more tokens than chat interactions... this requires tasks that are worth the additional overhead",
+    "sourceHighlight": "15x more tokens"
+  },
+  {
+    "id": "ccdv-016",
+    "number": 16,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "A developer must process 10,000 documents overnight for a non-urgent report where cost is the priority and results are needed by morning. Which approach best fits?",
+    "options": [
+      "Send every request synchronously in parallel to finish fastest",
+      "Use the Message Batches API for latency-tolerant, high-volume workloads at reduced cost",
+      "Lower max_tokens on synchronous calls",
+      "Switch to the smallest model regardless of quality"
+    ],
+    "correctAnswer": 1,
+    "explanation": "This is exactly what batch processing is for: a large volume of work with no urgency, where trading latency for a lower per-request cost is a clear win. Firing everything synchronously in parallel optimizes for speed nobody asked for, and shrinking max_tokens or downgrading the model doesn't address the actual cost/latency tradeoff being made.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "sourceLabel": "Claude Docs: Batch Processing",
+    "sourceExcerpt": "The Message Batches API is a powerful, cost-effective way to asynchronously process large volumes of Messages requests.",
+    "sourceHighlight": "cost-effective way to asynchronously process large volumes"
+  },
+  {
+    "id": "ccdv-017",
+    "number": 17,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which statement about the Messages API stream parameter is correct?",
+    "options": [
+      "Streaming returns the full response only after generation completes",
+      "Streaming emits incremental events as tokens are generated, improving perceived latency",
+      "Streaming disables tool use",
+      "Streaming is only available in batch mode"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Streaming sends events as the model produces them, so the caller can start showing output before generation finishes -- that's the whole point, improving how fast the response feels. It works fine alongside tool use and is a realtime-API feature, not a batch-mode one.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/streaming",
+    "sourceLabel": "Claude Docs: Streaming Messages",
+    "sourceExcerpt": "Streaming allows you to receive the response as a series of Server-Sent Events... as they become available.",
+    "sourceHighlight": "as they become available"
+  },
+  {
+    "id": "ccdv-018",
+    "number": 18,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "In the Messages API, the system parameter is used to:",
+    "options": [
+      "Provide top-level instructions and role/context that guide model behavior",
+      "Store the final assistant answer",
+      "Define billing limits",
+      "Terminate the connection"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The system parameter is where you set persistent, top-level guidance -- the role, tone, and constraints the model should follow throughout the conversation. It plays no part in storing the eventual answer, setting billing limits, or ending a connection.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/messages",
+    "sourceLabel": "Claude Docs: Messages API",
+    "sourceExcerpt": "system -- A system prompt is a way of providing context and instructions to Claude.",
+    "sourceHighlight": "context and instructions to Claude"
+  },
+  {
+    "id": "ccdv-019",
+    "number": 19,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "What is the correct structure of a multi-turn conversation sent to the Messages API?",
+    "options": [
+      "A single string containing all turns",
+      "An array of message objects alternating user and assistant roles",
+      "Only the most recent user message; the API remembers prior turns automatically",
+      "A JSON object keyed by timestamps"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Every call sends the full conversation as an ordered array of role-tagged message objects, alternating user and assistant. There's no single flattened string and no timestamp-keyed structure, and critically the API does not remember anything on its own -- see the next question.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/messages",
+    "sourceLabel": "Claude Docs: Messages API",
+    "sourceExcerpt": "messages -- Input messages... Each input message must be an object with a role and content.",
+    "sourceHighlight": "an object with a role and content"
+  },
+  {
+    "id": "ccdv-020",
+    "number": 20,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "The Messages API is fundamentally stateless. What does this imply for a chat application?",
+    "options": [
+      "The application must resend relevant conversation history on each request",
+      "The API stores all prior turns server-side indefinitely",
+      "Streaming cannot be used",
+      "Tokens are never counted"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Because the API keeps no memory between calls, the calling application is responsible for resending whatever prior turns are relevant on every single request. Nothing here is stored server-side by default, and statelessness has no bearing on whether streaming works or how tokens are counted.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/messages",
+    "sourceLabel": "Claude Docs: Messages API",
+    "sourceExcerpt": "The Messages API is stateless... you must include the full conversation history in each request.",
+    "sourceHighlight": "you must include the full conversation history in each request"
+  },
+  {
+    "id": "ccdv-021",
+    "number": 21,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "Which is an appropriate use of the batch API rather than realtime calls?",
+    "options": [
+      "A live customer-facing chatbot needing sub-second responses",
+      "Bulk classification of a large backlog of records",
+      "Overnight enrichment of a dataset where latency is tolerable",
+      "An interactive coding assistant"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Batch processing is the right tool when there is a lot of work and no one waiting on an immediate answer -- a large backlog to classify, or an overnight enrichment job. A live chatbot and an interactive coding assistant both need realtime, sub-second turnaround, which batch cannot provide.",
+    "correctAnswers": [
+      1,
+      2
+    ],
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "sourceLabel": "Claude Docs: Batch Processing",
+    "sourceExcerpt": "Batch processing is a great fit for... large-scale evaluations... and other bulk tasks that don’t require immediate responses.",
+    "sourceHighlight": "don't require immediate responses"
+  },
+  {
+    "id": "ccdv-022",
+    "number": 22,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Prompt caching primarily helps by:",
+    "options": [
+      "Reducing latency and cost when a large, stable prefix (e.g., long system prompt or documents) is reused across requests",
+      "Permanently storing user PII",
+      "Increasing the maximum context window",
+      "Eliminating the need for tokens"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Prompt caching pays off specifically when a large chunk of the prompt -- a long system prompt or reference document -- stays identical across many calls, letting the API skip reprocessing it and cutting both latency and cost. It doesn't touch PII storage, expand the context window, or make tokens go away.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+    "sourceLabel": "Claude Docs: Prompt Caching",
+    "sourceExcerpt": "Prompt caching allows you to resume from specific prefixes in your prompt... reducing processing time and costs for repetitive tasks.",
+    "sourceHighlight": "reducing processing time and costs"
+  },
+  {
+    "id": "ccdv-023",
+    "number": 23,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Claude's vision capability allows the model to:",
+    "options": [
+      "Generate images from text",
+      "Accept and reason over image inputs alongside text",
+      "Stream audio",
+      "Render 3D models"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Vision is an input capability: Claude can look at an image you send it and reason about it together with any accompanying text. It does not generate images, stream audio, or render 3D content -- those are different capabilities entirely.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/vision",
+    "sourceLabel": "Claude Docs: Vision",
+    "sourceExcerpt": "Claude can read both text and images in requests",
+    "sourceHighlight": "read both text and images in requests"
+  },
+  {
+    "id": "ccdv-024",
+    "number": 24,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "\"Extended thinking\" (or thinking) in Claude refers to:",
+    "options": [
+      "A mode where the model performs additional internal reasoning before answering, improving performance on complex tasks",
+      "A way to disable the model",
+      "A billing tier only",
+      "A method to reduce context window size"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Extended thinking gives the model room to work through a problem internally before producing its final answer, which tends to help most on harder, multi-step tasks. It is a reasoning feature, not a way to disable the model, a billing tier by itself, or a context-window trick.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking",
+    "sourceLabel": "Claude Docs: Extended Thinking",
+    "sourceExcerpt": "Extended thinking gives Claude enhanced reasoning capabilities... by giving it space to work through a problem",
+    "sourceHighlight": "space to work through a problem"
+  },
+  {
+    "id": "ccdv-025",
+    "number": 25,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "A developer wants to call Claude but their organization standardizes on a third-party cloud vendor. Which is true?",
+    "options": [
+      "Claude can only be accessed through Anthropic's first-party API",
+      "Claude is available through third-party platforms (e.g., cloud provider marketplaces), and integration mechanics may differ slightly",
+      "Third-party access disables all tools",
+      "Third-party access requires no authentication"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Claude is genuinely available through third-party cloud marketplaces in addition to Anthropic's own API, though the exact integration details (auth, request shape) vary slightly by platform. It's not first-party-only, tool use isn't disabled on those platforms, and authentication is still required.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/overview",
+    "sourceLabel": "Claude Docs: API Overview",
+    "sourceExcerpt": "Claude is also available... through Amazon Bedrock, Google Cloud Vertex AI, and Microsoft Foundry.",
+    "sourceHighlight": "Amazon Bedrock, Google Cloud Vertex AI, and Microsoft Foundry"
+  },
+  {
+    "id": "ccdv-026",
+    "number": 26,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which HTTP method and pattern typify a REST API call to create a resource?",
+    "options": [
+      "GET to retrieve, POST to create",
+      "POST to retrieve, GET to create",
+      "DELETE to create",
+      "PUT is the only valid method"
+    ],
+    "correctAnswer": 0,
+    "explanation": "By REST convention, GET fetches an existing resource and POST creates a new one -- the reverse pairing, or trying to use DELETE to create something, breaks the standard semantics every REST client expects. PUT can update or create-with-a-known-id in some designs, but it is not the only valid method for creation."
+  },
+  {
+    "id": "ccdv-027",
+    "number": 27,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Idempotency in an API request means:",
+    "options": [
+      "Making the same request multiple times has the same effect as making it once",
+      "The request always fails",
+      "The request cannot be retried",
+      "The response is always cached"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Idempotency means repeating the exact same request doesn't pile up extra side effects -- one call or five calls end up in the same state. It says nothing about the request always failing, being unretryable, or the response being cached."
+  },
+  {
+    "id": "ccdv-028",
+    "number": 28,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "When handling a 429 (rate limit) response, a robust client should:",
+    "options": [
+      "Immediately retry in a tight loop with no delay",
+      "Retry with exponential backoff and jitter, respecting any Retry-After header",
+      "Crash the process",
+      "Switch to synchronous-only mode permanently"
+    ],
+    "correctAnswer": 1,
+    "explanation": "The standard, well-behaved response to a rate limit is to back off exponentially, add jitter to avoid synchronized retries, and honor any Retry-After header the server sends. Retrying instantly in a loop only makes the rate-limiting worse, and crashing or permanently changing modes is a wildly disproportionate reaction to a transient condition.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/rate-limits",
+    "sourceLabel": "Claude Docs: Rate Limits",
+    "sourceExcerpt": "We recommend using... a retry mechanism with exponential backoff to handle 429 errors gracefully.",
+    "sourceHighlight": "retry mechanism with exponential backoff"
+  },
+  {
+    "id": "ccdv-029",
+    "number": 29,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "Asynchronous programming is valuable when integrating Claude because:",
+    "options": [
+      "It lets an application issue and await many I/O-bound API calls concurrently",
+      "It guarantees the model is deterministic",
+      "It improves throughput for I/O-bound workloads without blocking threads",
+      "It removes the need for error handling"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Async I/O lets an application fire off many API calls at once and keep working instead of blocking a thread on each one, which is a genuine throughput win for I/O-bound work like API calls. It has no bearing on the model's determinism and does not let you skip error handling.",
+    "correctAnswers": [
+      0,
+      2
+    ]
+  },
+  {
+    "id": "ccdv-030",
+    "number": 30,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which is a best practice for handling API errors from Claude?",
+    "options": [
+      "Distinguish retryable (e.g., 429, 529) from non-retryable (e.g., 400) errors and handle accordingly",
+      "Treat all errors as fatal",
+      "Ignore all 4xx errors",
+      "Retry 400 validation errors indefinitely"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Sound error handling treats transient errors (rate limits, overload) as worth retrying and structural ones (a malformed request) as something to fix in code, not hammer with retries. Treating everything as fatal, ignoring 4xx wholesale, or retrying a validation error forever all mishandle the distinction.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/errors",
+    "sourceLabel": "Claude Docs: Errors",
+    "sourceExcerpt": "Some errors... are retryable... Other errors... are not likely to succeed on retry.",
+    "sourceHighlight": "are retryable... are not likely to succeed on retry"
+  },
+  {
+    "id": "ccdv-031",
+    "number": 31,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "JSON is commonly used as the request/response format for Claude integrations because:",
+    "options": [
+      "It is a lightweight, language-agnostic, structured data-interchange format",
+      "It cannot represent nested data",
+      "It is only supported in Python",
+      "It requires no parsing"
+    ],
+    "correctAnswer": 0,
+    "explanation": "JSON is popular precisely because it's compact, works the same way regardless of which language reads or writes it, and naturally represents structured/nested data. The other options describe things JSON explicitly is not -- it does need parsing, does support nesting, and is used far beyond Python."
+  },
+  {
+    "id": "ccdv-032",
+    "number": 32,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "Version control (e.g., Git) in a Claude application project is important for:",
+    "options": [
+      "Tracking changes to prompts, code, and configuration over time",
+      "Guaranteeing model determinism",
+      "Enabling collaboration, review, and rollback",
+      "Increasing the context window"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Version control gives you a durable history of how prompts, code, and config evolved, and it's what makes real collaboration, code review, and safe rollback possible. It has no effect on the model's determinism or the size of the context window -- those are unrelated concerns.",
+    "correctAnswers": [
+      0,
+      2
+    ]
+  },
+  {
+    "id": "ccdv-033",
+    "number": 33,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "\"Prompt versioning\" refers to:",
+    "options": [
+      "Storing and tracking iterations of prompts so changes are reproducible and revertible",
+      "Compressing prompts to save tokens automatically",
+      "Randomizing prompts each run",
+      "Deleting old prompts permanently"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Prompt versioning is about keeping a traceable history of how a prompt changed over time, so any given result can be tied back to the exact prompt that produced it and reverted if needed. It has nothing to do with automatic compression, randomization, or permanently discarding old versions."
+  },
+  {
+    "id": "ccdv-034",
+    "number": 34,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Why pin a specific model version (e.g., a dated model string) in production?",
+    "options": [
+      "To avoid unexpected behavior changes when Anthropic releases updated models",
+      "To make the model slower",
+      "To disable caching",
+      "To force batch mode"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Pinning a dated model string means your production behavior stays stable and predictable even after Anthropic ships a newer model -- you upgrade on your own schedule rather than being surprised by a silent behavior shift. It has no effect on speed, caching, or batch mode.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "We recommend using... snapshot versions in production applications to ensure consistent behavior.",
+    "sourceHighlight": "ensure consistent behavior"
+  },
+  {
+    "id": "ccdv-035",
+    "number": 35,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which is a valid reason to build a small refactor into an existing Claude integration?",
+    "options": [
+      "To extract duplicated API-call logic into a reusable client wrapper",
+      "To increase code duplication",
+      "To remove all error handling",
+      "To hard-code secrets in source"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Pulling repeated API-call logic into one shared wrapper is a textbook, low-risk refactor that reduces duplication and centralizes future fixes. The other three options each make the codebase measurably worse, which is the opposite of what a refactor is for."
+  },
+  {
+    "id": "ccdv-036",
+    "number": 36,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "How does Claude interpret instructions differently across interfaces such as Claude Code, the API, and claude.ai?",
+    "options": [
+      "Behavior and available context (system prompts, tools, files) differ by interface, so instruction design must account for the environment",
+      "All interfaces behave identically in every respect",
+      "Only claude.ai supports instructions",
+      "The API cannot receive instructions"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Each interface wraps the model with a different environment -- different default system prompts, different tool access, different file/context handling -- so the same instructions can play out differently depending on where they're given. None of the interfaces are identical, and the API absolutely does accept instructions via the system parameter."
+  },
+  {
+    "id": "ccdv-037",
+    "number": 37,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "\"Session hygiene\" in a Claude application refers to:",
+    "options": [
+      "Managing conversation/session state cleanly—clearing, scoping, or resetting context to prevent leakage or bloat",
+      "Cleaning the physical server",
+      "Deleting the user’s account",
+      "Encrypting the database only"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Session hygiene is about keeping conversational state under control -- clearing it, scoping it correctly, or resetting it so unrelated information doesn't leak between sessions or accumulate into bloat. It's unrelated to physical hardware, account deletion, or encryption specifically."
+  },
+  {
+    "id": "ccdv-038",
+    "number": 38,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "Well-designed input/output schema design for a Claude integration helps by:",
+    "options": [
+      "Making structured outputs predictable and easier to validate",
+      "Guaranteeing the model never errs",
+      "Clarifying content boundaries between trusted and untrusted data",
+      "Eliminating the need for the API"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A clear schema makes what comes back predictable enough to validate mechanically, and a well-designed input schema also helps separate trusted instructions from untrusted data. No schema, however good, guarantees the model never makes a mistake, and none of this removes the need to call the API.",
+    "correctAnswers": [
+      0,
+      2
+    ]
+  },
+  {
+    "id": "ccdv-039",
+    "number": 39,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "A CLAUDE.md file is primarily used to:",
+    "options": [
+      "Provide persistent project-level instructions and context to Claude Code",
+      "Store API keys in plaintext",
+      "Define billing tiers",
+      "Replace the Messages API"
+    ],
+    "correctAnswer": 0,
+    "explanation": "CLAUDE.md is where a project's durable context lives -- conventions, architecture notes, anything Claude Code should know every time it works in that repo. It is explicitly not a place to store secrets, and it has nothing to do with billing tiers or the Messages API.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Claude Code can remember your preferences... by storing them in memory files.",
+    "sourceHighlight": "storing them in memory files"
+  },
+  {
+    "id": "ccdv-040",
+    "number": 40,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which best describes settings.json in a Claude Code project?",
+    "options": [
+      "A configuration file controlling behavior, permissions, and settings for Claude Code",
+      "A log of all API responses",
+      "The model weights",
+      "A prompt cache"
+    ],
+    "correctAnswer": 0,
+    "explanation": "settings.json is a plain configuration file -- it's where behavior, permissions, and other Claude Code settings for a project get defined. It doesn't log API responses, hold model weights, or act as a prompt cache.",
+    "sourceUrl": "https://code.claude.com/docs/en/settings",
+    "sourceLabel": "Claude Code Docs: Settings",
+    "sourceExcerpt": "settings.json is our official mechanism for configuring Claude Code through hierarchical settings files.",
+    "sourceHighlight": "official mechanism for configuring Claude Code"
+  },
+  {
+    "id": "ccdv-041",
+    "number": 41,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Understanding functional requirements before building a Claude solution means:",
+    "options": [
+      "Identifying what the system must do (behaviors, inputs, outputs) to meet business needs",
+      "Only choosing a model tier",
+      "Only estimating token cost",
+      "Ignoring stakeholders"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Functional requirements describe the actual behaviors the system needs to exhibit -- what goes in, what should come out, what it must accomplish for the business. Picking a model tier and estimating token cost are downstream implementation decisions, not requirements-gathering, and ignoring stakeholders is the opposite of good requirements work."
+  },
+  {
+    "id": "ccdv-042",
+    "number": 42,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which is an infrastructure (non-functional) requirement rather than a functional one?",
+    "options": [
+      "\"The assistant must summarize uploaded contracts\"",
+      "\"The system must handle 500 concurrent requests with 99.9% uptime\"",
+      "\"The assistant must extract party names\"",
+      "\"The assistant must output JSON\""
+    ],
+    "correctAnswer": 1,
+    "explanation": "Concurrency and uptime describe how well the system performs under load, not what it does -- that makes it a non-functional/infrastructure requirement. The other three all describe a specific behavior the assistant performs, which is the definition of a functional requirement."
+  },
+  {
+    "id": "ccdv-043",
+    "number": 43,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "In the systems life cycle, which phase focuses on keeping a deployed Claude application running well over time (patches, monitoring, updates)?",
+    "options": [
+      "Requirements gathering",
+      "Design",
+      "Operations and maintenance",
+      "Initial prototyping"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Operations and maintenance is specifically the phase concerned with a system's life after launch -- patching, monitoring, and updating it. Requirements gathering, design, and prototyping all happen earlier, before there's a running system to maintain."
+  },
+  {
+    "id": "ccdv-044",
+    "number": 44,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "A code review of a new Claude integration PR should check for:",
+    "options": [
+      "Proper error handling and retry logic",
+      "Hard-coded API keys (to remove them)",
+      "Whether the reviewer likes the model’s personality",
+      "Whether the model was trained on the reviewer’s data"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A solid review checks for real engineering concerns: does it handle and retry errors correctly, and are there any secrets accidentally hard-coded that need to come out. Whether a reviewer personally likes the model's tone, or something about the model's training data, has nothing to do with reviewing this PR's code.",
+    "correctAnswers": [
+      0,
+      1
+    ]
+  },
+  {
+    "id": "ccdv-045",
+    "number": 45,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Which is the best reason to consume Claude via an official client SDK rather than raw HTTP?",
+    "options": [
+      "SDKs wrap the REST API with typed helpers, retries, and streaming support, reducing boilerplate",
+      "SDKs bypass authentication",
+      "SDKs make the model deterministic",
+      "SDKs remove token costs"
+    ],
+    "correctAnswer": 0,
+    "explanation": "An official SDK saves you from re-implementing typed request/response handling, retry logic, and streaming support yourself -- it's the same REST API underneath, just with far less boilerplate. It doesn't bypass authentication, change the model's determinism, or make tokens free.",
+    "sourceUrl": "https://platform.claude.com/docs/en/api/client-sdks",
+    "sourceLabel": "Claude Docs: Client SDKs",
+    "sourceExcerpt": "Our client SDKs... provide convenient access to the Claude API... including built-in retry logic and streaming support.",
+    "sourceHighlight": "built-in retry logic and streaming support"
+  },
+  {
+    "id": "ccdv-046",
+    "number": 46,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "Multi-format input handling in a Claude application typically includes:",
+    "options": [
+      "Accepting text, images (vision), and documents, and normalizing them into API message content blocks",
+      "Only plain ASCII text",
+      "Only audio",
+      "Only CSV"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A well-built integration normalizes whatever it accepts -- plain text, images, PDF-style documents -- into the content-block shapes the Messages API expects. Restricting to only ASCII text, only audio, or only CSV all describe a narrower system than \"multi-format\" implies.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/vision",
+    "sourceLabel": "Claude Docs: Vision",
+    "sourceExcerpt": "You can include multiple images or a combination of images and text in a single request",
+    "sourceHighlight": "a combination of images and text"
+  },
+  {
+    "id": "ccdv-047",
+    "number": 47,
+    "domain": "apps-integration",
+    "type": "single",
+    "text": "\"Plugin management\" in the Claude ecosystem involves:",
+    "options": [
+      "Tracking, versioning, and controlling dependencies for plugins/extensions used by the application",
+      "Overclocking the CPU",
+      "Disabling all tools",
+      "Deleting the system prompt"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Plugin management is the ordinary dependency-management discipline applied to plugins/extensions: knowing which versions are in use and controlling how they get updated. It has nothing to do with CPU overclocking, disabling tools outright, or removing the system prompt.",
+    "sourceUrl": "https://code.claude.com/docs/en/plugins",
+    "sourceLabel": "Claude Code Docs: Plugins",
+    "sourceExcerpt": "Plugins let you package and share slash commands, agents, MCP servers, and hooks... manage plugin versions",
+    "sourceHighlight": "manage plugin versions"
+  },
+  {
+    "id": "ccdv-048",
+    "number": 48,
+    "domain": "apps-integration",
+    "type": "multi",
+    "text": "Which practice best supports reproducible deployments of a Claude application?",
+    "options": [
+      "Pinning model versions and prompt versions",
+      "Tracking configuration (CLAUDE.md, settings.json) in version control",
+      "Letting each environment use whatever model is newest",
+      "Storing prompts only in a developer’s memory"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Reproducibility comes from pinning both the model version and the prompt version, and from keeping configuration files under version control so every environment can be rebuilt identically. Letting each environment silently pick up whatever model is newest, or keeping prompts only in someone's head, are exactly the practices that make deployments non-reproducible.",
+    "correctAnswers": [
+      0,
+      1
+    ]
+  },
+  {
+    "id": "ccdv-049",
+    "number": 49,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "In the CLAUDE.md hierarchy, how are multiple CLAUDE.md files typically combined?",
+    "options": [
+      "Only the root file is ever read",
+      "Files at different levels (e.g., global, project, subdirectory) are layered so more specific context supplements broader context",
+      "They are ignored entirely",
+      "Only the deepest file is read, discarding all others"
+    ],
+    "correctAnswer": 1,
+    "explanation": "CLAUDE.md files at different scopes -- global, project root, subdirectory -- layer together, with the more specific file adding on top of the broader one rather than replacing it outright. It's not a single-file, winner-take-all system in either direction.",
+    "sourceUrl": "https://code.claude.com/docs/en/memory",
+    "sourceLabel": "Claude Code Docs: Memory (CLAUDE.md)",
+    "sourceExcerpt": "Claude Code reads memories recursively: starting in the current working directory... Claude also discovers CLAUDE.md files nested in subtrees",
+    "sourceHighlight": "reads memories recursively"
+  },
+  {
+    "id": "ccdv-050",
+    "number": 50,
+    "domain": "claude-code",
+    "type": "single",
+    "text": "\"Headless mode\" in Claude Code refers to:",
+    "options": [
+      "Running Claude Code non-interactively (e.g., in scripts or CI) without the interactive UI",
+      "Running without a model",
+      "Disabling all output",
+      "A mode that removes the CLAUDE.md file"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Headless mode runs Claude Code without its interactive terminal UI -- useful for scripts and CI pipelines -- while the model and its output still work normally. It doesn't remove the model, silence output, or touch CLAUDE.md.",
+    "sourceUrl": "https://code.claude.com/docs/en/cli-reference",
+    "sourceLabel": "Claude Code Docs: CLI Reference",
+    "sourceExcerpt": "claude -p... runs Claude Code in non-interactive (headless) mode",
+    "sourceHighlight": "non-interactive (headless) mode"
+  },
+  {
+    "id": "ccdv-051",
+    "number": 51,
+    "domain": "claude-code",
+    "type": "multi",
+    "text": "Which are core components or features of Claude Code?",
+    "options": [
+      "Skills",
+      "Slash commands (built-in and custom)",
+      "Session management",
+      "GPU driver installation"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Skills, slash commands, and session management are all genuine, documented Claude Code features. GPU driver installation is an unrelated system-administration task that Claude Code has no part in.",
+    "correctAnswers": [
+      0,
+      1,
+      2
+    ],
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills",
+    "sourceExcerpt": "Skills are folders containing instructions, scripts, and resources that Claude can discover and use",
+    "sourceHighlight": "Skills are folders containing instructions"
+  },
+  {
+    "id": "ccdv-052",
+    "number": 52,
+    "domain": "eval-testing-debugging",
+    "type": "single",
+    "text": "A Claude agent returns a wrong answer. Trace analysis shows the model requested the correct tool, but the tool returned malformed data. Where is the failure most likely isolated?",
+    "options": [
+      "The model's reasoning",
+      "The integration layer / tool implementation",
+      "The system prompt only",
+      "The tokenizer"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Since the model correctly identified and requested the right tool, the breakdown happened after that -- in the tool implementation or integration layer that returned malformed data. The model's reasoning, the system prompt, and the tokenizer are all upstream of that point and already worked correctly here."
+  },
+  {
+    "id": "ccdv-053",
+    "number": 53,
+    "domain": "eval-testing-debugging",
+    "type": "single",
+    "text": "When an application intermittently fails on structured-output parsing, a sound first debugging step is to:",
+    "options": [
+      "Immediately switch models",
+      "Log and inspect the raw model output to determine whether the model or the parser is at fault",
+      "Increase temperature",
+      "Delete the eval suite"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Before changing anything, you need to know which side of the boundary actually broke -- so logging and inspecting the raw model output is the first move that tells you whether the model or your parser is at fault. Switching models, raising temperature, or deleting the eval suite are all premature actions taken before you've even diagnosed the problem."
+  },
+  {
+    "id": "ccdv-054",
+    "number": 54,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "A token is best described as:",
+    "options": [
+      "A unit of text (roughly a word-piece) that models process; input and output are measured in tokens",
+      "A single character always",
+      "A dollar amount",
+      "An API key"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A token is the model's basic unit of text -- often a word-piece rather than a whole word or a single character -- and both what you send and what comes back are measured in them. It is not a dollar amount or an API key, though token counts do drive cost.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/token-counting",
+    "sourceLabel": "Claude Docs: Token Counting",
+    "sourceExcerpt": "Tokens are the fundamental units that Claude uses to process text.",
+    "sourceHighlight": "fundamental units that Claude uses to process text"
+  },
+  {
+    "id": "ccdv-055",
+    "number": 55,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "The context window is:",
+    "options": [
+      "The maximum number of tokens (input + output) the model can consider at once",
+      "The screen resolution",
+      "The number of API keys allowed",
+      "The batch size limit"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The context window is the ceiling on how many tokens -- input plus output combined -- the model can hold in view for a single request. Screen resolution, API-key counts, and batch size limits are entirely separate concepts.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "Context window: The maximum number of tokens that can be processed in a single request",
+    "sourceHighlight": "maximum number of tokens that can be processed in a single request"
+  },
+  {
+    "id": "ccdv-056",
+    "number": 56,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "Why is LLM output non-deterministic by default?",
+    "options": [
+      "Sampling introduces randomness in next-token selection (e.g., via temperature)",
+      "The API randomly drops requests",
+      "The model changes weights each call",
+      "Tokens are chosen alphabetically"
+    ],
+    "correctAnswer": 0,
+    "explanation": "By default the model samples from a probability distribution over possible next tokens, and that sampling step is where the randomness comes from -- temperature controls how much. The weights themselves don't change between calls, the API isn't dropping requests, and tokens are never picked alphabetically."
+  },
+  {
+    "id": "ccdv-057",
+    "number": 57,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "Setting temperature to 0 (or near 0) tends to:",
+    "options": [
+      "Make output more deterministic/focused",
+      "Increase creativity and randomness",
+      "Disable the model",
+      "Expand the context window"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A temperature near zero sharply narrows the sampling distribution toward the single most likely next token, which makes output far more deterministic and focused run to run. It doesn't increase randomness, disable the model, or change the size of the context window."
+  },
+  {
+    "id": "ccdv-058",
+    "number": 58,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "Which prompting technique provides the model with several worked examples before the task?",
+    "options": [
+      "Zero-shot",
+      "Single-shot",
+      "Multi-shot (few-shot)",
+      "Batch prompting"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Multi-shot (few-shot) prompting is defined by including several worked examples before asking the model to do the actual task, so it can pattern-match the desired format. Zero-shot gives none, single-shot gives exactly one, and batch prompting is an unrelated infrastructure concept, not a prompting technique.",
+    "sourceUrl": "https://docs.anthropic.com/en/docs/prompt-engineering",
+    "sourceLabel": "Claude Docs: Prompt Engineering",
+    "sourceExcerpt": "Multishot prompting... is giving Claude examples of what you want it to do",
+    "sourceHighlight": "giving Claude examples of what you want it to do"
+  },
+  {
+    "id": "ccdv-059",
+    "number": 59,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "For a high-volume, latency-sensitive classification task where cost matters and the task is relatively simple, which model tier is generally most appropriate?",
+    "options": [
+      "The Haiku tier (fastest, most cost-efficient)",
+      "The Opus tier for every request",
+      "No model; use regex only",
+      "Always the largest available model"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Haiku is purpose-built for exactly this profile: high volume, latency-sensitive, cost-conscious, and a task that doesn't demand deep reasoning. Reaching for Opus or the largest model on every request pays for capability the task doesn't need, and abandoning the model for pure regex throws away the actual classification quality Claude provides.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "Claude Haiku... the fastest, most cost-effective model for everyday use cases.",
+    "sourceHighlight": "fastest, most cost-effective model"
+  },
+  {
+    "id": "ccdv-060",
+    "number": 60,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "For the most complex reasoning tasks requiring maximum capability, which tier is generally chosen?",
+    "options": [
+      "Haiku",
+      "Sonnet",
+      "Opus",
+      "None"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Opus sits at the top of the model lineup specifically for the hardest, most demanding reasoning tasks where capability matters more than speed or cost. Haiku and Sonnet are positioned for lighter or more balanced workloads, and \"none\" isn't a real option when a task genuinely needs top-tier reasoning.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "Claude Opus... our most capable model for complex tasks",
+    "sourceHighlight": "most capable model for complex tasks"
+  },
+  {
+    "id": "ccdv-061",
+    "number": 61,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "The Sonnet tier is typically positioned as:",
+    "options": [
+      "A balance of capability, speed, and cost between Haiku and Opus",
+      "The slowest and most expensive",
+      "Incapable of tool use",
+      "Only for images"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Sonnet sits in the middle of the lineup by design -- more capable than Haiku, faster and cheaper than Opus -- making it the default balanced choice for most workloads. It isn't the slowest or most expensive option, and it supports tool use and text just like the other tiers, not only images.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "Claude Sonnet... balances intelligence and speed for high-throughput tasks",
+    "sourceHighlight": "balances intelligence and speed"
+  },
+  {
+    "id": "ccdv-062",
+    "number": 62,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "\"Adaptive thinking\" / effort levels allow a developer to:",
+    "options": [
+      "Tune how much reasoning effort the model spends, trading latency/cost against quality",
+      "Change the model’s training data",
+      "Remove the context window",
+      "Disable streaming"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Effort/thinking-level controls let you dial reasoning depth up or down for a given request, directly trading latency and cost against answer quality. None of this touches the model's training data, removes the context window, or disables streaming.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking",
+    "sourceLabel": "Claude Docs: Extended Thinking",
+    "sourceExcerpt": "budget_tokens... give Claude guidance on how many tokens it can use for its internal reasoning process",
+    "sourceHighlight": "how many tokens it can use for its internal reasoning"
+  },
+  {
+    "id": "ccdv-063",
+    "number": 63,
+    "domain": "model-selection",
+    "type": "multi",
+    "text": "Which techniques help manage token cost?",
+    "options": [
+      "Prompt caching for stable prefixes",
+      "Choosing a smaller model tier where quality allows",
+      "Pruning unnecessary context/tool output",
+      "Sending the entire document history on every call regardless of need"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Caching stable prefixes, right-sizing the model tier to the task, and pruning context that doesn't need to be there are all genuine, complementary ways to bring token cost down. Resending the entire document history on every call regardless of need does the opposite -- it's the behavior these techniques exist to avoid.",
+    "correctAnswers": [
+      0,
+      1,
+      2
+    ]
+  },
+  {
+    "id": "ccdv-064",
+    "number": 64,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "\"Cache check-pointing\" / prompt caching is most beneficial when:",
+    "options": [
+      "Each request has completely unique content",
+      "A large, identical prefix is reused across many requests",
+      "Requests are all very short and unique",
+      "You never repeat any content"
+    ],
+    "correctAnswer": 1,
+    "explanation": "Caching only pays off when there's something stable to actually cache -- a large prefix that's identical across many requests. If every request is short, unique, and never repeats content, there's nothing for the cache to reuse and no benefit to gain.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+    "sourceLabel": "Claude Docs: Prompt Caching",
+    "sourceExcerpt": "Cache hits... require that... the same prompt prefix... has been seen before, in the same order.",
+    "sourceHighlight": "the same prompt prefix... has been seen before"
+  },
+  {
+    "id": "ccdv-065",
+    "number": 65,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "A developer notices costs are high because a 50-page policy document is re-sent verbatim on every request. The best optimization is to:",
+    "options": [
+      "Enable prompt caching on the stable document prefix",
+      "Increase temperature",
+      "Switch to batch API only",
+      "Remove all instructions"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Since the document is large, stable, and repeated on every call, this is exactly the case prompt caching is designed for -- cache that prefix once and stop paying to reprocess it every time. Temperature, batch-only mode, and removing instructions don't address the actual cost driver, which is the repeated document.",
+    "sourceUrl": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+    "sourceLabel": "Claude Docs: Prompt Caching",
+    "sourceExcerpt": "reference text, such as a document... reduces both latency and costs by reusing previously processed content",
+    "sourceHighlight": "reduces both latency and costs"
+  },
+  {
+    "id": "ccdv-066",
+    "number": 66,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "A \"breaking behavior change across model releases\" means:",
+    "options": [
+      "A newer model may respond differently to the same prompt, potentially requiring prompt/eval updates",
+      "The API endpoint URL always changes",
+      "Old prompts are automatically migrated",
+      "Nothing ever changes between releases"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Model releases can genuinely shift how the same prompt is answered, which is exactly why prompts and evals sometimes need revisiting after an upgrade. The endpoint URL doesn't change because of this, prompts are never auto-migrated for you, and pretending nothing changes is the opposite of the real risk being described.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/models/overview",
+    "sourceLabel": "Claude Docs: Models Overview",
+    "sourceExcerpt": "Models can behave differently... we recommend thorough testing when upgrading between model versions.",
+    "sourceHighlight": "thorough testing when upgrading between model versions"
+  },
+  {
+    "id": "ccdv-067",
+    "number": 67,
+    "domain": "model-selection",
+    "type": "multi",
+    "text": "Which is a legitimate reason to not always pick the largest model?",
+    "options": [
+      "Larger models can cost more and add latency",
+      "A smaller model may meet quality requirements at lower cost",
+      "Larger models never follow instructions",
+      "Smaller models cannot use the API"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The real tradeoffs are cost and latency: bigger models cost more and respond slower, and often a smaller model already meets the quality bar at a fraction of the price. It's false that larger models never follow instructions, and smaller models can use the API exactly the same way larger ones do.",
+    "correctAnswers": [
+      0,
+      1
+    ]
+  },
+  {
+    "id": "ccdv-068",
+    "number": 68,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "An SDK that \"wraps a REST API\" means:",
+    "options": [
+      "The SDK provides language-native functions that internally make HTTP calls to the REST endpoints",
+      "The SDK replaces HTTP with websockets exclusively",
+      "The SDK is unrelated to the API",
+      "The SDK stores the model locally"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Wrapping means the SDK gives you idiomatic functions in your language, and under the hood those functions still make the same HTTP calls to the same REST endpoints. It doesn't swap HTTP for websockets exclusively, it's directly tied to the API it wraps, and it never stores the model itself locally."
+  },
+  {
+    "id": "ccdv-069",
+    "number": 69,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "Websockets are useful in some integrations because they:",
+    "options": [
+      "Provide a persistent, bidirectional connection suitable for real-time streaming interactions",
+      "Are the only way to call any API",
+      "Cannot carry text",
+      "Replace JSON entirely"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Websockets keep one connection open in both directions, which suits real-time, ongoing streaming interactions better than a fresh request per message. They are far from the only way to call an API, they carry text just fine, and they don't replace JSON as a payload format."
+  },
+  {
+    "id": "ccdv-070",
+    "number": 70,
+    "domain": "model-selection",
+    "type": "single",
+    "text": "To track token usage and model cost accurately, a developer should:",
+    "options": [
+      "Read the usage fields (input/output tokens) returned by the API and apply per-token pricing",
+      "Guess based on character count only",
+      "Ignore output tokens",
+      "Assume all requests cost the same"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The API's response includes actual input/output token counts, and multiplying those by the published per-token rates is the accurate way to track cost. Estimating from character count, ignoring output tokens, or assuming a flat cost per request all produce inaccurate numbers.",
+    "sourceUrl": "https://docs.claude.com/en/docs/about-claude/pricing",
+    "sourceLabel": "Claude Docs: Pricing",
+    "sourceExcerpt": "usage -- Billing units for each model... calculated based on the number of input and output tokens",
+    "sourceHighlight": "number of input and output tokens"
+  },
+  {
+    "id": "ccdv-071",
+    "number": 71,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "\"Context drift\" refers to:",
+    "options": [
+      "The model losing focus or accuracy as irrelevant or excessive context accumulates",
+      "The context window physically moving",
+      "A network latency issue",
+      "A billing anomaly"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Context drift describes a real, observed effect: as irrelevant or excessive material piles up in context, the model's focus and accuracy can degrade. It has nothing to do with the window physically relocating, network latency, or a billing issue.",
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "as the context grows... this can result in “context rot,” where model performance... becomes less reliable",
+    "sourceHighlight": "context rot"
+  },
+  {
+    "id": "ccdv-072",
+    "number": 72,
+    "domain": "prompt-context",
+    "type": "multi",
+    "text": "Which techniques help prevent context bloat in long agent runs?",
+    "options": [
+      "Pruning stale tool output",
+      "Compaction/summarization of prior history",
+      "Appending every raw tool result forever",
+      "Never removing anything from context"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Actively pruning stale tool output and periodically compacting/summarizing history are the concrete techniques that keep long-running context under control. Appending every raw result forever and never removing anything are the exact behaviors that cause the bloat in the first place.",
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "sourceUrl": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "sourceLabel": "Anthropic Engineering: Effective Context Engineering",
+    "sourceExcerpt": "Compaction: summarizing the contents... and reinitiating a new context window with the summary",
+    "sourceHighlight": "Compaction"
+  },
+  {
+    "id": "ccdv-073",
+    "number": 73,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Context isolation via subagents helps because:",
+    "options": [
+      "Each subagent works within a focused context, reducing interference from unrelated information",
+      "It removes the need for any prompt",
+      "It always lowers accuracy",
+      "It disables tool use"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Giving each subagent its own, narrower context keeps unrelated information from crowding in and interfering with its specific task. Subagents still need prompts and still use tools, and isolating context is meant to help accuracy, not hurt it.",
+    "sourceUrl": "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "sourceLabel": "Anthropic Engineering: Multi-Agent Research System",
+    "sourceExcerpt": "Each subagent... provides... its own context window, thereby avoiding contaminating the shared context",
+    "sourceHighlight": "avoiding contaminating the shared context"
+  },
+  {
+    "id": "ccdv-074",
+    "number": 74,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "A best practice for instruction clarity in prompts is to:",
+    "options": [
+      "Be specific, unambiguous, and state the desired format and constraints",
+      "Keep instructions as vague as possible",
+      "Rely on the model to guess intent",
+      "Use contradictory requirements"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Clear prompts spell out exactly what's wanted, in what format, and under what constraints, leaving as little as possible to interpretation. Vagueness, relying on the model to guess, or giving it contradictory requirements all invite inconsistent results.",
+    "sourceUrl": "https://docs.anthropic.com/en/docs/prompt-engineering",
+    "sourceLabel": "Claude Docs: Prompt Engineering",
+    "sourceExcerpt": "Be clear, direct, and detailed... Claude responds best to clear and direct instructions.",
+    "sourceHighlight": "clear and direct instructions"
+  },
+  {
+    "id": "ccdv-075",
+    "number": 75,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Few-shot examples in a prompt are most useful when:",
+    "options": [
+      "You want to demonstrate the exact format or style of desired output",
+      "You want the model to ignore format",
+      "You want more randomness",
+      "You never care about consistency"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Few-shot examples earn their place when you need the model to match a specific format or style, since a worked example communicates that far more precisely than a description could. They work against you if the goal is to ignore format, maximize randomness, or if consistency doesn't matter at all.",
+    "sourceUrl": "https://docs.anthropic.com/en/docs/prompt-engineering",
+    "sourceLabel": "Claude Docs: Prompt Engineering",
+    "sourceExcerpt": "Examples are... one of the most effective tools for getting Claude to behave as desired",
+    "sourceHighlight": "most effective tools for getting Claude to behave as desired"
+  },
+  {
+    "id": "ccdv-076",
+    "number": 76,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Placing durable, role-defining instructions in the system prompt rather than each user message is preferred because:",
+    "options": [
+      "It establishes consistent behavior/context that persists across turns",
+      "System prompts are ignored",
+      "User messages cannot contain instructions",
+      "It disables the model’s reasoning"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Putting stable, role-level guidance in the system prompt means it applies consistently across every turn without needing to be repeated. System prompts are not ignored, user messages absolutely can carry instructions too, and none of this affects the model's reasoning ability.",
+    "sourceUrl": "https://docs.anthropic.com/en/docs/system-prompts",
+    "sourceLabel": "Claude Docs: System Prompts",
+    "sourceExcerpt": "System prompts... set the stage for the conversation... establishing Claude’s role and behavior",
+    "sourceHighlight": "establishing Claude's role and behavior"
+  },
+  {
+    "id": "ccdv-077",
+    "number": 77,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "\"Output constraints\" in a prompt (e.g., \"respond only with valid JSON matching this schema\") help by:",
+    "options": [
+      "Making downstream parsing and validation more reliable",
+      "Increasing hallucination",
+      "Removing the need for validation entirely",
+      "Guaranteeing the model can never deviate"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Constraining the output shape makes whatever comes back easier to parse and validate downstream, since there's a known target format to check against. It doesn't increase hallucination, and constraints reduce -- but don't guarantee away -- the chance of deviation, so validation is still worth keeping."
+  },
+  {
+    "id": "ccdv-078",
+    "number": 78,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Iterative prompt refinement is the practice of:",
+    "options": [
+      "Testing a prompt, observing failures, and adjusting wording/examples/constraints repeatedly",
+      "Writing one prompt and never changing it",
+      "Randomizing the prompt each time",
+      "Copying prompts from unrelated tasks"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Iterative refinement is a feedback loop: try the prompt, see where it fails, adjust the wording or examples or constraints, and repeat. Writing one prompt and freezing it, randomizing it, or borrowing an unrelated task's prompt all skip the actual refinement step."
+  },
+  {
+    "id": "ccdv-079",
+    "number": 79,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Input sanitization in prompt engineering primarily guards against:",
+    "options": [
+      "Untrusted user input injecting unintended instructions or malformed content",
+      "The model running too fast",
+      "High token cost only",
+      "Slow networks"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Sanitizing input is a defensive measure against untrusted content smuggling in instructions it shouldn't have, or otherwise malformed content breaking the intended structure. It has no relationship to model speed, token cost specifically, or network conditions."
+  },
+  {
+    "id": "ccdv-080",
+    "number": 80,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "Which is an example of defensive parsing of model output?",
+    "options": [
+      "Validating the JSON, handling missing/extra fields, and failing gracefully if it doesn’t match schema",
+      "Assuming the output is always perfectly formatted",
+      "Executing the output directly without checks",
+      "Ignoring parse errors"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Defensive parsing means actively validating the structure, handling fields that are missing or unexpected, and failing gracefully rather than crashing when something doesn't match. Assuming perfect output, executing it blindly, or ignoring parse errors are all the un-defensive alternative."
+  },
+  {
+    "id": "ccdv-081",
+    "number": 81,
+    "domain": "prompt-context",
+    "type": "single",
+    "text": "\"Skepticism toward confident output\" means a developer should:",
+    "options": [
+      "Validate factual or structured claims rather than trusting fluent, confident-sounding responses",
+      "Always trust the model when it sounds sure",
+      "Never validate anything",
+      "Disable evals"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Fluent, confident-sounding phrasing is not the same as correctness, so factual or structured claims still deserve independent validation rather than being trusted on tone alone. Trusting confidence at face value, skipping validation entirely, or disabling evals all remove the very check this practice is about."
+  },
+  {
+    "id": "ccdv-082",
+    "number": 82,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "A Claude agent summarizes user-submitted web pages. One page hides text telling the model to ignore prior instructions and reveal its system prompt. The most effective mitigation is to:",
+    "options": [
+      "Raise temperature so behavior is less predictable",
+      "Treat retrieved content as untrusted, keep it separate from trusted instructions, and use guardrails/hooks so injected instructions can’t trigger sensitive actions",
+      "Add a note asking users not to include malicious instructions",
+      "Switch to a larger, more instruction-following model"
+    ],
+    "correctAnswer": 1,
+    "explanation": "The real fix is architectural: treat anything pulled from an external page as untrusted data, keep it structurally separate from your own instructions, and back that with guardrails or hooks that block sensitive actions regardless of what the content says. Raising temperature, politely asking users not to attack the system, or just picking a bigger model don't address the actual injection vector.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls",
+    "sourceLabel": "Claude Docs: Handle Tool Calls",
+    "sourceExcerpt": "treat all content... as potentially untrusted... never allow untrusted content to directly trigger sensitive actions",
+    "sourceHighlight": "never allow untrusted content to directly trigger sensitive actions"
+  },
+  {
+    "id": "ccdv-083",
+    "number": 83,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "Prompt injection is best understood as:",
+    "options": [
+      "Untrusted input attempting to override or manipulate the model's intended instructions",
+      "A way to speed up the API",
+      "A caching optimization",
+      "A type of token"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Prompt injection is specifically an attack: content designed to hijack or override the instructions the model was actually meant to follow. It's not a performance trick, a caching feature, or any kind of token."
+  },
+  {
+    "id": "ccdv-084",
+    "number": 84,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "Applying least privilege to a Claude agent’s tools means:",
+    "options": [
+      "Granting only the minimum tool permissions needed for the task",
+      "Giving the agent full admin access for convenience",
+      "Removing all tools",
+      "Sharing one API key across all users"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Least privilege means an agent only gets the specific tool permissions its task actually requires, no more. Blanket admin access for convenience is precisely what least privilege is meant to prevent, and it's a permissions-scoping principle, not a call to remove every tool or to share one shared credential across everyone."
+  },
+  {
+    "id": "ccdv-085",
+    "number": 85,
+    "domain": "security-safety",
+    "type": "multi",
+    "text": "Which practices reduce data leakage / protect PII in a Claude application?",
+    "options": [
+      "Redacting or minimizing PII before sending to the model when not required",
+      "Logging full raw prompts including secrets to a public location",
+      "Scoping and controlling what untrusted content can access",
+      "Embedding API keys in client-side code"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Minimizing/redacting PII before it ever reaches the model, and tightly scoping what untrusted content is allowed to access, both genuinely reduce exposure. Logging raw secrets somewhere public and embedding API keys in client-side code are themselves data-leakage risks, not mitigations.",
+    "correctAnswers": [
+      0,
+      2
+    ]
+  },
+  {
+    "id": "ccdv-086",
+    "number": 86,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "Where should API keys and secrets be stored?",
+    "options": [
+      "In environment variables or a secrets manager, never hard-coded in source or client code",
+      "In the system prompt",
+      "In a public Git repository",
+      "In the model’s context window on every call"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Secrets belong in environment variables or a dedicated secrets manager, kept out of source code and client-side bundles entirely. Putting them in a system prompt, a public repo, or the model's context window all expose them to parties who should never see them."
+  },
+  {
+    "id": "ccdv-087",
+    "number": 87,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "Hooks contribute to safety by:",
+    "options": [
+      "Intercepting actions (e.g., before a destructive tool call) to enforce checks or block them",
+      "Increasing randomness",
+      "Removing authentication",
+      "Disabling logging"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Hooks can sit right before a sensitive action -- like a destructive tool call -- and enforce a check or block it outright, deterministically. They don't add randomness, remove authentication, or disable logging; if anything they support the opposite of all three.",
+    "sourceUrl": "https://code.claude.com/docs/en/hooks-guide",
+    "sourceLabel": "Claude Code Docs: Hooks Guide",
+    "sourceExcerpt": "PreToolUse hooks run after Claude creates tool parameters and before processing the tool call... can... block the call",
+    "sourceHighlight": "block the call"
+  },
+  {
+    "id": "ccdv-088",
+    "number": 88,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "\"Guardrail layering\" refers to:",
+    "options": [
+      "Combining multiple defensive controls (input filtering, output checks, permission limits) rather than relying on one",
+      "Using exactly one control",
+      "Turning off all controls in production",
+      "A UI theme"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Layering guardrails means stacking several independent defenses -- input filtering, output checks, permission limits -- so a single failure doesn't leave the system unprotected. It's the opposite of relying on one control, and it certainly isn't a matter of turning controls off or a cosmetic UI choice."
+  },
+  {
+    "id": "ccdv-089",
+    "number": 89,
+    "domain": "security-safety",
+    "type": "single",
+    "text": "Which is a sound identity/access practice for a production Claude system?",
+    "options": [
+      "Validate identity, verify authorization level before privileged actions, and monitor authorized access",
+      "Allow anonymous access to all tools",
+      "Share a single credential with no auditing",
+      "Disable authentication to reduce latency"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Solid production practice checks who's asking, confirms they're actually authorized for a privileged action before it happens, and keeps monitoring that access afterward. Anonymous access to everything, one shared unaudited credential, or disabling authentication outright each remove the very controls this question is asking about."
+  },
+  {
+    "id": "ccdv-090",
+    "number": 90,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "A team needs Claude to call an internal inventory REST API, reusable across several apps and maintained independently. Best approach?",
+    "options": [
+      "Hard-code the inventory logic into each app's system prompt",
+      "Build an MCP server exposing inventory operations as tools that multiple apps can connect to",
+      "Paste current inventory data into the context on every request",
+      "Rely on a built-in tool, since built-in tools reach any internal API"
+    ],
+    "correctAnswer": 1,
+    "explanation": "An MCP server is exactly the right shape for this: it exposes the inventory operations once, as tools, and any number of apps can connect to that same server independently. Hard-coding logic per app or pasting a live data dump into every request duplicates effort and goes stale immediately, and built-in tools have no special reach into a company's private internal API.",
+    "sourceUrl": "https://modelcontextprotocol.io/introduction",
+    "sourceLabel": "Model Context Protocol: Introduction",
+    "sourceExcerpt": "MCP is an open protocol that standardizes how applications provide context to LLMs... connect once, and interact with many servers.",
+    "sourceHighlight": "connect once, and interact with many servers"
+  },
+  {
+    "id": "ccdv-091",
+    "number": 91,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "In tool use / function calling, the tool description and input schema matter because:",
+    "options": [
+      "They tell the model when and how to call the tool, so clear descriptions improve correct invocation",
+      "They are ignored by the model",
+      "They set the model’s temperature",
+      "They store the API key"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The description and schema are the model's only guide to when a tool is relevant and exactly what arguments it needs -- vague ones lead directly to wrong or missed tool calls. They're read and used by the model, not ignored, and they have nothing to do with temperature or storing credentials.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+    "sourceLabel": "Claude Docs: Define Tools",
+    "sourceExcerpt": "Provide extremely detailed descriptions. This is by far the most important factor in tool performance.",
+    "sourceHighlight": "most important factor in tool performance"
+  },
+  {
+    "id": "ccdv-092",
+    "number": 92,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "Which is the correct high-level flow of function calling with Claude?",
+    "options": [
+      "The model emits a tool-use request, the application executes the tool, and the result is returned to the model to continue",
+      "The model executes the tool itself on Anthropic’s servers automatically for custom tools",
+      "Tools run before the model sees the prompt",
+      "The application must never return tool results"
+    ],
+    "correctAnswer": 0,
+    "explanation": "For a custom tool, the model only ever emits a request to use it -- the calling application is the one that actually executes it and sends the result back so the model can continue. Anthropic's servers don't run your custom tool code for you, tools don't run before the model even sees the prompt, and returning the result back is a required step, not a forbidden one.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use",
+    "sourceLabel": "Claude Docs: Implement Tool Use",
+    "sourceExcerpt": "Claude may then construct and use a formatted tool call... Your application should then extract the tool input, run the actual tool... and return the result",
+    "sourceHighlight": "run the actual tool code... and return the result"
+  },
+  {
+    "id": "ccdv-093",
+    "number": 93,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "A \"client-side tool\" versus a \"server-side/built-in tool\" differs in that:",
+    "options": [
+      "Client-side (custom) tools are executed by the developer's application code; built-in tools are executed within Anthropic's platform",
+      "They are identical",
+      "Client-side tools cannot return data",
+      "Built-in tools require an MCP server"
+    ],
+    "correctAnswer": 0,
+    "explanation": "The split is about who runs the code: a custom (client-side) tool executes in the developer's own application, while a built-in tool runs inside Anthropic's platform itself. They are not interchangeable, custom tools return data just like built-in ones, and built-in tools don't require an MCP server to function.",
+    "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+    "sourceLabel": "Claude Docs: Tool Use Overview",
+    "sourceExcerpt": "Client tools... are executed on the client side... Server tools... execute on Anthropic’s servers",
+    "sourceHighlight": "executed on the client side... execute on Anthropic’s servers"
+  },
+  {
+    "id": "ccdv-094",
+    "number": 94,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "An \"approval pattern\" for tools is used when:",
+    "options": [
+      "A tool action is sensitive or destructive and should require human confirmation before executing",
+      "You want to skip all checks",
+      "The tool is read-only and harmless",
+      "You want to disable the model"
+    ],
+    "correctAnswer": 0,
+    "explanation": "An approval pattern inserts a human-in-the-loop checkpoint specifically for actions sensitive or destructive enough to warrant a second look before they execute. It's the opposite of skipping checks, it's typically unnecessary for a harmless read-only tool, and it has nothing to do with disabling the model."
+  },
+  {
+    "id": "ccdv-095",
+    "number": 95,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "MCP (Model Context Protocol) is best described as:",
+    "options": [
+      "An open protocol standardizing how applications expose tools, resources, and prompts to models",
+      "A proprietary billing system",
+      "A model architecture",
+      "A prompt template language"
+    ],
+    "correctAnswer": 0,
+    "explanation": "MCP is an open, shared protocol for exposing tools, resources, and prompts to a model in a standardized way, regardless of which application or model is on either end. It is not a billing system, a model architecture, or a templating language.",
+    "sourceUrl": "https://modelcontextprotocol.io/introduction",
+    "sourceLabel": "Model Context Protocol: Introduction",
+    "sourceExcerpt": "MCP is an open protocol that standardizes how applications provide context to LLMs.",
+    "sourceHighlight": "open protocol that standardizes how applications provide context"
+  },
+  {
+    "id": "ccdv-096",
+    "number": 96,
+    "domain": "tools-mcps",
+    "type": "multi",
+    "text": "MCP servers commonly communicate with clients over:",
+    "options": [
+      "stdio (standard input/output)",
+      "Sockets / network transports",
+      "Fax",
+      "Physical mail"
+    ],
+    "correctAnswer": 0,
+    "explanation": "MCP defines transports over stdio for local processes and over network sockets (like HTTP-based transports) for remote servers -- both are real, documented options. Fax and physical mail are obviously not data transports of any kind.",
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "sourceUrl": "https://modelcontextprotocol.io/introduction",
+    "sourceLabel": "Model Context Protocol: Introduction",
+    "sourceExcerpt": "MCP servers can... run locally... communicating via stdio, or run remotely, communicating via HTTP",
+    "sourceHighlight": "via stdio... via HTTP"
+  },
+  {
+    "id": "ccdv-097",
+    "number": 97,
+    "domain": "tools-mcps",
+    "type": "multi",
+    "text": "Besides tools, MCP servers can expose:",
+    "options": [
+      "Resources",
+      "Prompts",
+      "GPU firmware",
+      "Billing invoices"
+    ],
+    "correctAnswer": 0,
+    "explanation": "MCP's specification covers three primitives an MCP server can offer: tools, resources, and prompts. GPU firmware and billing invoices are not part of the protocol in any form.",
+    "correctAnswers": [
+      0,
+      1
+    ],
+    "sourceUrl": "https://modelcontextprotocol.io/introduction",
+    "sourceLabel": "Model Context Protocol: Introduction",
+    "sourceExcerpt": "Resources... Prompts... Tools -- the core primitives that MCP servers can expose",
+    "sourceHighlight": "core primitives that MCP servers can expose"
+  },
+  {
+    "id": "ccdv-098",
+    "number": 98,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "When should a Skill be preferred over building a full MCP server?",
+    "options": [
+      "When you want to package reusable instructions/knowledge/procedures for the model without standing up an external server",
+      "When you need a live external system connection maintained independently",
+      "Never; MCP is always better",
+      "When you want to disable tools"
+    ],
+    "correctAnswer": 0,
+    "explanation": "A Skill is the right choice when what you actually need is packaged, reusable know-how or procedure -- no external server required. Reaching for MCP makes more sense when you need a genuinely live, independently-maintained connection to an external system, and neither tool is universally \"always better\" than the other.",
+    "sourceUrl": "https://code.claude.com/docs/en/skills",
+    "sourceLabel": "Claude Code Docs: Skills",
+    "sourceExcerpt": "Skills package procedural knowledge... without requiring a running server, unlike MCP.",
+    "sourceHighlight": "without requiring a running server"
+  },
+  {
+    "id": "ccdv-099",
+    "number": 99,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "A developer needs Claude to access a capability Anthropic already provides natively (e.g., a built-in tool). Choosing the built-in tool over a custom tool is best when:",
+    "options": [
+      "The built-in tool already meets the need, reducing implementation and maintenance effort",
+      "You want maximum custom code for its own sake",
+      "Built-in tools are always insufficient",
+      "You must avoid all Anthropic features"
+    ],
+    "correctAnswer": 0,
+    "explanation": "If a built-in tool already does what's needed, using it saves you from building and then maintaining a custom equivalent for no real benefit. Writing custom code for its own sake, assuming built-ins are always insufficient, or deliberately avoiding Anthropic's own features are all reasons not grounded in the actual requirement."
+  },
+  {
+    "id": "ccdv-100",
+    "number": 100,
+    "domain": "tools-mcps",
+    "type": "single",
+    "text": "A team is deciding among built-in tools, custom tools, Skills, and MCPs. The best general principle is to:",
+    "options": [
+      "Match the mechanism to the use case—built-in for provided capabilities, custom tools for app-specific logic, Skills for packaged know-how, MCPs for reusable/independently-maintained external integrations",
+      "Always use MCPs for everything",
+      "Always hard-code logic in prompts",
+      "Always use the largest tool set possible regardless of need"
+    ],
+    "correctAnswer": 0,
+    "explanation": "Each mechanism fits a different need: built-in tools for capabilities Anthropic already provides, custom tools for logic specific to your app, Skills for packaged know-how, and MCP for reusable integrations maintained as their own service. Defaulting to MCP for everything, hard-coding logic into prompts, or maximizing the tool set regardless of fit all ignore that these mechanisms solve different problems."
+  }
+]

@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { source: '/advanced/:path*', destination: '/advanced-ccaf/:path*', permanent: true },
       { source: '/professional', destination: '/professional-ccarp', permanent: true },
       { source: '/professional/:path*', destination: '/professional-ccarp/:path*', permanent: true },
+      { source: '/developer', destination: '/developer-ccdv', permanent: true },
+      { source: '/developer/:path*', destination: '/developer-ccdv/:path*', permanent: true },
     ];
   },
 };
