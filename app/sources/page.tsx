@@ -154,7 +154,7 @@ export default function SourcesPage() {
 
           <Box>
             <Heading as="h3" size="lg" fontWeight={700} color="brand.700" mb={5}>
-              ⭐ Featured — Top Recommended Sources
+              ⭐ Certified Passer Recommendation
             </Heading>
             <SimpleGrid columns={[1, 1, 2]} gap={6}>
               {FEATURED_LINKS.map((source, idx) => (

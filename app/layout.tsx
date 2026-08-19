@@ -8,8 +8,8 @@ import './globals.css';
 const cert = getActiveCertification();
 
 export const metadata: Metadata = {
-  title: `${cert.shortName} Exam Platform | ${cert.fullName}`,
-  description: cert.description,
+  title: `Claude Certified Exams Reviewer | ${cert.shortName}, Advanced & Professional Practice`,
+  description: `Practice exam platform covering the full Claude Certified Architect track -- Foundations, Advanced, and Professional levels.`,
 };
 
 export default function RootLayout({
