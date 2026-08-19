@@ -13,9 +13,6 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { getActiveCertification } from '@/lib/certifications';
-
-const cert = getActiveCertification();
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -130,7 +127,7 @@ export function ModeSelector({ onStart }: ModeSelectorProps) {
                   Claude you Ace?
                 </Heading>
                 <Text color="gray.600" fontSize="lg" lineHeight="tall">
-                  Select your practice mode below to begin studying for the {cert.fullName} exam.
+                  Select your practice mode below to begin studying with the Claude Certified Exams Reviewer.
                 </Text>
               </Box>
             </motion.div>
