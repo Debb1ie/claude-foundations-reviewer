@@ -88,10 +88,85 @@ export default function OverviewPage() {
             <motion.div variants={itemVariants}>
               <Box textAlign="center" maxW="2xl" mx="auto">
                 <Heading as="h1" size="2xl" fontWeight={800} color="brand.700" mb={4} letterSpacing="tight">
-                  About the Exam
+                  About the Exams
                 </Heading>
                 <Text color="gray.600" fontSize="lg" lineHeight="tall">
-                  With Claude Certified Foundations exam, you can validate your expertise in building production-grade agentic systems with Claude Code, the Claude Agent SDK, and Model Context Protocol (MCP).
+                  The Claude Certified Exams Reviewer covers four practice tracks -- Foundations, Advanced, Developer, and Professional -- so you can validate your expertise in building production-grade agentic systems with Claude Code, the Claude Agent SDK, and Model Context Protocol (MCP), whichever certification you&apos;re working toward.
+                </Text>
+              </Box>
+            </motion.div>
+
+            {/* Four Practice Tracks -- at-a-glance comparison across the whole site */}
+            <motion.div variants={itemVariants}>
+              <Box textAlign="center" mb={6}>
+                <Heading as="h2" size="xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
+                  Four Practice Tracks
+                </Heading>
+                <Text color="gray.600" fontSize="md" maxW="2xl" mx="auto">
+                  Each track has its own question bank, format, and pacing -- pick the one that matches the certification you&apos;re preparing for.
+                </Text>
+              </Box>
+              <SimpleGrid columns={[1, 2, 4]} gap={4}>
+                {[
+                  {
+                    title: 'Exam Mode',
+                    sub: 'Foundations (CCA-F)',
+                    stats: ['60 questions', '~2h timer', 'Single-select', '5 domains'],
+                    color: '#7C6EFA',
+                  },
+                  {
+                    title: 'Advanced Practice',
+                    sub: 'CCAF',
+                    stats: ['60 questions', '~2h timer', 'Harder 2x/3x tier', '5 domains'],
+                    color: '#FA8C6E',
+                  },
+                  {
+                    title: 'Developer Practice',
+                    sub: 'CCDV-F',
+                    stats: ['53 of 100 questions', '~66 min timer', 'Select-two & -three', '8 domains'],
+                    color: '#D6409F',
+                  },
+                  {
+                    title: 'Professional Mode',
+                    sub: 'CCARP',
+                    stats: ['63 of 100 questions', '~79 min timer', 'Multi-select & matching', '5 domains'],
+                    color: '#C89A3F',
+                  },
+                ].map((track) => (
+                  <Box
+                    key={track.title}
+                    bg="rgba(255, 255, 255, 0.45)"
+                    backdropFilter="blur(12px)"
+                    _dark={{ bg: 'rgba(35, 33, 32, 0.45)', borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                    borderRadius="xl"
+                    border="2px solid"
+                    borderColor="rgba(255, 255, 255, 0.35)"
+                    p={4}
+                    boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.03)"
+                  >
+                    <Box w="10px" h="10px" borderRadius="sm" bg={track.color} mb={3} />
+                    <Heading as="h3" size="sm" fontWeight={700} color="brand.700" mb={0.5}>{track.title}</Heading>
+                    <Text fontSize="2xs" color="gray.500" fontFamily="mono" fontWeight={700} mb={3}>{track.sub}</Text>
+                    <VStack align="stretch" gap={1.5}>
+                      {track.stats.map((s) => (
+                        <HStack key={s} gap={2}>
+                          <Box w="4px" h="4px" borderRadius="full" bg={track.color} flexShrink={0} />
+                          <Text fontSize="xs" color="gray.600" fontWeight={500}>{s}</Text>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  </Box>
+                ))}
+              </SimpleGrid>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Box textAlign="center" mb={2}>
+                <Text fontSize="xs" fontWeight={700} color="gray.500" fontFamily="mono" letterSpacing="0.06em" textTransform="uppercase">
+                  Deep Dive -- Foundations Exam (CCA-F)
+                </Text>
+                <Text fontSize="xs" color="gray.500" mt={1} maxW="2xl" mx="auto">
+                  The format, domain weights, and prep plan below describe the standard Foundations exam specifically -- Advanced, Developer, and Professional each have their own format shown above and on their own practice screens.
                 </Text>
               </Box>
             </motion.div>
@@ -127,7 +202,7 @@ export default function OverviewPage() {
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     </Box>
-                    <Heading as="h2" size="md" fontWeight={700} color="brand.700">Exam Format</Heading>
+                    <Heading as="h2" size="md" fontWeight={700} color="brand.700">Foundations Exam Format</Heading>
                   </HStack>
                   <VStack align="stretch" gap={4} pl={1}>
                     <HStack gap={4}>
@@ -192,7 +267,7 @@ export default function OverviewPage() {
               <Box>
                 <Box textAlign="center" mb={6}>
                   <Heading as="h2" size="xl" fontWeight={800} color="brand.700" mb={3} letterSpacing="tight">
-                    Knowledge Domains
+                    Foundations Exam Domains
                   </Heading>
                 </Box>
                 <Box

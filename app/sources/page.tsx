@@ -148,7 +148,7 @@ export default function SourcesPage() {
               Study Resources
             </Heading>
             <Text color="gray.600" fontSize="lg" lineHeight="tall">
-              A curated collection of official documentation, guides, and courses to help you prepare for the {cert.fullName} exam.
+              A curated collection of official documentation, guides, and courses to help you prepare with the Claude Certified Exams Reviewer.
             </Text>
           </Box>
 
